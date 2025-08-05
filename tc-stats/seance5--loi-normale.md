@@ -5,6 +5,21 @@ Reprendre fichier `tips.csv` :
 - [Format Excel](tips.xlsx)
 - [Format Libre Office](tips.ods)
 
+<!--
+Idées de choses à faire ici :
+- Prendre une des colonnes
+- Calculer la moyenne et l'écart-type
+- TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
+
+- Générer les quantiles de la loi Normale avec cette moyenne et cette écart-type de 0.01 à 0.99, par pas de 0.01
+- Faire un graphique des deux (et si on y arrive, ajouter la droite) : QQ-plot
+- Analyse sur la normalité ou non de la variable
+
+
+- Faire de même sur une autre colonne
+-->
+
+<!-- OLD VERSION
 ## 1ère étape :
 
 - Calculer moyenne et écart-type de total_bill (colonne `A:A`) dans les cellules `M2` et `M3` (par exemple)
@@ -83,3 +98,4 @@ On peut donc obtenir les bornes de l'intervalle comprenant 95% des données d'or
 - Calculer les bornes de l'intervalle comprenant 95% des valeurs de la colonne `tip` (`B`) 
   - Regarder la répartition des valeurs dans cet intervalle et en-dehors
 - Faire de même pour la variable `size`. Est-ce pertinent ?
+-->
