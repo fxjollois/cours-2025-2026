@@ -1,0 +1,396 @@
+---
+title: "Statistique inférentielle - TD 1"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Données `tips`
+
+Dans cette séance, nous allons utiliser les données [`tips`](https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/tips.csv), contenant des informations recueillies par un serveur pendant son travail. Les voici présentées ci-dessous (les 6 premières lignes).
+
+```{r donnees, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(DT)
+tips = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/tips.csv")
+datatable(tips)
+```
+
+## Test de normalité
+
+Lorsqu'on réalise une description des variables quantitatives, une des questions à se poser est la *normalité* de la variable. Dans le cas de données, puisque c'est la variable d'intérêt, on peut se poser la question suivante :
+
+> La variable `total_bill` suit-elle une loi normale ?
+
+### Visuellement
+
+Premier graphique à créer, l'histogramme permet d'avoir un premier élément de réponse.
+
+> La distribution semble unimodale (un seul *pic*-- en diminuant le nombre d'intervalles) mais pas totale symétrique.
+
+```{r hist}
+ggplot(tips, aes(total_bill)) +
+  geom_histogram()
+```
+
+```{r hist2}
+ggplot(tips, aes(total_bill)) +
+  geom_histogram(bins = 15)
+```
+
+Pour avoir une meilleure estimation de la distribution de la variable, il est d'usage de représenter une estimation par noyau de la densité, comme ci-dessous. L'intérêt est que cette représentation est moins sensible qu'un histogramme, dont l'allure peut changer en fonction du nombre d'intervalles choisi.
+
+> On fait la même observation que ci-dessus.
+
+```{r density}
+ggplot(tips, aes(total_bill)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15, fill = "lightgray") +
+  geom_density()
+```
+
+Mais le meilleur moyen est de réaliser ce qu'on appelle un **Q-Q plot**. Ce graphique présente les valeurs observées (en $Y$) pour les quantiles, versus les valeurs théoriques d'une loi Normale. Si les points suivent la droite, il y a normalité, sinon, on s'en éloigne. 
+
+> On remarque que la variable `total_bill` ne suit pas la droite.
+
+```{r qqplot}
+ggplot(tips, aes(sample = total_bill)) +
+  stat_qq() +     # représentation des quantiles observés
+  stat_qq_line()  # affichage de la droite, représentant la "normalité"
+```
+
+### Via un test statistique - Test de *Shapiro-Wilk*
+
+La question peut se résoudre formellement à l'aide d'un *test statistique*, ici le **test de Shapiro-Wilk**. Celui-ci oppose deux hypothèses :
+
+- **$[H_0]$** : la variable suit une loi Normale (on parle d'*hypothèse nulle*)
+- **$[H_1]$** : la variable ne suit pas une loi Normale (*hypothèse alternative*) 
+
+Pour tous les tests que nous verrons par la suite, le fonctionnement d'un test est le suivant :
+
+1. La fonction utilisée (ici `shapiro.test()`) calculera la probabilité d'être dans l'hypothèse $H_0$ au vu de ce qui est observé. Cette probabilité, $p(H_0)$, est appelé *p-value* ;
+1. On compare cette valeur avec un seuil défini en amont, très souvent 5%, mais potentiellement plus (parfois 10%) ou moins (parfois 1%, voire 1‰) ;
+1. La décision sera la suivante, selon le résultat de la comparaison :
+  - Si la *p-value* est inférieure au seuil choisi, on conclue que, la situation observée ayant peu de chances de l'être au vu de notre hypothèse $H_0$, celle-ci est fausse (on dit qu'elle est *rejetée*);
+  - Si la *p-value* est supérieure, on ne peut rejetter l'hypothèse nulle.
+
+Voici donc son utilisation sur le montant total de la facture.
+
+> On en conlue que la variable ne suit pas une loi normale (la *p-value* étant largement inférieure à 0.001).
+
+```{r shapiro}
+shapiro.test(tips$total_bill)
+```
+
+### EXERCICE A FAIRE
+
+Tester la normalité de la variable `tip`, en produisant les graphiques nécessaires.
+
+## Test de comparaison sur variable quantitative
+
+Dans la suite, nous allons voir deux cas spécifiques de comparaison, pour lesquels le test utilisé est le même :
+
+- Comparaison d'un ensemble de valeurs à une valeur spécifique ;
+- Comparaison de deux ensembles de valeurs entre elle.
+
+Dans ces deux cas, deux tests seront possibles :
+
+- **Test de Students** (nommé aussi $t$-test) : test dit paramétrique, avec comme hypothèse que la ou les variables suivent une loi Normale (fonction `t.test()`);
+- **Test de Wilcoxon** (nommé aussi de *Mann-Whitney* dans le deuxième cas) : test dit non-paramétrique, car ne posant aucune hypothèse sur les variables (fonction `wilcox.test()`)
+  - on parle aussi de test des rangs.
+  
+L'usage de l'un ou l'autre test dépend donc de la normalité des variables. Cependant, le Théorème Central Limite (*TCL*, qui affine la loi des grands nombres) permet de justifier l'usage du premier dès que $n$ est grand.
+
+### A une valeur spécifique
+
+Ce cas est utilisée dès qu'on a une idée de la moyenne que doit prendre la variable. Par exemple, cela peut être utile lorsqu'on souhaite vérifier qu'un échantillon est représentatif par exemple. 
+
+Imaginons que notre serveur pense que le montant total est de 18$ en moyenne (parce qu'on lui a dit cela par exemple). Nous allons utiliser les deux tests pour se décider. Dans les deux fonctions, les hypothèses par défaut sont les suivantes :
+
+- **$[H_0]$** : la variable a une espérance de 0
+- **$[H_1]$** : la variable a une espérance différente de 0
+
+Il est possible de définir deux éléments :
+
+- la valeur de référence (par défaut égal à 0), avec le paramètre `mu` ;
+- l'hypothèse alternative avec le paramètre `alternative` :
+  - *des deux cotés* (valeur par défaut -- `"two-sided"`) $\rightarrow$ on teste juste la différence ;
+  - *plus faible* (valeur `"less"`) $\rightarrow$ valeur observée inférieure à la référence ;
+  - *plus élevée* (valeur `"greater"`) $\rightarrow$ valeur observée supérieure à la référence.
+
+> Si l'on suit le résultat fourni par le $t$-test, avec un risque d'erreur à 5%, nous conluons que le montant moyen est différent de 18. Alors qu'avec le test de Wilcoxon, nous ne pouvons pas rejeter l'hypothèse nulle, et donc concluons qu'il n'y a pas de différence.
+
+```{r ttest_1}
+t.test(tips$total_bill, mu = 18)
+```
+
+```{r wtest_1}
+wilcox.test(tips$total_bill, mu = 18)
+```
+
+> Si l'on change l'hypothèse alternative, en cherchant à savoir si la valeur est supérieure à 18, comme le laisse penser la moyenne calculée, nous obtenons les conclusions suivantes :
+
+- Le $t$-test nous indique que nous rejetons l'hypothèse nulle et donc la moyenne est bien supérieure à 18, avec un seuil de 5% (voire même de 1%) ;
+- Si on prend un seuil de 10%, le test de Wilcoxon permet de conclure que la moyenne est supérieure à 18 aussi.
+
+
+```{r ttest_1greater}
+t.test(tips$total_bill, mu = 18, alternative = "greater")
+```
+
+```{r wtest_1greater}
+wilcox.test(tips$total_bill, mu = 18, alternative = "greater")
+```
+
+### Comparaison de deux ensembles
+
+Ce cas est intéressant quand on a deux échantillons de à comparer (deux études, deux groupes de personnes...). Dans notre cas, on peut se demander si le montant payé est le même selon que ce soit un homme ou une femme qui paie l'addition.
+
+Ici, les hypothèses seront les suivantes :
+
+- **$[H_0]$** : les deux échantillons ont la même espérance ;
+- **$[H_1]$** : les deux échantillons ont une espérance différente.
+
+Comme précédemment, il est possible de changer l'hypothèse alternative pour chercher si le deuxième échantillon a une valeur plus petite ou plus grande que le premier.
+
+La première étape à faire est de comparer numériquement et visuellement les deux distributions. Cela peut se faire soit via des histogrammes, soit via des estimation de densités, soit via des boîtes à moustaches.
+
+> Nous remarquons que les montants payés lorsque c'est un homme sont plus élevés que lorsque c'est une femme qui règle l'addition.
+
+```{r comp_mean}
+tips %>%
+  group_by(sex) %>%
+  summarise(Moyenne = mean(total_bill))
+```
+
+```{r comp_hist}
+ggplot(tips, aes(x = total_bill, fill = sex)) +
+  geom_histogram(bins = 15) +
+  facet_wrap(~ sex, ncol = 1)
+```
+
+```{r comp_dens}
+ggplot(tips, aes(x = total_bill, col = sex)) +
+  geom_density()
+```
+
+```{r comp_box}
+ggplot(tips, aes(x = total_bill, fill = sex)) +
+  geom_boxplot()
+```
+
+Pour réaliser les tests, nous utilisons donc les mêmes fonctions, avec une notation spécifique, de type `formulae`, qui permet de bien comprendre ce qu'on cherche à tester.
+
+> Dans les deux tests, la conclusion sera la même : avec un seuil d'erreur 5%, nous conluons que les montants payés par les hommes sont plus élevés que ceux payés par les femmes.
+
+```{r ttest_2}
+t.test(data = tips, total_bill ~ sex)
+```
+
+```{r wtest_2}
+wilcox.test(data = tips, total_bill ~ sex)
+```
+
+### EXERCICE A FAIRE
+
+Tester les hypothèses suivantes (avec les graphiques pour justifier) :
+
+- le pourboire donné (`tip`) est le même selon le sexe du payeur ;
+- le montant total est le même qu'il y est des fumeurs à table ou non (`smoker`) ;
+- le pourboire est le même quelque soit le moment de la journée (`time`).
+
+## Test de comparaison sur variable(s) qualitative(s)
+
+Ici, nous verrons comment répondre à deux comparaisons, en utilisant la même fonction `chisq.test()` pour réaliser un **test du $\chi^2$** :
+
+- Comparaison de la distribution d'une variable qualitative par rapport à une distribution de référence ;
+- Lien entre deux variables qualitatives.
+
+### Comparaison d'une distribution
+
+Dans ce cadre, nous cherchons à savoir si les modalités d'une variable sont distribuées de façon spécifique, par rapport à une référence. Par défaut, on cherche à savoir s'il y a équi-probabilité (toutes les modalités ayant la même probabilité d'apparition). Sinon, avec le paramètre `p`, nous pouvons définir une répartition connue (par exemple en cas de questionnement sur la représentativité). On peut chercher à savoir s'il y a autant d'hommes que de femmes qui règlent l'addition. 
+
+Dans ce cas, les hypothèses sont les suivantes 
+
+- **$[H_0]$** : la variable suit une distribution équi-probable entre les modalités ;
+- **$[H_1]$** : il n'y a pas équi-probabilité entre les modalités.
+
+Comme d'habitude, nous devons déjà représenter la distribution, via un tableau et un diagramme en barres par exemple.
+
+> On remarque un fort déséquilibre entre les deux sexes.
+
+```{r comp_table}
+t = table(tips$sex)
+t
+```
+
+```{r comp_ptable}
+prop.table(t)
+```
+
+
+```{r comp_bar}
+ggplot(tips, aes(y = sex, fill = sex)) +
+  geom_bar()
+```
+
+> Avec un seuil de 5%, il est très clair qu'il n'y a pas équi-probabilité des deux sexes.
+
+```{r comp_chi}
+chisq.test(t)
+```
+
+Comme précédemment, on peut vouloir comparer à une répartition de référence, comme par exemple 30% de femmes et 70% d'hommes. Les probabilités de référence s'écrivent dans l'ordre alphabétique des modalités (ici, `Female`, puis `Male`).
+
+> Au seuil de 5%, nous ne conluons pas à une différence entre ce qui est observé et ce qui est prévu (notre 30%/70%).
+
+```{r comp_chi_p}
+chisq.test(t, p = c(.3, .7))
+```
+
+### Lien entre variables qualitatives
+
+Dans ce cadre, nous souhaitons savoir si deux variables qualitatives sont liées. Pour cela, nous comparons la table de contingence (croisement des modalités des deux variables) observée à celle estimée s'il y avait indépendance entre les variables. Nous pouvons nous demander ici s'il y a un lien entre l'heure du repas et le sexe de la personne qui a payé.
+
+Ici, les hypothèses sont les suivantes 
+
+- **$[H_0]$** : les variables sont indépendantes ;
+- **$[H_1]$** : les variables ne sont pas indépendantes.
+
+Encore une fois, on décrit déjà la relation entre ces deux variables de façon numérique et graphique.
+
+> Analyser la table de contingence directement est assez complexe, d'autant plus si le nombre de modalités est grand. Ici, on peut envisager de la lire directement et voir que pour le déjeuner, c'est équilibré entre homme et femme, au contraire du dîner.
+
+```{r comp2_table}
+tt = table(tips$time, tips$sex)
+tt
+```
+
+Pour mieux comprendre la relation entre les deux, il est d'usage de présenter les profils lignes ou les profils colonnes (en fonction des phrases que l'on souhaite écrire/dire). La fonction `prop.table()`, en plus de calculer les proportions globales, permet de réaliser ces profils lignes (`margin = 1`) ou ces profils colonnes (`margin = 2`).
+
+> Dans les deux cas, on observe le même lien entre les deux modalités. Mais ici, on aura tendance à prendre les profils lignes.
+
+```{r comp2_row}
+round(prop.table(tt, margin = 1), 2)
+```
+
+```{r comp2_col}
+round(prop.table(tt, margin = 2), 2)
+```
+
+Graphiquement, il est préférable de réaliser des diagrammes en barres empilées (idem, on a 2 versions possibles).
+
+> Idem, ici, le premier graphique semble plus facile à présenter.
+
+```{r comp2_bar_row}
+ggplot(tips, aes(time, fill = sex)) +
+  geom_bar(position = "fill")
+```
+
+
+```{r comp2_bar_col}
+ggplot(tips, aes(sex, fill = time)) +
+  geom_bar(position = "fill")
+```
+
+> La *p-value* étant inférieure à 5 %, on en conclue qu'il y a bien un lien entre les deux variables.
+
+```{r}
+chisq.test(tt)
+```
+
+### EXERCICE A FAIRE
+
+Tester les liens suivants (avec les graphiques pour justifier) :
+
+- Entre le moment du repas et la présence ou non de fumeur ;
+- Entre la présence de fumeur et le sexe de la personne qui paie ;
+- Entre le jour de la semaine et la présence de fumeur.
+
+## Test de corrélation
+
+En présence de deux variables quantitatives, il est courant de calculer le **coefficient de corrélation linéaire** entre celles-ci pour savoir s'il existe un lien linéaire entre les deux. Pour rappel, ce coefficient a une valeur entre -1 et 1, qui se lit comme suit :
+
+- si égale à 0 $\rightarrow$ il n'existe pas de lien **linéaire** entre les deux variables ;
+- si proche de 1 $\rightarrow$ si une variable augmente, l'autre augmente aussi (lien linéaire positif) ;
+- si proche de -1 $\rightarrow$ si une variable augmente, l'autre diminue (lien linéaire négatif).
+
+Dans nos données, on peut vouloir chercher s'il y a un lien linéaire entre le montant total payé et le pourboire donné.
+
+Dans les **tests de corrélation**, les hypothèses sont les suivantes 
+
+- **$[H_0]$** : le coefficient de corrélation est égale 0 ;
+- **$[H_1]$** : le coefficient de corrélation est différent de 0.
+
+Comme pour le $t$-test, il existe une version paramétrique (dit **de Pearson**) et deux versions non-paramétriques (**Keandall** et **Spearman**), ici aussi basées sur les rangs. Toutes trois sont calculées avec la même fonction `cor.test()` (le paramètre `method` permettant de choisir le test en donnant son nom en minuscule). Par défaut, c'est celui de Pearson qui est calculé.
+
+On peut aussi modifier l'hypothèse alternative (de façon similaire au $t$-test encore), toujours avec le paramètre `alternative`.
+
+On va déjà calculer la corrélation entre les deux variable (avec les trois méthodes) et réaliser un nuage de points pour observer s'il y a une relation entre celles-ci.
+
+> On observe un lien positif entre les deux variables, ce qui semble logique.
+
+```{r cor_num}
+print(cor(tips$total_bill, tips$tip)) # Pearson
+print(cor(tips$total_bill, tips$tip, method = "kendall"))
+print(cor(tips$total_bill, tips$tip, method = "spearman"))
+```
+```{r cor_plot}
+ggplot(tips, aes(total_bill, tip)) +
+  geom_point()
+```
+
+> Nos trois tests nous mènent à la même conclusion : il y a bien un lien linéaire entre les deux variables.
+
+```{r cor_per}
+cor.test(tips$total_bill, tips$tip)
+```
+
+
+```{r cor_ken}
+cor.test(tips$total_bill, tips$tip, method = "kendall")
+```
+
+
+```{r cor_spe}
+cor.test(tips$total_bill, tips$tip, method = "spearman")
+```
+
+### EXERCICE A FAIRE
+
+Tester les liens suivants (avec les graphiques pour justifier) :
+
+- Entre le montant total et la nombre de personnes à table (`size`) ;
+- Entre le pourboire donné et le nombre de personnes à table.
+
+Quel commentaire pouvons-nous faire sur ces deux derniers tests ?
+
+
+
+## Application sur autres données
+
+Nous allons utiliser le jeu de données [`adult.csv`](https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv), issu d'une enquête aux USA pour analyser le salaire (variable binaire : plus ou moins de 50k$) en fonction de certains critères (âge, sexe, éducation, nombre d'heures de travail par semaine...).
+
+```{r adult}
+adult = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv")
+datatable(adult, options = list(scrollX = TRUE))
+```
+
+Tester les éléments suivants :
+
+- Normalité de l'âge
+- Normalité du nombre d'heures par semaine (variable `hours_per_week`)
+- Equi-répartition du sexe
+- Equi-répartition du salaire (variable `class`)
+
+Identifier si les liens suivants sont réels :
+
+- Âge et salaire
+- Nombre d'heures de travail par semaine et salaire
+- Sexe et salaire
+- Catégorisation ethnique (variable `race`) et salaire
+- Âge et nombre d'heures de travail par semaine
+

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Estimation par intervalle</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="FX Jollois" />
+    <script src="seance6--estimation-intervalle_files/header-attrs-2.27/header-attrs.js"></script>
+    <link href="seance6--estimation-intervalle_files/remark-css-0.0.1/nhsr.css" rel="stylesheet" />
+    <link href="seance6--estimation-intervalle_files/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Estimation par intervalle
+]
+.author[
+### FX Jollois
+]
+.date[
+### BUT TC - 2ème année
+]
+
+---
+
+
+
+
+
+## Problème à résoudre - exemple
+
+Comment puis-je connaître un indicateur sur la population française ?
+
+- Quelle est la taille moyenne de TOUS les français ?
+
+--
+
+&gt; Impossible à réaliser (trop coûteux, trop compliqué à mettre en oeuvre, ...)
+
+--
+
+Sélection d'un sous-ensemble de la population, appelé **échantillon**
+
+- Notion de *représentativité* de l'échantillon
+
+- Calcul d'un indicateur sur l'échantillon
+
+- Extrapolation à la population (avec une incertitude quantifiée)
+
+--
+
+`\(\rightarrow\)` **Inférence statistique**
+
+---
+## Estimation
+
+**Problème statistique** : 
+
+- Estimation d'un paramètre inconnu de la population via un échantillon
+
+--
+
+2 types d'estimation, basées sur l'hypothèse de la loi de la variable :
+
+- **Ponctuelle** : unique valeur mesurée dans l'échantillon
+  - La moyenne est un bon estimateur de l'espérance d’une v.a. par exemple
+
+--
+
+- **Par intervalle** : intervalle (dit de confiance) basée sur l'échantillon
+  - Il y a x % de chance que la vraie valeur (de la population) appartiennent à cet échantillon
+  - Intervalle très souvent symétrique
+  - Risque de se tromper dépendant du problème, mais très souvent 5%
+  
+---
+## Cas de la loi Normale
+
+- Pour une v.a. `\(N(0, 1)\)`, on cherche un intervalle de confiance `\([a;b]\)` tel que
+
+`$$p(a&lt;X&lt;b)=1-\alpha$$`
+
+- Si `\(\alpha\)` est égal à 5% `\(\rightarrow\)` a = -1,96 et b = 1,96
+
+&gt; Pour une variable `\(X\)` suivant une loi Normale `\(N(0, 1)\)`, on a donc **95%** de chances que la valeur soit comprise dans l'intervalle  `\(\mathbf{[−1.96 ; 1.96]}\)`
+
+&lt;img src="seance6--estimation-intervalle_files/figure-html/normal-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Intervalle de confiance d'une moyenne
+
+- Si `\(n\)` est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+`$$\left[m-u_{\alpha/2}\frac{s}{\sqrt{n}}\mbox{ ; }m + u_{\alpha/2}\frac{s}{\sqrt{n}}\right]$$`
+
+
+- `\(m\)` : moyenne sur l'échantillon
+
+- `\(s\)` : écart-type sur l'échantillon
+
+- `\(n\)` : taille de l'échantillon
+
+- `\(u_{\alpha/2}\)`  : valeur de la table de la loi Normale tel que `\(p(X &gt; u_{\alpha/2}) = \alpha/2\)`
+  - Si `\(\alpha = 0,05\)` (i.e. 5% donc), on aura `\(u_{\alpha/2} = 1,96\)`
+  - Autres valeurs parfois utilisées : 10% (avec `\(u_{\alpha/2} = 1,64\)`), 1%...
+
+
+---
+## Exemple
+
+### Mesure du niveau de pluie pendant 9 ans
+
+- Moyenne de **610,22**
+- Écart-type de **111,53**
+
+On considère que le niveau de pluie suit une loi Normale donc, avec un risque de 5%, on aura
+
+`$$IC_{95\%} = [ 537,35 ; 683,09 ]$$`
+
+--
+
+On dira la phrase suivante :
+
+&gt; **Il y a donc 95% de chance que le niveau de pluie soit compris entre 537,35 et 683,09.**
+
+
+---
+## Intervalle de confiance d'une proportion
+
+- Si `\(n\)` est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+`$$\left[p-u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\mbox{ ; }p+u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\right]$$`
+
+- `\(p\)` : proportion sur l'échantillon
+
+- `\(n\)` : taille de l'échantillon
+
+- `\(u_{\alpha/2}\)`  : valeur de la table de la loi Normale tel que `\(p(X &gt; u_{\alpha/2}) = \alpha/2\)`
+  - Si `\(\alpha = 0,05\)` (i.e. 5% donc), on aura `\(u_{\alpha/2}=1,96\)`
+  - Autres valeurs parfois utilisées : 10% (avec `\(u_{\alpha/2}=1,64\)`), 1%...
+
+---
+## Exemple
+
+### Mesure du niveau d'insatisfaction des habitants sur l'avancement des travaux
+
+- 500 personnes interrogées
+- 30% si disent mécontents
+
+On a n (largement) supérieur à 30 donc, avec un risque de 5%, on aura
+
+`$$IC_{95\%}=[26.0;34.0]$$`
+
+--
+
+On dira la phrase suivante :
+
+&gt; **Il y a donc 95% de chance que le niveau d’insatisfaction soit compris entre 26% et 34%.**
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

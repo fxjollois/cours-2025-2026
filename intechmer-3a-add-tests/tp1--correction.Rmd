@@ -1,0 +1,496 @@
+---
+title: "TP1 - Correction"
+subtitle: "Applications sur données réelles - ADULT"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+```{r import, include=FALSE}
+library(tidyverse)
+library(knitr)
+
+adult = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv")
+```
+
+## Analyses univariées
+
+### Variable cible `class`
+
+```{r class-test}
+# Je stocke dans un tableau pour calculer le chi-deux et les proportions après
+t1 = table(adult$class)
+r1 = chisq.test(t1)
+```
+
+::: {}
+::: {.column width="48%"}
+
+On remarque qu'il y a 75% des interrogés qui gagnent moins de 50000\$ par an. Il n'y a clairement pas équirépartition entre les deux groupes (*p-value* = `r format.pval(r1$p.value)` -- donc largement inférieure à 5%).
+
+```{r class-tab}
+# prop.table() calcule les proportions globales
+# stockage dans un tibble (data.frame) pour affichage propre
+df1 = tibble(names(t1), t1, round(prop.table(t1) * 100, 2))
+names(df1) = c("Modalité", "Nb de personnes", "% du total")
+# la fonction kable() permet un affichage propre mais simple d'un dataframe
+kable(df1)
+```
+
+:::
+::: {.column width="48%"}
+
+```{r class-graph}
+ggplot(adult, aes(class, fill = class)) +
+  geom_bar(show.legend = FALSE) +
+  scale_fill_discrete(type = c("darkred", "darkgreen")) + 
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+### Variable `age`
+
+L'âge moyen est de 38,5 ans, alors que l'âge médian est de 37 ans. Il y a quelques individus avec un âge assez important (jusque 90 ans). La variable semble suivre une loi normale (test de *Shapiro* non réalisable car plus de 5000 individus).
+
+::: {}
+::: {.column width="48%"}
+
+```{r age-tab}
+t2 = summary(adult$age)
+t2 = c(t2, var(adult$age), sd(adult$age))
+names(t2)[7:8] = c("Variance", "Ecart-type")
+df2 = tibble(names(t2), round(t2, 2))
+names(df2) = c("Statistique", "Valeur")
+kable(df2)
+```
+
+
+```{r age-graph3, fig.height=2}
+ggplot(adult, aes(sample = age)) +
+  stat_qq() +
+  stat_qq_line() +
+  theme_minimal()
+```
+
+:::
+::: {.column width="48%"}
+
+```{r age-graph1, fig.height=4}
+ggplot(adult, aes(age)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "lightgray") + 
+  geom_density() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+```{r age-graph2, fig.height=2}
+ggplot(adult, aes(age)) +
+  geom_boxplot(fill = "lightgray") + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+
+### Variable `hours_per_week`
+
+Le temps de travail semble être de 40 heures légalement. Pour autant, un certain nombre de personnes travaillent plus (voire beaucoup plus -- jusque presque 100 heures par semaine), et d'autres assez peu (1 heure au minimum). La variable ne suit pas du tout une loi normale.
+
+::: {}
+::: {.column width="48%"}
+  
+```{r hours-tab}
+t2 = summary(adult$hours_per_week)
+t2 = c(t2, var(adult$hours_per_week), sd(adult$hours_per_week))
+names(t2)[7:8] = c("Variance", "Ecart-type")
+df2 = tibble(names(t2), round(t2, 2))
+names(df2) = c("Statistique", "Valeur")
+kable(df2)
+```
+
+```{r hours-graph3, fig.height=2}
+ggplot(adult, aes(sample = hours_per_week)) +
+  stat_qq() +
+  stat_qq_line() +
+  theme_minimal()
+```
+
+:::
+::: {.column width="48%"}
+
+```{r hours-graph1, fig.height=4}
+ggplot(adult, aes(hours_per_week)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "lightgray") + 
+  geom_density() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+```{r hours-graph2, fig.height=2}
+ggplot(adult, aes(hours_per_week)) +
+  geom_boxplot(fill = "lightgray") + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+### Variables `capital_gain` et `capital_loss`
+
+Beaucoup d'individus ont la valeur 0 pour ces deux variables. Elles ne suivent clairement pas une loi normale, et on peut envisager de les transformer en variable binaire : 
+
+- 0 (`FALSE`) = les deux variables ont la valeur 0
+- 1 (`TRUE`) = une des deux variables est différente de 0
+
+::: {}
+::: {.column width="48%"}
+  
+#### `capital_gain`
+
+```{r gain-tab}
+t2 = summary(adult$capital_gain)
+t2 = c(t2, var(adult$capital_gain), sd(adult$capital_gain))
+names(t2)[7:8] = c("Variance", "Ecart-type")
+df2 = tibble(names(t2), round(t2, 2))
+names(df2) = c("Statistique", "Valeur")
+kable(df2)
+```
+
+```{r gain-graph3, fig.height=2}
+ggplot(adult, aes(sample = capital_gain)) +
+  stat_qq() +
+  stat_qq_line() +
+  theme_minimal()
+```
+
+```{r gain-graph1, fig.height=4}
+ggplot(adult, aes(capital_gain)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "lightgray") + 
+  geom_density() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+```{r gain-graph2, fig.height=2}
+ggplot(adult, aes(capital_gain)) +
+  geom_boxplot(fill = "lightgray") + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+::: {.column width="48%"}
+
+#### `capital_loss`
+
+```{r loss-tab}
+t2 = summary(adult$capital_loss)
+t2 = c(t2, var(adult$capital_loss), sd(adult$capital_loss))
+names(t2)[7:8] = c("Variance", "Ecart-type")
+df2 = tibble(names(t2), round(t2, 2))
+names(df2) = c("Statistique", "Valeur")
+kable(df2)
+```
+
+```{r loss-graph3, fig.height=2}
+ggplot(adult, aes(sample = capital_loss)) +
+  stat_qq() +
+  stat_qq_line() +
+  theme_minimal()
+```
+
+```{r loss-graph1, fig.height=4}
+ggplot(adult, aes(capital_loss)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "lightgray") + 
+  geom_density() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+```{r loss-graph2, fig.height=2}
+ggplot(adult, aes(capital_loss)) +
+  geom_boxplot(fill = "lightgray") + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+#### Tranformation en variable binaire
+
+```{r capital-transform}
+adult = adult %>%
+  mutate(capital = (capital_loss + capital_gain) > 0)
+ggplot(adult, aes(capital, fill = capital)) +
+  geom_bar(show.legend = FALSE) +
+  scale_fill_discrete(type = c("lightgray", "orange")) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+
+### Variable `sex`
+
+```{r sex-test}
+t3 = table(adult$sex)
+r3 = chisq.test(t3)
+```
+
+::: {}
+::: {.column width="48%"}
+
+Il y a deux fois plus d'hommes que de femmes dans l'échantillon. Il n'y a clairement pas équirépartition entre les deux groupes (*p-value* = `r format.pval(r3$p.value)` -- donc largement inférieure à 5%).
+
+```{r sex-tab}
+df3 = tibble(names(t3), t3, round(prop.table(t3) * 100, 2))
+names(df3) = c("Modalité", "Nb de personnes", "% du total")
+kable(df3)
+```
+
+:::
+::: {.column width="48%"}
+
+```{r sex-graph}
+ggplot(adult, aes(sex, fill = sex)) +
+  geom_bar(show.legend = FALSE) +
+  scale_fill_discrete(type = c("darkred", "darkgreen")) + 
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+
+### Variable `race`
+
+
+```{r race-test}
+t4 = table(adult$race)
+r4 = chisq.test(t4)
+```
+
+::: {}
+::: {.column width="48%"}
+
+Une très grande majorité de l'échantillon est considéré comme *blanc*. Il n'y a clairement pas équirépartition entre les deux groupes (*p-value* = `r format.pval(r4$p.value)` -- donc largement inférieure à 5%).
+
+```{r race-tab}
+df4 = tibble(names(t4), t4, round(prop.table(t4) * 100, 2))
+names(df4) = c("Modalité", "Nb de personnes", "% du total")
+kable(df4)
+```
+
+:::
+::: {.column width="48%"}
+
+```{r race-graph}
+ggplot(adult, aes(race, fill = race)) +
+  geom_bar(show.legend = FALSE) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+:::
+:::
+
+
+## Analyses bivariées
+
+### Âge et salaire
+
+L'âge étant quantitatif, et le salaire binaire (donc qualitatif à 2 modalités), on va chercher à tester les différences entre deux échantillons à l'aide du *t*-test (ou test de Student) et du test de Wilcoxon.
+
+```{r age-class-test}
+r5a = t.test(age ~ class, data = adult)
+r5b = wilcox.test(age ~ class, data = adult)
+```
+
+
+::: {}
+::: {.column width="48%"}
+
+Les personnes gagnant plus de 50000\$ sont plus âgées que les autres, ce qui semble assez logique. Les deux tests (resp. *t-test* et *Wilcoxon*) confirment la nette différence d'âge entre les deux classes de salaire (avec les *p-value* respectives suivantes : `r format.pval(r5a$p.value)` et `r format.pval(r5b$p.value)`).
+
+```{r age-class-graph1}
+ggplot(adult, aes(age, color = class)) +
+  geom_density() +
+  theme_minimal() +
+  labs(y = "", x = "")
+```
+
+:::
+::: {.column width="48%"}
+
+```{r age-class-tab}
+adult %>%
+  group_by(class) %>%
+  summarise(Age = mean(age, rm.na = T)) %>%
+  kable(digits = 2)
+```
+
+```{r age-class-graph2}
+ggplot(adult, aes(age, class, fill = class)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(y = "", x = "")
+```
+
+:::
+:::
+
+
+### Nombre d’heures de travail par semaine et salaire
+
+On se retrouve dans le même cas que précédemment.
+
+```{r hours-class-test}
+r6a = t.test(hours_per_week ~ class, data = adult)
+r6b = wilcox.test(hours_per_week ~ class, data = adult)
+```
+
+
+::: {}
+::: {.column width="48%"}
+
+Les personnes gagnant plus de 50000\$ travaillent plus longtemps que les autres, ce qui semble aussi assez logique. Les deux tests (resp. *t-test* et *Wilcoxon*) confirment la nette différence d'âge entre les deux classes de salaire (avec les *p-value* respectives suivantes : `r format.pval(r6a$p.value)` et `r format.pval(r6b$p.value)`).
+
+```{r hours-class-graph1}
+ggplot(adult, aes(hours_per_week, color = class)) +
+  geom_density() +
+  theme_minimal() +
+  labs(y = "", x = "")
+```
+
+:::
+::: {.column width="48%"}
+
+```{r hours-class-tab}
+adult %>%
+  group_by(class) %>%
+  summarise(Age = mean(hours_per_week, rm.na = T)) %>%
+  kable(digits = 2)
+```
+
+```{r hours-class-graph2}
+ggplot(adult, aes(hours_per_week, class, fill = class)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(y = "", x = "")
+```
+
+:::
+:::
+
+### Sexe et salaire
+
+Les deux variables étant qualitatives (binaires), nous allons chercher le lien avec le test du $\chi^2$.
+
+```{r}
+t7 = table(adult$sex, adult$class)
+r7 = chisq.test(t7)
+```
+
+
+::: {}
+::: {.column width="48%"}
+
+Sans surprise malheureusement, on remarque les femmes sont moins nombreuses à gagner plus de 50000\$ par an. Ceci est confirmé par le test du $\chi^2$, avec une *p-value* de `r format.pval(r7$p.value)`.
+
+```{r sex-class-tab}
+kable(round(prop.table(t7, margin = 2) * 100, 2))
+```
+
+:::
+::: {.column width="48%"}
+
+```{r sex-class-graph1}
+ggplot(adult, aes(class, fill = sex)) +
+  geom_bar(position = "fill") +
+  scale_fill_discrete(type = c("darkorange", "darkseagreen")) +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+:::
+:::
+
+
+### Catégorie ethnique (variable `race`) et salaire
+
+Même cas que précédemment.
+
+```{r}
+t8 = table(adult$race, adult$class)
+r8 = chisq.test(t8)
+```
+
+
+::: {}
+::: {.column width="48%"}
+
+Il y a bien un lien entre les deux variables. Ceci est confirmé par le test du $\chi^2$, avec une *p-value* de `r format.pval(r8$p.value)`. Les personnes dites *blanches* ou de provenance asiatique/pacifique sont plus fréquemment payées plus de 50000\$, contrairement aux autres ethnies.
+
+```{r race-class-tab}
+kable(round(prop.table(t8, margin = 1) * 100, 2))
+```
+
+:::
+::: {.column width="48%"}
+
+```{r race-class-graph1}
+ggplot(adult, aes(race, fill = class)) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+:::
+:::
+
+
+### Âge et nombre d’heures de travail par semaine
+
+Nous avons ici deux variables quantitatives, nous allons donc faire un test de corrélation (avec les trois méthodes : *Pearson*, *Spearman* et *Kendall*).
+
+::: {}
+::: {.column width="48%"}
+
+Bien que les *p-values* indiquent qu'il y a un lien entre les deux variables, les estimations du coefficient de corrélation sont proches de 0. On peut difficilement établir un lien clair entre les deux.
+
+Dans ce cas, il serait nécessaire de transformer la variable `hours_per_week` en une varaible binaire ("moins de 40h" vs "plus de 40h" par exemple).
+
+```{r age-hours-tab}
+r9a = cor.test(adult$age, adult$hours_per_week)
+r9b = cor.test(adult$age, adult$hours_per_week, method = "spearman")
+r9c = cor.test(adult$age, adult$hours_per_week, method = "kendall")
+df9 = tibble(
+  c("Pearson", "Spearman", "Kendall"),
+  c(r9a$estimate, r9b$estimate, r9c$estimate),
+  format.pval(c(r9a$p.value, r9b$p.value, r9c$p.value))
+)
+names(df9) = c("Méthode", "Estimation du coefficien de corrélation", "p-value")
+kable(df9)
+```
+
+:::
+::: {.column width="48%"}
+
+```{r age-hours-graph}
+ggplot(adult, aes(age, hours_per_week)) +
+  geom_bin_2d() +
+  theme_minimal()
+```
+

@@ -1,0 +1,213 @@
+---
+title: "TP2 - Correction"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chargement des librairies
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(scales)
+```
+
+## Importation des données
+
+Les données proviennent du site <https://data.gouv.fr> et sont disponibles sur [cette page](https://www.data.gouv.fr/fr/datasets/resultat-des-peches-electriques/).
+
+```{r}
+donnees = read_excel("Exploitations_Basse-normandie.xls", 
+                     sheet = 2) # ou sheet = "nom_feuille"
+```
+
+### Affichage des dix premières lignes
+
+```{r}
+knitr::kable(head(donnees, 10))
+```
+
+## Indiquer quelques éléments sur ces données
+
+- Etendue des dates de collecte des informations
+- Nombre de stations Sandre et Onema
+- Nombre de communes
+- Nombre d'espèces
+
+Pour avoir ces informations, on peut procéder item par item, comme ci-dessous
+
+```{r}
+min(donnees$`Date de pêche`) # et pareil avec max()
+```
+
+```{r}
+# unique() supprime les doublons
+# length() renvoie la taille du vecteur (donc le nombre de stations Sandre ici)
+donnees$`Code station Sandre` %>% 
+  unique() %>%
+  length()
+```
+
+Et on fait pareil donc avec `Code Station Onema` et `Nom usuel de l'espèce`.
+
+Au final, on peut tout faire en une seule opération, comme ci-dessous :
+
+```{r}
+donnees %>%
+  summarise(
+    DateMin = min(`Date de pêche`),
+    DateMax = max(`Date de pêche`),
+    NbStationsSANDRE = n_distinct(`Code station Sandre`),
+    NbStationsONEMA = n_distinct(`Code station Onema`),
+    NbEspeces = n_distinct(`Nom usuel de l'espèce`)
+  ) %>%
+  t() %>% # Permet de transposer une matrice (lignes en colonnes et inversement)
+  knitr::kable()
+```
+
+## Représenter, à l'aide d’un diagramme en barres, le nombre de pèches pour chaque espèce
+
+En ne tenant pas compte du décompte de chaque espèce (affichage par ordre alphabétique). L'affichage à l'horizontal permet de mieux lire le nom des espèces, car ceux-ci sont un peu longs parfois.
+
+```{r}
+ggplot(donnees, aes(y = `Nom usuel de l'espèce`)) +
+  geom_bar()
+```
+
+Dans un tel graphique, il est d'usage de trier par ordre décroissant du décompte.
+
+```{r}
+ggplot(donnees, aes(y = fct_rev(fct_infreq(`Nom usuel de l'espèce`)))) +
+  geom_bar()
+```
+
+Et en poussant la réflexion, on peut vouloir une couleur en fonction du nombre. Il faut déjà faire un calcul préalable pour le faire.
+
+```{r}
+temp = donnees %>%
+  group_by(`Nom usuel de l'espèce`) %>%
+  summarise(n = n())
+
+ggplot(temp, aes(x = n, y = fct_reorder(`Nom usuel de l'espèce`, n), fill = n)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(x = "", y = "", fill = "Nombre de\npèches") +
+  scale_fill_gradient(low = "lightblue", high = "orange")
+```
+
+
+## Représenter, à l'aide de diagrammes circulaires :
+
+### la part de chaque méthode de prospection
+
+```{r}
+ggplot(donnees, aes(x = "", fill = `Methode de Prospection`)) +
+  geom_bar(position = "fill") +
+  coord_polar(theta = "y") +
+  scale_y_continuous(labels = percent) +
+  scale_fill_brewer(palette = "Accent") +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+
+### la part de chaque moyen de prospection
+
+
+```{r}
+ggplot(donnees, aes(x = "", fill = `Moyen de Prospection`)) +
+  geom_bar(position = "fill") +
+  coord_polar(theta = "y") +
+  scale_y_continuous(labels = percent) +
+  scale_fill_brewer(palette = "Accent") +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+
+
+## Représenter, pour chaque département, avec des graphiques adaptés :
+
+### le nombre de communes
+
+```{r}
+temp2 = donnees %>% 
+  group_by(Département) %>%
+  summarise(nbCommunes = n_distinct(`Code Insee`))
+
+ggplot(temp2, aes(x = "", y = nbCommunes, fill = Département)) +
+  geom_bar(stat = "identity", position = "fill") +
+  coord_polar(theta = "y") +
+  scale_y_continuous(labels = percent) +
+  scale_fill_manual(values = c("red3", "steelblue", "green3")) +
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+
+### le nombre total de pèches
+
+```{r}
+temp3 = donnees %>% 
+  group_by(Département) %>%
+  summarise(nbPeches = n())
+
+ggplot(temp3, aes(x = fct_reorder(Département, nbPeches, .desc = TRUE), 
+                  y = nbPeches, fill = Département)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("red3", "steelblue", "green3")) +
+  scale_x_discrete(labels = c("Orne", "Manche", "Calvados")) + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+
+### le nombre total de pèches par année
+
+```{r}
+temp4 = donnees %>% 
+  mutate(annee = year(`Date de pêche`)) %>%
+  group_by(Département, annee) %>%
+  summarise(nbPeches = n())
+
+ggplot(temp4, aes(x = annee, 
+                  y = nbPeches, color = Département)) +
+  geom_line() +
+  scale_color_manual(values = c("red3", "steelblue", "green3"), 
+                     labels = c("Calvados", "Manche", "Orne")) + 
+  theme_minimal() +
+  labs(x = "", y = "")
+```
+
+## Représenter la densité moyenne observée pour chaque espèce (en nombre et en masse - idéalement (bonus) sur un même graphique)
+
+```{r}
+temp5 = donnees %>%
+  group_by(`Nom usuel de l'espèce`) %>%
+  summarise(densiteNombre = mean(`Densite en nombre(ind./100 m²)`, na.rm = T),
+            densiteMasse = mean(`Densité en masse (g/100 m²)`, na.rm = T))
+
+ggplot(temp5, aes(x = densiteNombre, 
+                  y = fct_reorder(`Nom usuel de l'espèce`, densiteNombre))) +
+  geom_point() +
+  labs(x = "Densité en nombre", y = "")
+
+ggplot(temp5, aes(x = densiteMasse, 
+                  y = fct_reorder(`Nom usuel de l'espèce`, densiteMasse))) +
+  geom_point() +
+  labs(x = "Densité en masse", y = "")
+
+ggplot(temp5, aes(x = densiteNombre, y = densiteMasse, 
+                  label = fct_reorder(`Nom usuel de l'espèce`, densiteMasse))) +
+  geom_text(size = 2) +
+  labs(x = "Densité en nombre", y = "Densité en masse") +
+  xlim(-2, 28) +
+  theme_minimal() 
+```
+
+

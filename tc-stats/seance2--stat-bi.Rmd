@@ -1,0 +1,302 @@
+---
+title: "Rappel de Statistique - Bivarié"
+author: "FX Jollois"
+date: "BUT TC - 2ème année"
+output:
+  xaringan::moon_reader:
+    css: [nhsr, chocolate-fonts]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align='center', fig.height=4, 
+                      message = FALSE, warning = FALSE, out.width='90%')
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+data = read_delim("tips.csv", delim = ",")
+```
+
+```{css echo=FALSE}
+.pull-left {
+  float: left;
+  width: 48%;
+}
+.pull-right {
+  float: right;
+  width: 48%;
+}
+.pull-right ~ p {
+  clear: both;
+}
+.pull-left30 {
+  float: left;
+  width: 28%;
+}
+.pull-right70 {
+  float: right;
+  width: 68%;
+}
+.pull-right70 ~ p {
+  clear: both;
+}
+```
+
+# Décrire un lien entre variable
+
+- Statistique univarié utile pour comprendre le comportement de chaque variable
+
+- Bivarié utile pour comprendre le lien éventuel entre 2 variables
+
+- Particulièrement intéressant si variable d'intérêt spécifique (de type achat oui/non, montant du panier, ...)
+
+- Croisements possibles
+  - 2 variables quantitatives
+  - 2 variables qualitatives
+  - 1 variable qualitative et 1 variable quantitative
+
+---
+class: middle, center, inverse
+
+# Quantitative vs quantitative
+
+---
+
+## Quantitative vs quantitative
+  
+- Covariance
+$$
+  cov(x,y) = \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x}) (y_i - \bar{y})
+$$
+  - Problème : non bornée et donc non exploitable
+
+- Coefficient de corrélation linéaire (de *Pearson*)
+$$
+  \rho(x,y) = \frac{cov(x,y)}{\sigma^2(x) \sigma^2(y)}
+$$
+  - Covariance des variables normalisées
+- Valeurs comprises entre -1 et 1
+  - $0$ : pas de lien linéaire (autre type de lien possible)
+  - $1$ : lien positif fort (si $x$ augmente, $y$ augmente)
+  - $-1$ : lien négatif fort (si $x$ augmente, $y$ diminue)
+
+---
+
+## Quantitative vs quantitative
+
+### Nuage de points
+
+```{r qtqt-graph}
+ggplot(data, aes(total_bill, tip)) + 
+  geom_point(color = "steelblue") + 
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+- Attention à la présence d'**outliers** avec un comportement atypique
+
+---
+
+## Anscombe
+
+La visualisation est aussi importante (voire plus) que la représentation numérique !
+
+Entre ces quatre séries :
+
+- même moyenne et même variance pour $x$ et $y$
+- même coefficient de corrélation entre les deux
+
+```{r anscombe-tab}
+a = lapply(1:4, function (i) { 
+  anscombe %>% 
+    select(ends_with(as.character(i))) %>% 
+    rename_with(function (n) { substr(n, 1, 1)}) %>%
+    mutate(id = i)
+  })
+c = sapply(a, function(df) {
+  res = c(m_x = mean(df$x), m_y = mean(df$y),
+          s_x = sd(df$x), s_y = sd(df$y),
+          cov = cov(df$x, df$y), cor = cor(df$x, df$y))
+})
+rownames(c) = c("Moyenne(x)", "Moyenne(y)", "Ecart-type(x)", "Ecart-type(y)", "Covariance", "Corrélation")
+colnames(c) = 1:4
+kable(c, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+---
+
+## Anscombe
+
+```{r anscombe-graph}
+b = Reduce(rbind, a)
+ggplot(b, aes(x, y)) +
+  geom_point(size = 4) +
+  facet_wrap(~ id) +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+class: middle, center, inverse
+
+# Qualitative vs qualitative
+
+---
+
+## Qualitative vs qualitative
+
+**Table de contingence** : Croisement des 2 ensembles de modalités, avec le nombre d'individus ayant chaque couple de modalités
+
+- $n_{ij}$ : Nombre d'observations ayant la modalité $i$ pour $x$ et $j$ pour $y$
+- $n_{i.}$ : Effectif marginal (nombre d'observations ayant la modalité $i$ pour $x$)
+- $n_{.j}$ : Effectif marginal (nombre d'observations ayant la modalité $j$ pour $y$)
+
+|          | 1 | $\ldots$ | $j$ | $\ldots$ | $\ell$ | Total |
+|----------|---|----------|-----|----------|--------|-------|
+|       1  |
+| $\ldots$ |
+|   $i$    |   |          | $n_{ij}$ |   |          | $n_{i.}$ |
+| $\ldots$ |
+|   $k$    |
+|  Total   |   |          | $n_{.j}$ |   |          | $n_{..}=n$ |
+
+---
+
+## Qualitative vs qualitative
+
+### Profils lignes et colonnes
+
+Distribution d'une variable conditionnellement aux modalités de l'autre
+  
+### Profil ligne
+
+Pour une ligne $i$ : $\frac{n_{ij}}{n_{i.}}$
+- Somme des valeurs en lignes = 100%
+
+### Profil colonne
+
+Pour une colonne $j$ : $\frac{n_{ij}}{n_{.j}}$
+  - Somme des valeurs en colonnes = 100%
+
+---
+
+## Qualitative vs qualitative
+
+Exemple : Jour de la semaine et Présence de fumeur
+
+.pull-left30[
+```{r qlql-num}
+mat = table(data$day, data$smoker)
+tib = tibble(as.data.frame.matrix(mat) %>% rownames_to_column("day")) %>%
+  arrange(match(day, c("Thur", "Fri", "Sat", "Sun")))
+kable(tib) %>%
+  kable_styling(position = "center")
+```
+]
+
+.pull-right70[
+```{r qtql-graph}
+ggplot(data, aes(day, fill = smoker)) +
+  geom_bar(position = "dodge", color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  labs(y = "") +
+  theme(text = element_text(size = 25)) +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+]
+
+Couple de modalités très peu pris : regroupement de modalités à envisager éventuellement
+
+---
+
+## Qualitative vs qualitative
+
+### Profils colonnes ici (sommes en colonnes = 100%)
+
+.pull-left30[
+```{r qlql-num-2}
+matcol = prop.table(mat, margin = 2)
+tib = tibble(as.data.frame.matrix(matcol) %>% rownames_to_column("day")) %>%
+  arrange(match(day, c("Thur", "Fri", "Sat", "Sun")))
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+]
+
+.pull-right70[
+```{r qtql-graph-2}
+tibbis = tib
+tibbis$day <- factor(tibbis$day, levels = rev(as.character(tibbis$day)))
+
+ggplot(tibbis %>% pivot_longer(!day), aes(name, y = value, fill = day)) +
+  geom_bar(color = "black", stat = "identity") +
+  theme_minimal() +
+  theme(text = element_text(size = 25)) +
+  scale_fill_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+]
+
+---
+
+## Qualitative vs qualitative
+
+### Profils lignes ici (sommes en lignes = 100%)
+
+.pull-left30[
+```{r qlql-num-3}
+matlig = prop.table(mat, margin = 1)
+tib = tibble(as.data.frame.matrix(matlig) %>% rownames_to_column("day")) %>%
+  arrange(match(day, c("Thur", "Fri", "Sat", "Sun")))
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+]
+
+.pull-right70[
+```{r qtql-graph-3}
+ggplot(data, aes(day, fill = smoker)) +
+  geom_bar(position = "fill", color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  theme(text = element_text(size = 25)) +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+]
+
+---
+class: middle, center, inverse
+
+# Qualitative vs quantitative
+
+---
+
+## Qualitative vs quantitative
+
+- Soit $Y$ la variable qualitative à $m$ modalités, et $X$ la variable quantitative
+- Sous-populations déterminées par les modalités de $Y$
+- Indicateurs calculés pour chaque modalité k
+
+$$\bar{x_j} = \frac{1}{n_j} \sum_{i | y_i = j} x_i$$
+
+$$\sigma^2(x_j) = \frac{1}{n_j} \sum {}_{i | y_i = j} (x_i - \bar{x_j})^2$$
+
+---
+
+## Qualitative vs quantitative
+
+Exemple : Montant payé et Jour de la semaine
+
+### Boîte à moustaches
+
+```{r qlqt-graph}
+ggplot(data, aes(day, total_bill, fill = day)) +
+  geom_boxplot(show.legend = FALSE) +
+  #scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  theme(text = element_text(size = 25)) +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+
+- Outliers observables par modalité
+

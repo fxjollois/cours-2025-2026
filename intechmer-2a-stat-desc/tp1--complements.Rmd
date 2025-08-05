@@ -1,0 +1,241 @@
+---
+title: "Compléments sur R - TP 1"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      fig.align = "center", 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+## Projet
+
+Comme vous avez pu le remarquer, entre deux sessions de R, un certain nombre d'éléments sont *oubliés*, en particulier le répertoire de travail. Pour palier, à ce problème, il existe, dans **R Studio**, la notion de **Projet** qui permet de garder en mémoire la configuration plus globale de R.
+
+Pour créer un nouveau projet, vous devez suivre les étapes suivantes :
+
+1. Cliquer sur *File*
+2. Choisir *New Project*
+  - Veillez à bien indiquer que vous souhaitez sauvegarder votre travail
+3. Indiquer si c'est dans un nouveau répertoire ou dans un répertoire existant (puis le choisir)
+4. Choisir le type de projet
+  - Nous, ce sera toujours *New project*
+5. Indiquer le nom du projet (et donc du répertoire)
+  - par exemple `mon_projet`
+5. Cliquer sur *Create project*
+
+> Une nouvelle instance de R Studio est ouverte, avec une nouvelle session de R. Un fichier `mon_projet.Rproj` est maintenant créé dans le répertoire `mon_projet/`.
+
+Vous pouvez maintenant faire les modifications que vous le souhaitez (ouvrir certains fichiers, choisir un répertoire de travail spécifique - souvent celui du projet, ...). Tant que le projet sera sauvegardé régulièrement, la session **R Studio** sera la même quand vous relancerez le logiciel en ouvrant le fichier
+
+## Document `R markdown`
+
+Un document `R markdown` (généralement enregistré avec l'extension `.rmd` ou `.Rmd`) permet d'une part d'utiliser la syntaxe [`markdown`](https://daringfireball.net/projects/markdown/) pour écrire du texte, mais aussi d'inclure des commandes `R` directement dans le document. Ainsi, un seul document contient le code et le commentaire, ce qui est un atout non négligeable pour des rapports ou présentations devant être mises à jour ou refaits régulièrement.
+
+Il est possible d'inclure les commandes `R` soit dans un bloc de code, appelé *chunk* dans **R Studio**, ou en ligne, appelé *inline chunk*.
+
+Pour créer un document `R markdown` dans **R Studio**, vous pouvez cliquer sur l'icône avec un plus, puis sur *R markdown...*. Vous devez voir apparaître une interface vous demandant de choisir entre un document, une présentation, une application *Shiny* ou de choisir un *template* prédéfini. Nous allons rester sur le *document* pour le moment. De plus, vous pouvez indiquer le titre et l'auteur, ainsi que choisir le format de sortie (HTML, PDF ou Word). Nous allons garder HTML pour le moment.
+
+### En-tête
+
+Lors de la création d'un nouveau document `R markdown`, vous devez voir apparaître en début de document une partie d'en-tête, comme ci-dessous, au format `YAML`.
+
+```
+---
+title: "Untitled"
+author: "FX Jollois"
+date: "04/03/2025"
+output: html_document
+---
+```
+
+Dans cette en-tête, nous pouvons donc définir le titre, éventuellement un sous-titre (avec `subtitle:`), le ou les auteurs, la date et des options de sortie. Pour le moment, nous allons garder la sortie au format HTML. Pour passer au format `PDF`, il faut écrire `pdf_document` dans `output` (ainsi qu'avoir $\LaTeX$ installé sur sa machine). Pour créer un document de type Word, il faut choisir `word_document` pour `output`. 
+
+Il y a d'autres possibilités de sortie, ainsi que la possibilité d'ajouter d'autres paramètres de sortie, que nous ne verrons pas ici.
+
+### *Chunk*
+
+Un *chunk* sera donc un bloc de commande `R` (ou autre langage possible) qui sera exécuté par **R Studio**. Pour cela, il faut indiquer sur la première ligne le langage utilisé. Pour `R`, voici donc un exemple simple
+
+<pre><code>&#96;&#96;&#96;{r}
+# code R
+summary(iris)
+&#96;&#96;&#96;</code></pre>
+
+Dans le document sera donc intégré à la fois le code, ainsi que le résultat de son exécution. L'exemple donnera donc
+
+```{r}
+# code R
+summary(iris)
+```
+
+Il est possible de nommer le *chunk* en lui donnant un label (sans espace, sans accent) après `r` dans les `{}`. Ceci est intéressant surtout dans l'étape de développement, car si une erreur arrive lors de l'exécution, il sera plus facile de retrouver dans quel *chunk* est l'erreur (indiqué lors de l'affichage de l'erreur).
+
+De plus, il est possible de mettre des options dans le *chunk*, toujours dans les `{}`, après une `","`. Voici quelques options classiques et utiles (avec leur valeur par défaut indiquée, si elle existe) :
+
+- `include = TRUE` : si `FALSE`, le code est exécuté mais il n'est pas inclus dans le document (ni le code, ni son résultat)
+- `echo = TRUE` : si `FALSE`, le code n'est pas affiché mais bien exécuté
+- `eval = TRUE` : si `FALSE`, le code est affiché mais n'est pas exécuté
+- `results = 'markup'` : permet de définir comment le résultat est affiché (intéressant parfois)
+- `fig.cap` : titre du graphique produit
+
+Il est possible de mettre plusieurs options, toutes séparées par des `","`.
+
+#### Quelques exemples
+
+Dans la suite, voici quelques exemples de *chunks* avec options. Regardez le source pour mieux comprendre le fonctionnement.
+
+Tout d'abord, on importe les données `Iris.txt`, mais ce genre de code n'est souvent pas à inclure, dans le sens où l'on ne veut ni l'afficher, ni voir de résultat.
+
+```{r import, include = FALSE}
+library(tidyverse)
+library(readr)
+iris = read_delim("Iris.txt", delim = "\t")
+```
+
+Ensuite, la librairie `knitr` contient une fonction `kable()` permettant d'afficher un `data.frame` au format `markdown`. Cela permet d'avoir un résultat plus lisible qu'une sortie de console `R` classique.
+
+```{r head}
+knitr::kable(head(iris, 10))
+```
+
+Enfin, on peut vouloir faire un graphique, ce qui pourrait donner ce qui suit. Pour ce genre de présentation, nous pouvons décider de ne pas afficher le code permettant de les obtenir.
+
+```{r graph, fig.cap = "Répartition de la longueur de sépale selon l'espèces des individus", echo = FALSE}
+ggplot(iris, aes(Species, `Sepal Length`)) +
+  geom_boxplot()
+```
+
+### *Inline chunk* 
+
+On peut faire des *chunks* en ligne en encadrant le code avec des `` ` `` et en commencant le code par un `r`. Par exemple, on peut dire que dans le jeu de données `iris` sont présentés `r nrow(iris)` individus et `r ncol(iris)` variables.
+
+### Paramètres globaux des *chunks*
+
+Il est possible de déterminer des paramètres globaux pour tous les blocs *chunks* du document (sauf paramètres locaux précisés). Ceci doit se faire comme suit, avec la fonction `set()` de l'objet `opts_chunk` de la librairie `knitr`. Il est par exemple possible de définir `echo=FALSE` pour n'avoir aucun code apparaissant dans le document.
+
+```
+knitr::opts_chunk$set(...)
+```
+
+## Fichiers `.RData`
+
+Plutôt que de devoir importer plusieurs fois des données, il est possible d'utiliser le format de données `.RData`, qui permet de sauvegarder tout ou partie de l'environnement de travail. Pour cela, nous allons utiliser les fonctions `save()` et `save.image()`  pour sauvegarder, et la fonction `load()` pour charger les variables sauvegardées.
+
+### Sauvegarde de variable(s)
+
+En premier lieu, il est possible de sauvegarder uniquement une variable créée dans un fichier `.RData`. Ci-dessous, nous créons l'objet `a`, qui est une chaîne simple, puis nous la sauvegardons dans le fichier `a.RData`. Enfin, nous la supprimons (et l'affichons pour bien voir qu'elle n'existe plus).
+
+```{r, error=TRUE}
+a = "test de RData"
+print(a)
+save(a, file = "a.RData")
+rm(a)
+print(a)
+```
+
+L'intérêt est donc que la variable `a` est dans le fichier `.RData`, qu'il est possible de charger dans `R` comme suit.
+
+```{r}
+load("a.RData")
+print(a)
+```
+
+```{r, include=FALSE}
+# Ce code ne sert quà nettoyer le répertoire pour ne pas le polluer de fichier inutile.
+file.remove("a.RData")
+```
+
+Pour sauvegarder plusieurs variables, il faut juste les lister dans la fonction `save()`.
+
+```{r, error=TRUE}
+b = "deuxième test de RData"
+c = 123456789
+save(b, c, file = "bc.RData")
+rm(b, c)
+print(b, c)
+```
+
+Et on les charge de la même façon.
+
+```{r}
+load("bc.RData")
+print(b)
+print(c)
+```
+
+
+### Sauvegarde de l'environnement
+
+Quand on lance la fonction `ls()`, on liste l'ensemble des objets créés dans l'environnement de travail. La fonction `save.image()` va tous les sauvegarder dans un même fichier `.RData`.
+
+```{r}
+ls()
+save.image("env.RData")
+```
+
+Ensuite, nous allons nettoyer l'environnement de travail, en supprimant tous les objets (1ère ligne ci-dessous). Ainsi, en listant les variables avec `ls()`, on s'aperçoit qu'il n'y a plus rien.
+
+```{r}
+rm(list = ls()) # Pour tout supprimer de l'environnement
+ls()
+```
+
+Enfin, toujours avec la fonction `load()`, on charge les variables présentes dans le fichier, qu'on retrouve bien en faisant un `ls()`.
+
+```{r}
+load("env.RData")
+ls()
+```
+
+
+## A faire
+
+Dans votre document, penser à nommer chaque chunk différemment. Et n'hésiter pas à commenter le document pour le rendre plus conforme à ce qu'on pourrait vouloir produire comme document.
+
+Vous trouverez sur le site [rmarkdown](https://daringfireball.net/projects/markdown/) beaucoup d'informations et de compléments sur cette librairie. Beaucoup sont résumées dans ce [document](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf).
+
+Nous allons travailler sur les données `varespec` et `varechem` présente dans le package `vegan`. Quelques informations sont disponibles sur [cette page](https://vegandevs.github.io/vegan/reference/varechem.html). Pour les charger dans R, vous devez exécuter les commandes suivantes :
+
+```{r vare-import}
+data(varechem)
+data(varespec)
+```
+
+
+1. Créer un nouveau document `R markdown`, intitulé `"TP"`, avec votre nom comme auteur
+1. Sauvegarder ce document sous le nom `"TP.Rmd"`
+1. Cliquer sur le bouton *knit* pour voir le résultat de l'exemple fourni
+1. Supprimer le contenu du document, en gardant uniquement l'en-tête
+1. Paramétrer l'ensemble des chunks pour ne pas voir apparaître le code des *chunks* dans le résultat
+1. Créer 4 titres de niveau 2, avec le contenu suivant
+    1. **Données** : 
+        - écrire un texte introductif précisant (en ligne) le nombre de lignes et de colonnes du jeu de données `varechem`, et incluant un lien vers la page de présentation
+        - afficher proprement l'ensemble du jeu de données
+    3. **`Baresoil`**
+        - Histogramme de la variable `Baresoil`
+        - Boîte à moustache de la même variable
+    2. **`Fe`** :
+        - créer une nouvelle variable `Fe_bin` dans le jeu de données `varechem` prenant comme valeur `"high"` pour `Fe > 50` et `"low"` sinon, en affichant le code pour la créer
+        - afficher un tableau à deux colonnes : 
+            - `"Fe"` avec les deux modalités de `Fe_bin`
+            - `"Effectif"` avec l'effectif pour chaque transmission
+        - afficher le diagramme circulaire de la répartition des voitures en fonction de leur transmission avec les paramètres suivants :
+            - un titre de figure indiquant ce qui est représenté (cf `fig.cap`)
+            - centrage dans le document (cf `fig.align`)
+            - largeur et hauteur de `2.5`(cf `fig.width` et `fig.height`)
+            - la couleur `"orange"` pour `"high"` et `"blue"` pour `"low"`
+1. Maintenant, 
+    1. Créer un fichier texte `script.R` dans lequel vous allez placer tout votre code d'importation des données, de manipulations de celles-ci et de création des graphiques
+    2. Stocker les graphiques dans des variables lors de la création
+    3. Créer un fichier `RData` contenant l'ensemble des éléments utiles pour la création de votre fichier `html`
+    4. Utiliser ce fichier `RData` dans votre fichier `Rmd`
+    

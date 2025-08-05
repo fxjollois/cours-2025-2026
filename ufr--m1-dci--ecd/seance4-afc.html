@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Extraction de connaissances à partir de données structurées et non structurées</title>
+    <meta charset="utf-8" />
+    <script src="seance4-afc_files/header-attrs-2.27/header-attrs.js"></script>
+    <link href="seance4-afc_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="seance4-afc_files/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Extraction de connaissances à partir de données structurées et non structurées
+]
+.subtitle[
+## Séance 4 : Analyse Factorielle des Correspondances (AFC)
+]
+
+---
+
+
+
+
+##  Que veut-on faire ?
+
+- Décrire et/ou résumer l'information contenue dans les données 
+    - Sans formuler d'hypothèses au préalable 
+- Tableau individu `\(\times\)` variable
+    - On connaît : **ACP**
+- Table de contingence
+    - **AFC**
+- Plus largement sur un tableau de nombres non négatifs
+
+**Idée principale** : Utiliser les principes de l'ACP en utilisant une autre métrique
+
+---
+## Table de contingence
+
+Croisement de deux variables qualitatives, représentant les effectifs de chaque couple de modalité
+
+
+&lt;table class="table table-condensed centering"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; No &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Yes &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 1st &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 122 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 203 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2nd &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 167 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 118 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 3rd &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 528 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 178 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Crew &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 673 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 212 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Ici, nous représentons les passagers du Titanic répartis sur leur classe (1ère, 2nde, 3ème et équipage) et leur surie ou non (*i.e.* 178 passagers en 3ème classe ont survécu au naufrage).
+
+---
+## Problème et objectifs
+
+Visualiser les liens entre les deux variables
+
+- Utiliser la représentation simultanée des deux variables pour analyser les liens entre les modalités des deux variables
+- Détection de modalités atypiques 
+- Visualiser les ressemblances entre les modalités d'une même variable
+
+**Objectifs similaires à l'ACP**
+
+---
+## Pourquoi pas une ACP directement ?
+
+Tableau analysé :
+
+- Individus : modalités de la variable en lignes
+- Variables : madalités de la variable en colonnes
+
+Comparaison des distributions en **fréquences absolues**
+
+- Importance beaucoup trop importante d'une modalité très (trop) présente en lignes
+- On est plutôt intéressé par les **profils**
+
+---
+## Quelques notations
+
+- `\(\mathbf{X}\)` et `\(\mathbf{Y}\)` : deux variables qualitatives à respectivement `\(p\)` et `\(q\)` modalités
+- `\(\mathbf{T} = (t_{ij})\)`, avec `\(i=1,\ldots,p\)` et `\(j=1,\ldots,q\)` : 
+    - nombre d'individus ayant la modalité `\(i\)` pour `\(X\)` et `\(j\)` pour `\(Y\)`
+    - `\(\sum_{i=1}^p \sum_{j=1}^q t_{ij} = n\)`
+- Marge en ligne : `\((t_{i.}) = \sum_{j=1}^q t_{ij}\)` (effectifs des modalités de `\(X\)`)
+- Marge en colonne : `\((t_{.j}) = \sum_{i=1}^p t_{ij}\)` (effectifs des modalités de `\(Y\)`)
+- `\(\mathbf{D}_X\)` et `\(\mathbf{D}_Y\)` matrice diagonale contenant les marges en lignes et en colonnes sur la diagonale
+- Profils lignes : `\(\frac{t_{ij}}{t_{i.}} = P(Y=j | X=i)\)`, donné par `\(\mathbf{D}_X^{-1}\mathbf{T}\)`
+- Profils colonnes : `\(\frac{t_{ij}}{t_{.j}} = P(X=i | Y=j)\)`, donné par `\(\mathbf{T}\mathbf{D}_Y^{-1}\)`
+
+---
+## Indépendance
+
+Rappel de l'Indépendance : `\(P(AB) = P(A)P(B)\)`
+
+`\(\chi^2\)` : Mesure de l'écart à l'indépendance 
+
+`$$\chi^2(X,Y)=n\sum_{i=1}^p \sum_{j=1}^q \frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}$$`
+
+- Si les variables sont indépendantes, `\(\chi^2 (X,Y) = 0\)`
+    - cela voudra dire que `\(f_{ij} = f_{i.}f_{.j}\)` pour chaque couple de modalités
+
+- On a aussi `\(\chi^2(X,Y) \le n \times \mbox{inf}(p-1,q-1)\)`. 
+  - Si `\(\chi^2(X,Y)\)` est égal respectivement à `\(n(p-1)\)` ou `\(n(q-1)\)`, cela voudra dire que `\(X\)` (resp. `\(Y\)`) est fonctionnellement liée à `\(Y\)` (resp. `\(X\)`).
+- Contribution d'une cellule `\(ij\)` : `\(\frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}\)`
+
+---
+## Distance
+
+**Idée** : Les profils lignes et les profils colonnes sont deux nuages de points sur lesquels on pourra appliquer une ACP
+
+Distance entre 2 modalités de `\(X\)` : 
+
+`$$d_{\chi^2}^2(i,i')=\sum_{j=1}^q\frac{n}{t_{.j}}\left(\frac{t_{ij}}{t_{i.}}-\frac{t_{i'j}}{t_{i'.}}\right)^2$$`
+
+Cela revient à utiliser la métrique `\(n\mathbf{D}_Y^{-1}\)` sur les profils lignes, ce qu'on appelle la **métrique du `\(\chi^2\)`**.
+
+Idem pour les colonnes.
+
+---
+## Inertie
+
+Inertie du nuage des profils lignes, par rapport au centre de gravité de ce nuage `\(g_\ell = (f_{.j})\)` :
+
+`$$I_{g_\ell} = \sum_{i=1}^p \frac{t_{i.}}{n} d_{\chi^2}^2 (i, g_\ell) = \chi^2 (X,Y)$$`
+
+Idem pour les colonnes. 
+
+### Avantage de cette métrique
+
+Regroupement de modalités ne modifiant pas l'inertie et donc la valeur du `\(\chi^2\)`, ni même les distances. C'est l'**équivalence distributionnelle**.
+
+---
+## ACP sur les profils
+
+Deux possibilités totalement symétriques :
+
+Info | Profil lignes | Profil colonnes
+-|-|-
+Données `\(Z\)`					| `\(D_X^{-1}T\)`      | `\(D_Y^{-1}T'\)`
+Métrique `\(M\)`				| `\(nD_Y^{-1}\)`      | `\(nD_X^{-1}\)`
+Poids `\(D\)`						| `\(D_X/n\)`          | `\(D_Y/n\)`
+Centre 							| `\(Z'D1\)`            
+Variance-covariance | `\(V = Z'DZ - gg'\)` 
+
+- Calcul **identiques à l'ACP** avec ces définitions
+- Deux analyses conduisant aux mêmes valeurs propres 
+- Facteurs principaux de l'une = composantes principales de l'autre.
+
+---
+## Interprétation
+
+### Choix du nombre d'axes
+
+- Pproblème plus compliqué que dans l'ACP 
+- Critère de Kaiser s'applique mal
+- Règle du coude toujours valide
+
+### Coordonnées de points
+
+- Principal résultat
+- Représentation en 2 (ou plus) dimensions des modalités des deux variables
+
+Les deux nuages de points, et donc les deux ensembles de modalités (de `\(X\)` et de `\(Y\)`) peuvent être représentés **sur le même graphique**.
+
+Le cercle de corrélations n'a aucun intérêt ici.
+
+---
+## Interpretation
+
+### Contributions
+
+- De même que pour l'ACP
+- Contribution de la modalité `\(i\)` de `\(X\)` = `\(\frac{t_{i.}}{n} \frac{(a_{ki}^2}{\lambda_k}\)`
+- Contributions fortes (supérieures à `\(1/p\)`)
+- Idem les modalités `\(j\)` de `\(Y\)`.
+
+### Qualité de représentation
+
+Idem que pour l'ACP et que pour les contributions.
+
+---
+## Plus loin
+
+**Modalités supplémentaires** ne participant pas au calcul, mais pouvant être représentés sur les graphiques :
+
+- Lignes et/ou colonnes supplémentaires : modalités de `\(X\)` ou de `\(Y\)` qu'on ne veut pas inclure dans le calcul de l'AFC
+
+**Regroupement de modalités** 
+
+- à considérer si une modalité est trop peu présente
+    - elle *tire* le nuage vers elle
+
+Travail *envisageable* sur un jeu de données Individus x Variables, sous quelques conditions :
+
+- Variables de mêmes unités ;
+- Somme en lignes et en colonnes ayant un sens ;
+- Recherche sur les profils (de consommation par exemple).
+
+---
+## Exemple simple 
+
+Nous utilisons les données `occupationalStatus`, qui nous donne la répartition d'hommes britaniques suivant le statut professionnel de leur père (en ligne) et le leur (en colonne). Les statuts sont codés de 1 à 8, et nous n'avons aucune information sur ceux-ci.
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=6 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=7 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=8 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sum &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583"&gt;50&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;19&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f"&gt;26&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;8&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;7&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;2&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 129 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;40&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;18&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d"&gt;20&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;8&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 150 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;35&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;65&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;35&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b"&gt;88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;21&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 345 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d"&gt;20&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f"&gt;110&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;40&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d"&gt;183&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 518 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;2&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;8&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 156 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d"&gt;102&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099"&gt;162&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;90&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;554&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6"&gt;230&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;177&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1355 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;19&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;40&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;21&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98"&gt;158&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95"&gt;143&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 458 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c"&gt;14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c"&gt;15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92"&gt;126&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;91&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;106&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 387 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 159 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 330 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 459 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 244 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 593 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 424 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3498 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Proportions globales
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=6 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=7 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=8 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sum &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583"&gt;1.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;0.54&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f"&gt;0.74&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.20&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.69 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;1.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;0.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d"&gt;0.57&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.29 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;1.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;1.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;1.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380"&gt;1.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b"&gt;2.52&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;0.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;0.60&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.86 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d"&gt;0.57&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;1.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f"&gt;3.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;1.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d"&gt;5.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;1.83&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;0.91&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;0.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;0.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483"&gt;1.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;0.80&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.46 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;0.80&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d"&gt;2.92&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099"&gt;4.63&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;2.57&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;15.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6"&gt;6.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;5.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 38.74 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;0.54&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481"&gt;1.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;0.60&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98"&gt;4.52&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95"&gt;4.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;2.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.09 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c"&gt;0.40&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;0.91&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c"&gt;0.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92"&gt;3.60&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;2.60&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;3.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.06 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Profils lignes
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=6 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=7 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=8 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sum &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b1d5e0"&gt;38.76&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a0"&gt;14.73&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf"&gt;20.16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;6.20&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788"&gt;5.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;8.53&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;4.65&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;1.55&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae96"&gt;10.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c9c4c0"&gt;26.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d1bfb5"&gt;22.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099"&gt;12.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d"&gt;7.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29d"&gt;13.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788"&gt;5.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;2.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483"&gt;3.48&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94"&gt;10.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d9b9ab"&gt;18.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d8baac"&gt;19.13&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94"&gt;10.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cbc2bd"&gt;25.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;6.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;6.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;2.12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;3.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97"&gt;11.20&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bdb2"&gt;21.24&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;7.72&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d7"&gt;35.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b09a"&gt;12.36&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;6.18&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;1.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;5.13&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;7.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a0"&gt;14.74&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #deb5a4"&gt;16.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c3c8c7"&gt;29.49&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dbb8a9"&gt;17.95&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;7.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;2.07&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d"&gt;7.53&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099"&gt;11.96&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;6.64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;40.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6"&gt;16.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;13.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;1.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a584"&gt;4.15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab91"&gt;8.73&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;4.59&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b9cfd5"&gt;34.50&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c0cacc"&gt;31.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dfb5a2"&gt;15.50&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.78&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483"&gt;3.62&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f"&gt;8.27&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;3.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bdcccf"&gt;32.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cfc0b8"&gt;23.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c8c5c2"&gt;27.39&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Profils colonnes
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=6 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=7 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=8 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;48.54&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94"&gt;11.95&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;7.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d"&gt;1.74&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;2.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.93&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;1.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.47&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;15.53&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bdb1"&gt;25.16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;10.30&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;3.92&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;4.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;1.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;1.35&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.71&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad93"&gt;11.65&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d9b9aa"&gt;22.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ddb6a5"&gt;19.70&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099"&gt;14.38&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099"&gt;14.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;7.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;3.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;4.95&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac91"&gt;10.68&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95"&gt;12.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1"&gt;17.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf"&gt;23.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e"&gt;16.39&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;15.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92"&gt;10.79&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;7.55&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;1.94&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;5.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;3.64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;5.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;10.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;3.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;4.72&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;2.83&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad93"&gt;11.65&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1"&gt;17.61&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cac3be"&gt;30.91&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c3c8c8"&gt;35.29&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c0cacc"&gt;36.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b0d5e1"&gt;46.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bdccd0"&gt;38.79&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6"&gt;41.75&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;3.77&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;5.76&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d"&gt;8.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d"&gt;8.61&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97"&gt;13.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf"&gt;24.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f"&gt;16.75&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;1.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483"&gt;4.24&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a889"&gt;6.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;6.15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edac91"&gt;10.62&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e5b19c"&gt;15.35&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bcb1"&gt;25.00&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+
+---
+## Part de la variance expliquée
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Valeur propre &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Variance (%) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Cumulée (%) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.53 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88.08 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 94.83 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97.29 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98.70 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.75 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dim 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="seance4-afc_files/figure-html/eigenfig-1.png" style="display: block; margin: auto;" /&gt;
+
+2 axes suffisent à représenter 88.1% de l'information présente dans les données.
+
+---
+## Représentation graphique - modalités en lignes
+
+&lt;img src="seance4-afc_files/figure-html/graphs_row-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Représentation graphique - modalités en colonnes
+
+&lt;img src="seance4-afc_files/figure-html/graphs_col-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Représentation conjointe
+
+&lt;img src="seance4-afc_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Lignes importantes
+
+### Contribution
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 5 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;57.96&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d1beb5"&gt;31.92&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a584"&gt;5.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.37&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e"&gt;19.37&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c"&gt;10.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #becbce"&gt;45.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.77&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;9.49&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;4.81&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e0b4a2"&gt;21.63&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.24&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483"&gt;5.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;9.39&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.08&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d"&gt;10.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e"&gt;19.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.11&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;1.99&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.29&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97"&gt;16.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c2c9ca"&gt;43.10&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483"&gt;5.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;6.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;2.45&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #deb6a5"&gt;23.28&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;6.07&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;9.05&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;6.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bfcbce"&gt;45.16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.29&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;6.62&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95"&gt;14.93&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b098"&gt;16.61&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d3bdb2"&gt;30.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad94"&gt;13.97&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Lignes importantes
+
+### Qualité de représentation
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Somme &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;0.13&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #baced4"&gt;0.72&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;0.10&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;0.16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bcb0"&gt;0.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1bb"&gt;0.52&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.98 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1bb"&gt;0.52&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a7"&gt;0.36&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.90 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95"&gt;0.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae96"&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a7"&gt;0.36&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b5d2da"&gt;0.77&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;0.07&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c9c4c0"&gt;0.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95"&gt;0.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;0.05&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c"&gt;0.15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.98 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d0bfb7"&gt;0.49&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e"&gt;0.29&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789"&gt;0.12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;0.08&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Colonnes importantes 
+
+### Contribution
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 5 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;55.37&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1ba"&gt;33.26&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a788"&gt;7.44&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.13&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d"&gt;18.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;11.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bbced3"&gt;45.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.93&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;4.50&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;8.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c"&gt;9.59&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a381"&gt;3.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.12&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95"&gt;14.10&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab90"&gt;11.29&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b"&gt;0.81&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;7.10&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;5.39&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;2.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483"&gt;4.72&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c1cacb"&gt;41.76&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;5.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f"&gt;11.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c8c5c1"&gt;36.64&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;6.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;11.74&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;6.48&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6"&gt;47.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a"&gt;0.49&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;6.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95"&gt;14.35&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98"&gt;15.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c1cacb"&gt;41.83&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98c"&gt;9.27&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Colonnes importantes 
+
+### Qualité de représentation
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Somme &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;0.85&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;0.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bbced2"&gt;0.70&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789"&gt;0.12&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f"&gt;0.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6"&gt;0.73&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97"&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.97 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bfcbcd"&gt;0.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92"&gt;0.19&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d"&gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.90 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f"&gt;0.04&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf"&gt;0.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a381"&gt;0.06&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;0.05&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099"&gt;0.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.83 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b9cfd5"&gt;0.72&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d"&gt;0.15&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;0.10&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.97 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cbc2bd"&gt;0.53&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c"&gt;0.27&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;0.05&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b"&gt;0.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;0.00&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.99 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dest=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d0bfb6"&gt;0.48&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d"&gt;0.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;0.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787"&gt;0.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Lien avec le `\(\chi^2\)`
+
+Il y a clairement un lien entre les deux variables.
+
+
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  o
+## X-squared = 1416, df = 49, p-value &lt; 2.2e-16
+```
+
+---
+## Résidus 
+
+Différence entre observé et estimé.
+
+
+&lt;table class="table table-condensed"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=5 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=6 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=7 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; dest=8 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6"&gt;23.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1"&gt;5.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e5b19b"&gt;3.96&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;-2.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;-0.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a"&gt;-4.95&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa37f"&gt;-3.39&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;-3.45&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1"&gt;5.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ccc2bc"&gt;12.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b3a0"&gt;5.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b"&gt;-0.38&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d"&gt;0.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;-4.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;-3.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f"&gt;-3.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;0.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f"&gt;4.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e0b4a2"&gt;5.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af98"&gt;3.08&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95"&gt;2.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;-2.68&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b"&gt;-4.64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;-3.22&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a788"&gt;-1.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a889"&gt;-0.73&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edac91"&gt;1.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f"&gt;5.10&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8f"&gt;0.64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;0.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483"&gt;-2.54&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27d"&gt;-3.89&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788"&gt;-1.21&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d"&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a889"&gt;-0.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e"&gt;0.56&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29c"&gt;4.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789"&gt;-0.95&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d"&gt;0.30&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686"&gt;-1.59&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17b"&gt;-4.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c"&gt;-4.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584"&gt;-2.28&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788"&gt;-1.18&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;-0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29d"&gt;4.41&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c"&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90"&gt;1.00&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;-3.67&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380"&gt;-3.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;-3.68&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;-2.59&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585"&gt;-1.94&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d"&gt;0.22&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dbb8a8"&gt;7.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94"&gt;2.08&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; orig=8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa37f"&gt;-3.38&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f"&gt;-3.48&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e"&gt;-3.73&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482"&gt;-2.64&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583"&gt;-2.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a"&gt;-0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98"&gt;3.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d8baad"&gt;8.63&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

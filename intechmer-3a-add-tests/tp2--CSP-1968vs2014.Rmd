@@ -1,0 +1,45 @@
+---
+title: "Applications sur données réelles - CSP 1968 vs 2014 - TP 2"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Données CSP 1968 et 2014 
+
+Nous disposons sur cette page de la répartition de la population active de 25 à 54 ans selon la catégorie socioprofessionnelle et la position vis à vis de l'emploi, par commune et département, de [1968](https://fxjollois.github.io/donnees/regions-csp/regions-csp-1968.csv) et de [2014](https://fxjollois.github.io/donnees/regions-csp/regions-csp-2014.csv).
+
+Les codes ci-dessous vous montrent comment les importer (en supprimant les données sur les chômeurs).
+
+```{r}
+library(readr)
+library(tibble)
+library(dplyr)
+library(DT)
+regions1968 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-1968.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions1968) = sub(" RP1968", "", names(regions1968))
+datatable(regions1968, options = list(scrollX = TRUE))
+```
+
+```{r}
+regions2014 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-2014.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions2014) = sub(" RP2014", "", names(regions2014))
+datatable(round(regions2014), options = list(scrollX = TRUE))
+```
+
+## A faire
+
+- Réaliser une AFC sur le croisement entre la catégorie socioprofessionnelle et la région
+  - pour 1968
+  - pour 2014
+- A l'aide des outils à votre disposition (tableaux et graphiques),
+  - Décrire la situation pour chaque année,
+  - Comparer les deux situations

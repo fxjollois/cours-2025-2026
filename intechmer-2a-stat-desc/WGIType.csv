@@ -1,0 +1,7 @@
+"TypeCode";"TypeName"
+"EST";"Estimate"
+"NO.SRC";"Number of Sources"
+"PER.RNK";"Percentile Rank"
+"PER.RNK.LOWER";"Percentile Rank, Lower Bound of 90% Confidence Interval"
+"PER.RNK.UPPER";"Percentile Rank, Upper Bound of 90% Confidence Interval"
+"STD.ERR";"Standard Error"

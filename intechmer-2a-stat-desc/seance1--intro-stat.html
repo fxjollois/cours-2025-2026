@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction à la Statistique</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Traitement des données" />
+    <script src="seance1--intro-stat_files/header-attrs-2.27/header-attrs.js"></script>
+    <link href="seance1--intro-stat_files/remark-css-0.0.1/fc.css" rel="stylesheet" />
+    <link href="seance1--intro-stat_files/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <link href="seance1--intro-stat_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+    <script src="seance1--intro-stat_files/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+    <link href="seance1--intro-stat_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="seance1--intro-stat_files/datatables-binding-0.33/datatables.js"></script>
+    <script src="seance1--intro-stat_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+    <link href="seance1--intro-stat_files/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="seance1--intro-stat_files/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="seance1--intro-stat_files/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+    <link href="seance1--intro-stat_files/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="seance1--intro-stat_files/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Introduction à la Statistique
+]
+.author[
+### Traitement des données
+]
+.date[
+### INTECHMER - CT2 GEM/PVRM
+]
+
+---
+
+
+
+
+## Qu'est-ce que la statistique ?
+
+&gt; Ensemble de méthodes permettant de décrire et d'analyser des observations (communément appelées **données** de nos jours)
+
+--
+
+Utilisé maintenant dans tous les secteurs d'activités
+
+- Economie et finance : marketing, sondages...
+- Industrie : fiabilité, contrôle qualité...
+- Santé : recherche médicale, gestion des hôpitaux...
+- Environnement : prévisions climatiques et météorologiques, pollution...
+- Web : réseaux, publicité...
+- ...
+
+&gt; Essor important avec le développement des outils informatiques et du web
+
+
+---
+  
+## Définitions de base
+  
+- **Population** : ensemble d'entités (personnes, objets, ...) étudiées
+
+--
+
+- **Individu** (ou *unité statistique*) : entité étudiée
+
+--
+
+- **Variable** : caractéristique étudiée sur chaque individu
+
+--
+
+- **Observation** : mesure 
+
+--
+
+- **Série statistique** : série d'observations recueillies sur les individus
+
+--
+
+- **Tableau de données** : stockage de la série statistique
+  - Individus croisant des variables 
+  - Chaque ligne représente un individu
+  - Chaque colonne représente une variable (ou attribut)
+  - C'est ce qu'on fait classiquement dans un tableur de type Excel
+
+---
+
+## Données `mtcars`
+
+Informations sur des voitures
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-d9009c9db946623388b4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d9009c9db946623388b4">{"x":{"filter":"none","vertical":false,"data":[["Mazda RX4","Mazda RX4 Wag","Datsun 710","Hornet 4 Drive","Hornet Sportabout","Valiant","Duster 360","Merc 240D","Merc 230","Merc 280","Merc 280C","Merc 450SE","Merc 450SL","Merc 450SLC","Cadillac Fleetwood","Lincoln Continental","Chrysler Imperial","Fiat 128","Honda Civic","Toyota Corolla","Toyota Corona","Dodge Challenger","AMC Javelin","Camaro Z28","Pontiac Firebird","Fiat X1-9","Porsche 914-2","Lotus Europa","Ford Pantera L","Ferrari Dino","Maserati Bora","Volvo 142E"],[21,21,22.8,21.4,18.7,18.1,14.3,24.4,22.8,19.2,17.8,16.4,17.3,15.2,10.4,10.4,14.7,32.4,30.4,33.9,21.5,15.5,15.2,13.3,19.2,27.3,26,30.4,15.8,19.7,15,21.4],[6,6,4,6,8,6,8,4,4,6,6,8,8,8,8,8,8,4,4,4,4,8,8,8,8,4,4,4,8,6,8,4],[160,160,108,258,360,225,360,146.7,140.8,167.6,167.6,275.8,275.8,275.8,472,460,440,78.7,75.7,71.09999999999999,120.1,318,304,350,400,79,120.3,95.09999999999999,351,145,301,121],[110,110,93,110,175,105,245,62,95,123,123,180,180,180,205,215,230,66,52,65,97,150,150,245,175,66,91,113,264,175,335,109],[3.9,3.9,3.85,3.08,3.15,2.76,3.21,3.69,3.92,3.92,3.92,3.07,3.07,3.07,2.93,3,3.23,4.08,4.93,4.22,3.7,2.76,3.15,3.73,3.08,4.08,4.43,3.77,4.22,3.62,3.54,4.11],[2.62,2.875,2.32,3.215,3.44,3.46,3.57,3.19,3.15,3.44,3.44,4.07,3.73,3.78,5.25,5.424,5.345,2.2,1.615,1.835,2.465,3.52,3.435,3.84,3.845,1.935,2.14,1.513,3.17,2.77,3.57,2.78],[16.46,17.02,18.61,19.44,17.02,20.22,15.84,20,22.9,18.3,18.9,17.4,17.6,18,17.98,17.82,17.42,19.47,18.52,19.9,20.01,16.87,17.3,15.41,17.05,18.9,16.7,16.9,14.5,15.5,14.6,18.6],[0,0,1,1,0,1,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,0,1,0,0,0,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1],[4,4,4,3,3,3,3,4,4,4,4,3,3,3,3,3,3,4,4,4,3,3,3,3,3,4,5,5,5,5,5,4],[4,4,1,1,2,1,4,2,2,4,4,3,3,3,4,4,4,1,2,1,1,2,2,4,2,1,2,2,4,6,8,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>mpg<\/th>\n      <th>cyl<\/th>\n      <th>disp<\/th>\n      <th>hp<\/th>\n      <th>drat<\/th>\n      <th>wt<\/th>\n      <th>qsec<\/th>\n      <th>vs<\/th>\n      <th>am<\/th>\n      <th>gear<\/th>\n      <th>carb<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"dom":"p","columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6,7,8,9,10,11]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"mpg","targets":1},{"name":"cyl","targets":2},{"name":"disp","targets":3},{"name":"hp","targets":4},{"name":"drat","targets":5},{"name":"wt","targets":6},{"name":"qsec","targets":7},{"name":"vs","targets":8},{"name":"am","targets":9},{"name":"gear","targets":10},{"name":"carb","targets":11}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## Recensement vs Sondage
+  
+2 grandes méthodes de recueil de données
+
+--
+
+### Recensement
+  
+Etude de tous les individus d'une population
+
+- Recueil exhaustif de toutes les informations sur toutes les entités
+- Difficile à mettre en œuvre la plupart du temps
+
+--
+
+### Sondage
+
+Etude d'une partie de la population pour extrapolation sur l'ensemble de la population
+
+- Partie des individus étudiés = **échantillon**
+- Représentativité de l'échantillon ?
+
+---
+
+## Déroulement d'une étude statistique
+
+1. Définition du périmètre de l'étude 
+    - Ce qu'on étudie ?
+    - Conditions ?
+    - ...
+--
+
+1. Recueil des données
+    - Expérience, sondage, ...
+--
+
+1. Nettoyage, Pré-traitement, mise en forme des données
+    - Repérage données aberrantes
+    - Gestion données manquantes
+    - Transformation de variables
+--
+
+1. Description des données
+    - Univariée puis bivariée
+    - Méthodes multivariées ensuite
+--
+
+1. Selon étude, recherche d'un modèle, d'une partition, ...
+
+---
+
+## Type de variables
+  
+### Variable quantitative
+  
+Caractéristiques numériques : opérations de type somme ayant un sens
+
+### Continue
+  
+Mesurable
+
+- Ex : taille, poids, durée...
+
+### Discrète
+  
+Dénombrable ou mesurable en espace fini
+
+- Ex : âge, quantité en stock...
+
+---
+
+## Type de variables
+  
+### Variable qualitative
+  
+Caractéristiques non numériques : opérations de type somme n'ayant pas de sens
+
+- Valeurs possibles : **Modalités** (ou catégories)
+
+### Nominale
+
+Modalités n'ayant pas de lien entre elles (Ex : couleur des yeux, sexe...)
+
+- Cas particulier *Binaire* : 2 valeurs possibles uniquement (Ex : oui/non, présence/absence...)
+
+### Ordinale 
+
+Modalités devant être triées dans un ordre spécifique (Ex : mois, sentiment...)
+
+---
+class: center, middle, inverse
+
+## Manipuler les données
+
+---
+
+## Problème récurrent : manipuler les données
+
+Au sens mise en forme et extraction d'informations
+
+### Objectifs
+
+- Mettre en forme les données, provenant potentiellement de différentes sources
+- Extraire des informations simples (dénombrement, somme, ...)
+- Gérer les flux de données si tâches récurrentes
+
+### Outils
+
+- Programmation statistique
+- Algèbre relationnelle, applicable quelque soit les données
+
+---
+class: middle, center, inverse
+
+## Programmation statistique
+
+---
+
+## Utilisation du logiciel R
+
+Langage **R**, issu du langage *S+* (version *open source* de celui-ci)
+
+- Langage dit interprété : la *console* exécute les commandes les unes après les autres
+- Pour ceux qui connaissent, *Python* est aussi interprété
+- Dédié à la statistique, de nombreuses méthodes y sont développées, beaucoup de packages pour étendre les possibilités de l'outil
+
+--
+
+Outil de développement : **R Studio**
+
+- Interface permettant l'écriture et l'exécution des programmes
+- Intéressant car coloration syntaxique, aide à l'écriture, visualisation de l'environnement, accès à l'aide...
+
+--
+
+2 outils différents à installer donc, pour la suite des cours :
+- [Langage R](https://cran.r-project.org/)
+- [R Studio](https://posit.co/download/rstudio-desktop/)
+
+---
+
+## Méta-Librarie `tidyverse`
+
+- Suite de packages dédiés à la Science des données, développés par la même équipe que *RStudio*
+
+- [Site de la méta-librairie](https://www.tidyverse.org/)
+
+- Packages inclus :
+    - `tibble` : type `tibble` (extension de dataframe, que l'on verra plus tard)
+    - `readr` : importation de données
+    - `dplyr` : manipulation de données
+    - `ggplot2` : création de graphiques
+    - `tidyr`, `stringr`, `forcats`, `purrr` : outils complémentaires
+
+
+``` r
+install.packages(tidyverse) # A faire une seule fois
+library(tidyverse) # A faire à chaque session (= lancement de R)
+```
+
+
+---
+
+## Type de données
+
+- 3 grands types : `"int"`, `"numeric"` et `"character"` 
+- Typage faible : si modification de la variable, changement du type
+
+
+``` r
+a = 12
+class(a)
+```
+
+```
+## [1] "numeric"
+```
+
+``` r
+a = "bonjour"
+class(a)
+```
+
+```
+## [1] "character"
+```
+
+&gt; Noter que les noms de variables commencent toujours par une lettre et peuvent comporter des lettres, des chiffres et certains caractères (`_` et `.`).
+
+---
+
+## Type de données
+
+- Tout est vecteur
+
+
+``` r
+a = 12
+a[1]
+```
+
+```
+## [1] 12
+```
+
+``` r
+a[2] = 5
+a
+```
+
+```
+## [1] 12  5
+```
+
+- Suite de nombre facile à créer
+
+
+``` r
+a = 1:5
+a
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+---
+
+## Travail sur vecteurs
+
+- Indexation à partir de 1
+
+
+``` r
+a = 5:15
+a
+```
+
+```
+##  [1]  5  6  7  8  9 10 11 12 13 14 15
+```
+
+``` r
+a[1]
+```
+
+```
+## [1] 5
+```
+
+``` r
+a[1:3]
+```
+
+```
+## [1] 5 6 7
+```
+
+``` r
+a[3] = 27
+a
+```
+
+```
+##  [1]  5  6 27  8  9 10 11 12 13 14 15
+```
+
+
+---
+
+## Opérations
+
+- C'est une grosse calculatrice
+
+
+``` r
+13 * (11 + 27) - 54 / 19
+```
+
+```
+## [1] 491.1579
+```
+
+``` r
+1:5 * 2
+```
+
+```
+## [1]  2  4  6  8 10
+```
+
+- On peut faire des tests
+
+
+``` r
+1:5 &gt; pi
+```
+
+```
+## [1] FALSE FALSE FALSE  TRUE  TRUE
+```
+
+---
+
+## Fonctions statistiques usuelles
+
+
+``` r
+a = 1:50
+sum(a)  # somme
+```
+
+```
+## [1] 1275
+```
+
+``` r
+mean(a) # moyenne
+```
+
+```
+## [1] 25.5
+```
+
+``` r
+sd(a)   # écart-type
+```
+
+```
+## [1] 14.57738
+```
+
+``` r
+var(a)  # variance
+```
+
+```
+## [1] 212.5
+```
+
+``` r
+min(a)  # minimum
+```
+
+```
+## [1] 1
+```
+
+``` r
+max(a)  # maximum
+```
+
+```
+## [1] 50
+```
+
+
+---
+
+## Un peu de programmation classique
+
+&gt; Traitement conditionnel avec `if`, `else`
+
+
+``` r
+a = 91.15
+if (a &lt; 100) {
+  print("a est inférieur à 100")
+}
+```
+
+```
+## [1] "a est inférieur à 100"
+```
+
+
+``` r
+if (a &lt; 50) {
+  print("a est en dessous de 50")
+} else {
+  print("a est au dessus de 50")
+}
+```
+
+```
+## [1] "a est au dessus de 50"
+```
+
+---
+
+## Un peu de programmation classique
+
+&gt; Traitement itératif avec `for`
+
+
+``` r
+for (i in 1:5) {
+  print(i)
+}
+```
+
+```
+## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+```
+
+``` r
+print(i)
+```
+
+```
+## [1] 5
+```
+
+
+---
+
+## Un peu de programmation classique
+
+&gt; Possible de faire des boucles aussi avec `while`
+
+
+``` r
+i = 1
+while(i &lt;= 5) {
+  print(i)
+  i = i + 1
+}
+```
+
+```
+## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+```
+
+``` r
+print(i)
+```
+
+```
+## [1] 6
+```
+
+
+---
+
+## Notion de dataframe
+
+- Tableau statistique (ici avec des noms pour chaque ligne)
+
+
+``` r
+mtcars
+```
+
+```
+##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+```
+
+---
+
+## Colonnes d'un dataframe
+
+
+``` r
+names(mtcars) # noms des colonnes
+```
+
+```
+##  [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
+## [11] "carb"
+```
+
+``` r
+mtcars$mpg # contenu de la colonne "mpg"
+```
+
+```
+##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4
+```
+
+``` r
+mtcars[,"mpg"] # idem
+```
+
+```
+##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4
+```
+
+``` r
+mtcars[,1] # idem
+```
+
+```
+##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4
+```
+
+
+---
+
+## Lignes d'un dataframe
+
+
+``` r
+mtcars[1,] # Première ligne du datagrame
+```
+
+```
+##           mpg cyl disp  hp drat   wt  qsec vs am gear carb
+## Mazda RX4  21   6  160 110  3.9 2.62 16.46  0  1    4    4
+```
+
+``` r
+mtcars[1:5,] # Cinq premières lignes
+```
+
+```
+##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+```
+
+``` r
+mtcars[1:5, c(1, 3, 7)] # idem mais avec seulement les colonnes 1, 3 et 7
+```
+
+```
+##                    mpg disp  qsec
+## Mazda RX4         21.0  160 16.46
+## Mazda RX4 Wag     21.0  160 17.02
+## Datsun 710        22.8  108 18.61
+## Hornet 4 Drive    21.4  258 19.44
+## Hornet Sportabout 18.7  360 17.02
+```
+
+
+---
+
+## Compléments sur les dataframes
+
+- Création possible à partir de plusieurs vecteurs
+
+
+``` r
+engines = data.frame(
+  cyl = c(4, 6, 8, 12),
+  type = c("small", "medium", "large", "huge")
+)
+engines
+```
+
+```
+##   cyl   type
+## 1   4  small
+## 2   6 medium
+## 3   8  large
+## 4  12   huge
+```
+
+
+- Importation de données au format `CSV` ou autres
+
+- Un `tibble` (de tidyverse) est un dataframe *particulier*
+    - Pas de noms de ligne
+    - Colonnes uniquement réels ou caractères
+
+
+---
+class: middle, center, inverse
+
+## Algèbre relationnelle
+
+---
+
+## Manipulation avec `dplyr`
+
+Dans la suite, nous utilisons le formalisme de `dplyr`
+
+- Plus simple à écrire
+
+- Facilité de compréhension des opérations faites
+
+- Si enchaînement d'opération, lecture aisée
+
+---
+## Tri et limite d'affichage
+
+&gt; Tri avec la fonction `arrange()` (`desc()` permet de choisir un tri décroissant) et `slice()` permet de prendre une partie du tableau (début, fin, milieu...) 
+
+
+``` r
+mtcars %&gt;%
+  arrange(mpg)
+```
+
+```
+##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+```
+
+---
+## Tri décroissant
+
+&gt; `desc()` permet de choisir un tri décroissant
+
+
+``` r
+mtcars %&gt;%
+  arrange(desc(mpg))
+```
+
+```
+##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+```
+
+---
+## Limite d'affichage
+
+&gt; `slice()` permet de prendre une partie du tableau (début, fin, milieu...) 
+
+
+``` r
+mtcars %&gt;%
+  slice(1:3) # 5 premiers
+```
+
+```
+##                mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4     21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710    22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+```
+
+---
+
+## Restriction
+
+&gt; Sélection d'un nombre restreint de lignes d'une table, selon un ou plusieurs critères, à l'aide de `filter()`
+
+
+``` r
+mtcars %&gt;%
+  filter(mpg &gt; 25)
+```
+
+```
+##                 mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Fiat 128       32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic    30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Toyota Corolla 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## Fiat X1-9      27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Porsche 914-2  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+```
+
+
+---
+
+## Projection
+
+&gt; Sélection d'un nombre restreint de colonnes avec la fonction `select()`
+
+
+``` r
+mtcars %&gt;%
+  select(mpg, cyl)
+```
+
+```
+##                      mpg cyl
+## Mazda RX4           21.0   6
+## Mazda RX4 Wag       21.0   6
+## Datsun 710          22.8   4
+## Hornet 4 Drive      21.4   6
+## Hornet Sportabout   18.7   8
+## Valiant             18.1   6
+## Duster 360          14.3   8
+## Merc 240D           24.4   4
+## Merc 230            22.8   4
+## Merc 280            19.2   6
+## Merc 280C           17.8   6
+## Merc 450SE          16.4   8
+## Merc 450SL          17.3   8
+## Merc 450SLC         15.2   8
+## Cadillac Fleetwood  10.4   8
+## Lincoln Continental 10.4   8
+## Chrysler Imperial   14.7   8
+## Fiat 128            32.4   4
+## Honda Civic         30.4   4
+## Toyota Corolla      33.9   4
+## Toyota Corona       21.5   4
+## Dodge Challenger    15.5   8
+## AMC Javelin         15.2   8
+## Camaro Z28          13.3   8
+## Pontiac Firebird    19.2   8
+## Fiat X1-9           27.3   4
+## Porsche 914-2       26.0   4
+## Lotus Europa        30.4   4
+## Ford Pantera L      15.8   8
+## Ferrari Dino        19.7   6
+## Maserati Bora       15.0   8
+## Volvo 142E          21.4   4
+```
+
+---
+
+## Projection - doublons
+
+&gt; Il y a risque d'avoir des doublons (lignes identiques), qu'on peut supprimer avec `distinct()`
+
+
+``` r
+mtcars %&gt;%
+  select(cyl, am) %&gt;%
+  distinct()
+```
+
+```
+##                   cyl am
+## Mazda RX4           6  1
+## Datsun 710          4  1
+## Hornet 4 Drive      6  0
+## Hornet Sportabout   8  0
+## Merc 240D           4  0
+## Ford Pantera L      8  1
+```
+
+
+---
+
+## Calcul de variables
+
+&gt; Création d'une nouvelle variable en se basant sur un ou plusieurs autres variables de la table, avec `mutate()` (à stocker dans une variable pour réutilisation si besoin)
+
+
+``` r
+mtcars %&gt;%
+  select(hp, wt) %&gt;% # pour limiter l'affichage
+  mutate(hp_wt = hp / wt)
+```
+
+```
+##                      hp    wt    hp_wt
+## Mazda RX4           110 2.620 41.98473
+## Mazda RX4 Wag       110 2.875 38.26087
+## Datsun 710           93 2.320 40.08621
+## Hornet 4 Drive      110 3.215 34.21462
+## Hornet Sportabout   175 3.440 50.87209
+## Valiant             105 3.460 30.34682
+## Duster 360          245 3.570 68.62745
+## Merc 240D            62 3.190 19.43574
+## Merc 230             95 3.150 30.15873
+## Merc 280            123 3.440 35.75581
+## Merc 280C           123 3.440 35.75581
+## Merc 450SE          180 4.070 44.22604
+## Merc 450SL          180 3.730 48.25737
+## Merc 450SLC         180 3.780 47.61905
+## Cadillac Fleetwood  205 5.250 39.04762
+## Lincoln Continental 215 5.424 39.63864
+## Chrysler Imperial   230 5.345 43.03087
+## Fiat 128             66 2.200 30.00000
+## Honda Civic          52 1.615 32.19814
+## Toyota Corolla       65 1.835 35.42234
+## Toyota Corona        97 2.465 39.35091
+## Dodge Challenger    150 3.520 42.61364
+## AMC Javelin         150 3.435 43.66812
+## Camaro Z28          245 3.840 63.80208
+## Pontiac Firebird    175 3.845 45.51365
+## Fiat X1-9            66 1.935 34.10853
+## Porsche 914-2        91 2.140 42.52336
+## Lotus Europa        113 1.513 74.68605
+## Ford Pantera L      264 3.170 83.28076
+## Ferrari Dino        175 2.770 63.17690
+## Maserati Bora       335 3.570 93.83754
+## Volvo 142E          109 2.780 39.20863
+```
+
+
+---
+
+## Agrégat
+
+&gt; Calcul d'une statistique de base (moyenne, somme, ...) sur un attribut, avec `summarise()`
+
+
+``` r
+mtcars %&gt;%
+  summarise(nb = n(), mpg = mean(mpg))
+```
+
+```
+##   nb      mpg
+## 1 32 20.09062
+```
+
+&gt; Possibilité de le faire pour chaque valeur (modalité) d'une tierce variable (voire plus), avec `group_by()`
+
+
+``` r
+mtcars %&gt;%
+  group_by(cyl) %&gt;%
+  summarise(nb = n(), mpg = mean(mpg))
+```
+
+```
+## # A tibble: 3 × 3
+##     cyl    nb   mpg
+##   &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;
+## 1     4    11  26.7
+## 2     6     7  19.7
+## 3     8    14  15.1
+```
+
+
+---
+
+## Jointure
+
+&gt; Regroupement d'informations présentes dans deux tables, le rapprochement entre les deux étant fait sur la base d'un attribut commun (ou plus), avec `inner_join()`, `left_join()`, `full_join()`
+
+
+``` r
+mtcars %&gt;%
+  full_join(engines, by = "cyl")
+```
+
+```
+##     mpg cyl  disp  hp drat    wt  qsec vs am gear carb   type
+## 1  21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4 medium
+## 2  21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4 medium
+## 3  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1  small
+## 4  21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1 medium
+## 5  18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2  large
+## 6  18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1 medium
+## 7  14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4  large
+## 8  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2  small
+## 9  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2  small
+## 10 19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4 medium
+## 11 17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4 medium
+## 12 16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3  large
+## 13 17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3  large
+## 14 15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3  large
+## 15 10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4  large
+## 16 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4  large
+## 17 14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4  large
+## 18 32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1  small
+## 19 30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2  small
+## 20 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1  small
+## 21 21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1  small
+## 22 15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2  large
+## 23 15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2  large
+## 24 13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4  large
+## 25 19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2  large
+## 26 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1  small
+## 27 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2  small
+## 28 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2  small
+## 29 15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4  large
+## 30 19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6 medium
+## 31 15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8  large
+## 32 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2  small
+## 33   NA  12    NA  NA   NA    NA    NA NA NA   NA   NA   huge
+```
+
+
+---
+
+## Utilisation de plusieurs opérations
+
+&gt; Il est courant d'enchaîner plusieurs opérations
+
+
+``` r
+mtcars %&gt;%
+  full_join(engines, by = "cyl") %&gt;%
+  mutate(hp_wt = hp / wt) %&gt;%
+  group_by(type) %&gt;%
+  summarise(nb = n(), conso = mean(mpg), rapp_poids_puiss = mean(hp_wt)) %&gt;%
+  arrange(desc(conso))
+```
+
+```
+## # A tibble: 4 × 4
+##   type      nb conso rapp_poids_puiss
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;            &lt;dbl&gt;
+## 1 small     11  26.7             37.9
+## 2 medium     7  19.7             39.9
+## 3 large     14  15.1             53.9
+## 4 huge       1  NA               NA
+```
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="../macros.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,461 @@
+---
+title: "Lois de probabilité"
+author: "FX Jollois"
+date: "BUT TC - 2ème année"
+output:
+  xaringan::moon_reader:
+    css: [nhsr, chocolate-fonts]
+    nature: 
+      beforeInit: "macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+set.seed(1234)
+```
+
+## Variable aléatoire 
+
+Mesure d'un phénomène (*variable*) dont le résultat est déterminé par une expérience *aléatoire* (*i.e*. dépendant du hasard)
+
+- Exemples classiques : Pile/Face, Lancer de dé, Température, ...
+
+- Chaque résultat d'une expérience : **issue**
+
+- Ensemble de toutes les issues possibles : **univers des possibles** $\Omega$
+
+- Sous-ensemble de $\Omega$ : **évènement**
+  - Si ensemble à une seule issue *évènement élémentaire*
+
+- Possibilité d'associer une valeur réelle à chaque issue
+  - Notion de gain par exemple
+
+---
+
+## Variable aléatoire et loi de probabilité
+
+### Définition
+
+Une **variable aléatoire** (ou *v.a.*) $\mathbf{X}$ est une fonction définie sur $\Omega$ et à valeur dans $\mathbb{R}$, à laquelle on associe une **loi de probabilité** (ou *distribution de probabilité*) dont la masse totale est égale à 1
+
+- V.a. *continue* si les valeurs de $X$ sont quantitatives continues
+- V.a. *discrète* si le nombre de résultats est faible (ou si c'est qualitatif)
+
+### Fonction de répartition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles ou discrètes.
+
+La *fonction de répartition* $F_X$ de la v.a. est la fonction qui associe une probabilité $P(X \le x)$ à tout  $x$.
+
+---
+
+## Variable aléatoire 
+
+### Fonction de masse
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x_i$ discrètes.
+
+La *fonction de masse* de la v.a. associe une probabilité $P(X = x_i)$ à chaque résultat élémentaire $x_i$
+
+### Densité de probabilité
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles.
+
+La *fonction de densité* permet de calculer la probabilité d'appartenance à un domaine $P(a \le X \le b)$ (c'est la dérivée de la fonction de répartition).
+
+---
+
+## Exemple de cas discret
+
+On lance un dé (à 6 faces), et on calcule notre gain avec
+
+- $+1$ si c'est pair
+- $-2$ si c'est $\le 3$
+- $+5$ si c'est 2
+
+```{r ex1-def}
+x = 1:6
+gain = ((x %% 2) == 0) + (x <= 3) * -2 + (x == 2) * 5
+kable(t(data.frame(x = x, gain = gain))) %>%
+  kable_styling(position = "center")
+```
+
+### A noter
+
+- V.a. $\mathbf{X}$ *discrète* : gain d'un lancer
+- $\Omega$ : $1, \ldots, 6$
+- **Issues** : $-2, 0, 1, 4$
+
+---
+
+## Exemple de cas discret
+
+```{r ex1-gain}
+tab = as.data.frame(round(table(gain) / 6, 4), responseName = "p")
+kable(t(tab), digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+```{r ex1-plot, fig.align='center'}
+ggplot(tab, aes(factor(gain), p / sum(p))) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "", y = "") +
+  theme_minimal() +
+  theme(text = element_text(size = 25)) +
+  ggtitle("Fonction de masse")
+```
+
+
+---
+
+## Cas discret
+
+- **Loi uniforme discrète** (résultats équi-probables)
+
+- **Loi de Bernouilli**
+
+- **Loi Binomiale**
+
+- **Loi de Poisson**
+
+---
+
+## Loi uniforme discrète
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $k$ discrètes (avec $k=1,\ldots,n)$.
+
+$\mathbf{X}$ suit une **loi uniforme discrète** si pour chaque $k$, $P(X = k) = \frac{1}{n}$.
+
+### Exemple
+
+Dé à 6 faces (non pipé) $\rightarrow P(X = k) = \frac{1}{6}$ (avec $k=1,\ldots,6$).
+
+### Espérance et variance
+
+$$
+  E(X) = \frac{n+1}{2} \mbox{ et } V(X) = \frac{n^2 - 1}{12}
+$$
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Questions
+
+On dispose de 10 boules numérotées de 1 à 10 dans une urne.
+
+1. Quelle est la probabilité de tirer la boule 5 ?
+1. Quelle est la probabilité de tirer 2 fois de suite la boule 5 ? trois fois ?
+1. Si je tire 100 fois une boule (avec remise donc à chaque fois), quelle est valeur moyenne puis-je espérer avoir ?
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi uniforme discrète, à valeur entre 1 et 10. 
+
+1. $P(X = 5) = \frac{1}{10}$
+1. $P(X_1 = 5 \mbox{ et } X_2 = 5) = P(X_1 = 5) P(X_2 = 5) = \frac{1}{100}$ (car idépendance entre les 2 évènements)
+  - Il y a donc 1 chance sur mille d'avoir 3 cinq d'affilés
+1. $E(X) = \frac{n+1}{2} = 50.5$
+
+---
+
+## Loi de Bernouilli
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant deux valeurs $0$ ou $1$
+
+$\mathbf{X}$ suit une **loi de Bernouilli** si $P(X = 1)=p$ et $P(X = 0) = q = 1-p$.
+
+### Exemple
+
+Pile ou face avec une pièce équilibrée
+
+### Espérance et Variance
+
+$$
+  E(X) = p \mbox{ et } V(X) = pq
+$$
+
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Questions 
+
+On est en présence d'une assemblée de 250 personnes, dont 40 gauchers.
+
+1. Quelle est la probabilité qu'une personne soit gauchère ?
+1. A l'inverse, quelle est la probabilité qu'une personne soit droitière ?
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi de Bernouilli, valant 1 si la personne est gauchère, 0 sinon.
+
+1. $P(X = 1) = \frac{40}{250} = .16$
+1. $P(X = 0) = 1 - P(X = 1) = 1 - .16 = .84$ (complémentaire)
+
+---
+
+## Loi Binomiale
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant les valeurs $0$ (avec une probabilité $p$) ou $1$ (avec une probabilité $1-p$), et $n$ le nombre de tirages réalisés.
+
+$\mathbf{X}$ suit une **loi Binomiale** lorsque $P(X = k) = C_k^n p^k (1-p)^{n-k}$, somme de $n$ v.a. indépendants de loi de Bernouilli.
+
+$C_k^n = \frac{n!}{k!(n-k)!}$ se nomme le coefficient binomial, et représente le nombre d'ensembles à $k$ éléments qu'on peut obtenir dans l'ensemble des $n$ éléments.
+
+### Exemple
+
+Avec 100 tirages à pile ou face, combien de fois on aura pile ?
+
+### Espérance et Variance
+
+$$
+  E(X) = np \mbox{ et } V(X) = np(1-p)
+$$
+
+
+---
+
+## Loi Binomiale
+
+### Fonction de masse
+
+$$
+P(X = k) = f(k) = C_k^n p^k (1-p)^{n-k}
+$$
+### Fonction de répartition
+
+$$
+F(x) = \sum_{k=0}^{\lfloor x \rfloor} f(k) \mbox{ pour } 0 \le x \le n
+$$
+
+A noter que $F(x)=0$ pour $x < 0$ et $F(x)=1$ pour $x>n$.
+
+
+---
+
+## Loi Binomiale - *exercice*
+
+### Questions
+
+Supposons que nous avons formé 100 groupes de 2000 personnes, avec la même proportion de gaucher (16%) que précédemment.
+
+1. Si je choisis une personne de chaque groupe, combien puis-je espérer avoir de gauchers au final ?
+1. Quelle est la probabilité de n'avoir aucun gaucher ? Et 100 gauchers ?
+1. Quelle est la probabilité d'avoir 20 gauchers ?
+
+---
+
+## Loi Binomiale
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi Binomiale, avec $p = .16$ et $n = 100$
+
+1. $E(X) = np = 100 * .16 = 16$
+1. $P(X = 0) = C_0^{100} .16^0 .84^{100} = .84^{100} < 0.0001$ (très très faible) et $P(X = 100) = .16^{100} < 0.0001$ (aussi très très faible)
+1. $P(X = 20) = C_20^{100} .16^20 .84^{80} = 0.0567$
+
+---
+
+## Loi de Poisson
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $k$ discrètes (avec $k=1,2,\ldots$).
+
+$\mathbf{X}$ suit une **loi de Poisson** $Pois(\lambda)$ si pour chaque $k$, $P(X = k) = \frac{\lambda^k}{k!}e^{-\lambda}$ où
+
+- $e$ est la base de l'exponentielle
+- $\lambda$ représente le nombre moyen d'occurences dans un intervalle de temps fixé
+
+### Exemple
+
+Nombre de personnes à l'arrêt d'un bus après une certaine durée
+
+### Espérance et Variance
+
+$$
+  E(X) = \lambda \mbox{ et } V(X) = \lambda
+$$
+
+
+---
+
+## Loi de Poisson
+
+### Fonction de masse
+
+$$
+P(X = k) = f(k) = \frac{\lambda^k}{k!}e^{-\lambda}
+$$
+
+
+### Fonction de répartition
+
+$$
+F(k) = \frac{\Gamma(\lfloor k+1 \rfloor, \lambda)}{\lfloor k \rfloor !} \mbox{ pour } k > 0
+$$
+
+
+---
+
+## Cas continu
+
+- Loi uniforme
+
+- Loi Normale
+
+---
+
+## Loi uniforme continue
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles dans $[a;b]$.
+
+$\mathbf{X}$ suit une **loi uniforme continue** $U(a,b)$ si tous les intervalles de même longueur ont la même probabilité
+
+### Exemple
+
+Pas réellement de cas dans la vie de tous les jours
+
+### Espérance, Variance
+
+$$
+  E(X) = \frac{a+b}{2} \mbox{ et } V(X) = \frac{(b-a)^2}{12} 
+$$
+
+---
+
+## Loi uniforme continue
+
+### Densité de probabilité
+
+$$
+f(x) = \frac{1}{b-a}  \mbox{ pour } x \in [a;b]
+$$
+
+A noter que $f(x)=0$ pour toute valeur $x<a$ et $x>b$.
+
+```{r uni-cont-dens, fig.height=4}
+library(latex2exp)
+df <- data.frame(x = c(0, 1, 1, 1, 5, 5, 5, 6),
+                 y = c(.1, .1, NA, .7, .7, NA, .1, .1))
+df2 = data.frame(x = c(1, 5), y = .7)
+ggplot(df, aes(x, y)) + 
+  geom_point() + 
+  geom_line() +
+  geom_segment(data = df2, aes(xend = x, yend = .1), linetype = "dashed") +
+  labs(x = "", y = "") +
+  ylim(0, 1) +
+  theme_minimal() +
+  theme(axis.text = element_blank()) +
+  annotate("text", x = 1, y = .05, label = "a", size = 15) +
+  annotate("text", x = 5, y = .05, label = "b", size = 15) +
+  annotate("text", x = .5, y = .7, label = TeX("$\\frac{1}{b-a}$"), size = 15)
+```
+
+---
+
+## Loi uniforme continue
+
+### Fonction de répartition
+
+$$
+F(x) = \frac{x - a}{b - a} \mbox{ pour } x \in [a;b] 
+$$
+
+A noter que $F(x)=0$ pour $x<a$, et $F(x)=1$ pour $x>b$.
+
+```{r uni-cont-rep, fig.height=4}
+df <- data.frame(x = c(0, 1, 5, 6),
+                 y = c(0, 0, 1, 1))
+ggplot(df, aes(x, y)) + 
+  geom_point() + 
+  geom_line() +
+  labs(x = "", y = "") +
+  ylim(-.1, 1) +
+  theme_minimal() +
+  theme(axis.text.x = element_blank()) +
+  annotate("text", x = 1, y = -.05, label = "a", size = 15) +
+  annotate("text", x = 5, y = -.05, label = "b", size = 15) 
+```
+
+
+---
+
+## Loi Normale
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles.
+
+$\mathbf{X}$ suit une **loi Normale** $N(\mu, \sigma^2)$ de moyenne $\mu$ et de variance $\sigma^2$.
+
+### Exemple
+
+Mesure de la taille d'une population
+
+### Espérance et Variance
+
+$$
+  E(X) = \mu \mbox{ et } V(X) = \sigma^2
+$$
+
+---
+
+## Loi Normale
+
+### Densité de probabilité
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp \left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+$$
+
+```{r norm-dens, fig.height=4}
+x = seq(-5, 5, by = .01)
+df = data.frame(x = x, y = dnorm(x))
+ggplot(df, aes(x, y)) + 
+  geom_line(color = "steelblue", size = 2) +
+  labs(x = "", y = "") +
+  theme_minimal()
+```
+
+---
+
+## Loi Normale
+
+### Fonction de répartition
+
+$$
+ F(x) = \frac{1}{2} \left( 1 + \mbox{erf} \frac{x - \mu}{\sigma\sqrt{2}} \right)
+$$
+
+```{r norm-rep, fig.height=4}
+x = seq(-5, 5, by = .01)
+df = data.frame(x = x, y = pnorm(x))
+ggplot(df, aes(x, y)) + 
+  geom_line(color = "steelblue", size = 2) +
+  labs(x = "", y = "") +
+  theme_minimal()
+```
+

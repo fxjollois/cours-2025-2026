@@ -1,0 +1,313 @@
+---
+title: "Rappel de Statistique - Univarié"
+author: "FX Jollois"
+date: "BUT TC - 2ème année"
+output:
+  xaringan::moon_reader:
+    css: [nhsr, chocolate-fonts]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align='center', fig.height=4, 
+                      message = FALSE, warning = FALSE, out.width='90%')
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+data = read_delim("tips.csv", delim = ",")
+```
+
+
+# Qu'est-ce que la statistique ?
+
+- Ensemble de méthodes permettant de décrire et d'analyser des observations (communément appelées **données** de nos jours)
+
+- Utilisé maintenant dans tous les secteurs d'activités
+  - Economie et finance : marketing, sondages...
+  - Industrie : fiabilité, contrôle qualité...
+  - Santé : recherche médicale, gestion des hôpitaux...
+  - Environnement : prévisions climatiques et météorologiques, pollution...
+  - Web : réseaux, publicité...
+  - ...
+
+- Essor important avec le développement des outils informatiques et du web
+
+---
+  
+## Définitions de base
+  
+- **Population** : ensemble d'entités (personnes, objets, \ldots) étudiées
+- **Individu** (ou *unité statistique*) : entité étudiée
+- **Variable** : caractéristique étudiée sur chaque individu
+- **Observation** : mesure 
+- **Série statistique** : série d'observations recueillies sur les individus
+- **Tableau de données** : stockage de la série statistique
+  - Individus croisant des variables 
+  - Chaque ligne représente un individu
+  - Chaque colonne représente une variable (ou attribut)
+  - C'est ce qu'on fait classiquement dans un tableur de type Excel
+
+---
+
+## Données `tips`
+
+Serveur notant des infos sur chaque table dont le pourboire
+
+- Exemple utilisé dans ce document
+- 10 premières lignes
+
+```{r donnees}
+kable(data %>% slice(1:10)) %>%
+  kable_styling(position = "center")
+```
+
+---
+
+## Type de variables
+  
+### Variable quantitative
+  
+- Caractéristiques numériques : opérations de type somme ayant un sens
+
+### Continue
+  
+- Mesurable
+- Ex : taille, poids, durée...
+
+### Discrète
+  
+- Dénombrable ou mesurable en espace fini
+- Ex : âge, quantité en stock...
+
+---
+
+## Type de variables
+  
+### Variable qualitative
+  
+- Caractéristiques non numériques : opérations de type somme n'ayant pas de sens
+- Valeurs possibles : **Modalités** (ou catégories)
+
+### Nominale
+
+- Modalités n'ayant pas de lien entre elles (Ex : couleur des yeux, sexe...)
+- Cas particulier *Binaire* : 2 valeurs possibles uniquement (Ex : oui/non, présence/absence...)
+
+### Ordinale 
+
+- Modalités devant être triées dans un ordre spécifique (Ex : mois, sentiment...)
+
+
+---
+
+## Transformation de variable
+  
+### Quantitative en qualitative
+  
+- Courant de transformer une variable **quantitative** en variable **qualitative ordinale**
+- Ex : Catégorie d'âge, Nombre d'enfants du foyer, ...
+
+- Différents problèmes se posent
+- Combien de modalités (*intervalles* ici) ? 
+  - Taille identique des intervalles ou variable (*amplitude*) ?
+  - Seuils des intervalles ?
+  
+  
+---
+
+## Transformation de variable
+  
+### Standardisation ou normalisation d'une variable quantitative
+  
+- Obligatoire pour l'utilisation de certaines méthodes statistiques
+
+- 2 opérations sont réalisées :
+  - Centrage : on retire la moyenne à chaque valeur
+  - Réduction : on divise par l'écart-type
+$$
+  x_{norm} = \frac{x - \bar{x}}{\sigma}
+$$
+
+
+---
+
+## Premier problème : décrire les données
+
+On parle de **Statistique descriptive** ou **exploratoire**
+
+### Objectifs 
+
+- Résumer l'information contenue dans les données
+- Faire ressortir des éléments intéressants
+- Poser des hypothèses sur des phénomènes potentiellement existant dans les données
+
+### Outils
+  
+- Description numérique (moyenne, occurrences, corrélation...)
+- Description graphique (histogramme, diagramme en barres, nuage de points...)
+
+
+---
+class: inverse, middle, center
+
+# Variable quantitative
+
+---
+
+## Variable quantitative
+  
+- Moyenne $\bar{x}$
+$$
+  \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i
+$$
+  
+- Variance (et écart-type $\sigma(x)$)
+$$
+  \sigma^2(x) = \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2
+$$
+  
+---
+
+## Variable quantitative
+  
+- Médiane $med(x)$ : valeur permettant de séparer les observations ordonnées prises par $x$ en 2 groupes de même taille
+$$
+  med(x) = m | P(x \le m) = .5
+$$
+  - si $n$ est impair : $med(x) = x_{(n + 1) / 2}$
+  - si $n$ est pair : $med(x) = \frac{x_{n/2} + x_{n/2 + 1}}{2}$
+  
+- Quantile $q_p(x)$ : valeur pour laquelle une proportion $p$ d'observations sont inférieures
+$$
+  q_p(x) = q | P(x \le q) = p
+$$
+  - Quartiles $Q1$ et $Q3$ : respectivement 25% et 75% (utilisés dans les boîtes à moustaches)
+  - Quantiles usuels : $.01$ (1%), $.1$ (10%), $.9$ (90%), $.99$ (99%)$
+
+---
+
+## Variable quantitative
+  
+### Histogramme 
+
+```{r qt-graph-hist}
+ggplot(data, aes(total_bill)) + 
+  geom_histogram(fill = "steelblue", binwidth = 5) + 
+  geom_vline(xintercept = mean(data$total_bill), alpha = .5) +
+  annotate("text", x = mean(data$total_bill), y = 20, label = "Moyenne", hjust = -.1, size = 7) +
+  labs(y = "", x = "") +
+  theme_minimal() + 
+  theme(text = element_text(size = 25))
+```
+
+- Nombre de "barres" pouvant influer sur l'analyse
+
+---
+
+## Variable quantitative
+  
+### Boîte à moustaches
+
+```{r qt-graph-box}
+ggplot(data, aes(total_bill, "")) + 
+  geom_boxplot(fill = "steelblue", outlier.alpha = 0.5) + 
+  labs(y = "", x = "") +
+  theme_minimal() + 
+  theme(text = element_text(size = 25))
+```
+
+
+- Moustache au min et max OU à 1.5 fois la distance interquartile $(Q1-Q3)$ des quantiles $Q1$ et $Q3$
+
+---
+
+## Variable quantitative
+  
+### A quoi doit-on faire attention ?
+
+- Si divergence moyenne et médiane : déséquilibre de la répartition des valeurs 
+  - 
+  
+- Présence de valeurs aberrantes (nommés **outliers**)
+
+---
+class: inverse, middle, center
+
+# Variable qualitative
+
+---
+
+## Variable qualitative
+  
+### Nominale
+  
+- Modalités de la variable $x$ : $m_j$ (avec $j=1,...,p$)
+- Effectif (ou occurrences) d'une modalité $n_j$ : nombre d'individus ayant la modalité $m_j$
+- Fréquence d'une modalité $f_j$
+$$
+    f_j = \frac{n_j}{n}
+$$
+
+### Ordinale
+
+Effectif cumulé $n_j^{cum}$ : nombre d'individus ayant une modalité entre $m_1$ et $m_j$ inclus
+
+- N'a de sens que s'il y a un ordre naturel entre les modalités
+- Fréquence cumulée : somme des fréquences des modalités de $m_1$ à $m_j$
+
+---
+
+## Variable qualitative
+  
+### Diagramme en barres
+
+```{r ql-graph-bar}
+ggplot(data, aes(day, fill = day)) +
+  geom_bar(show.legend = FALSE) +
+  theme_minimal() +
+  theme(text = element_text(size = 25)) +
+  labs(x = "", y = "") +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+
+
+- Attention à l'ordre des barres si celui-ci a une importance
+
+---
+
+## Variable qualitative
+
+### Diagrame circulaire
+
+```{r ql-graph-pie}
+data_bis <- data %>% group_by(day) %>% count() %>% ungroup() %>%
+  arrange(match(day, c("Thur", "Fri", "Sat", "Sun"))) %>%
+  mutate(prop = n / nrow(data) * 100) %>%
+  mutate(ypos = cumsum(prop) - 0.5*prop )
+
+data_bis = as.data.frame(data_bis)
+data_bis$day <- factor(data_bis$day, levels = rev(as.character(data_bis$day)))
+
+ggplot(data_bis, aes("", y = prop, fill = day)) +
+  geom_bar(stat = "identity", width = 1, show.legend = FALSE) +
+  geom_text(aes(x = 1.2, y = ypos, label = day), color = "white", size=6) + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  labs(x = "", y = "") +
+  theme(text = element_text(size = 25))
+```
+
+- N'a de sens que si la somme doit bien faire 100% (à éviter si réponse multiple possible par exemple)
+
+---
+
+## Variable qualitative
+
+### A quoi doit-on faire attention ?
+  
+- Différence entre les proportions 
+
+- Si modalités trop peu fréquentes, regroupement de modalités à envisager
+
+- Pas de 3D pour le diagramme circulaire !!
+
+- Si plus de 5 modalités, privilégier le diagramme en barres

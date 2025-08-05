@@ -1,0 +1,198 @@
+---
+title: "Classification - TD 3"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Classification Ascendante Hiérarchique (CAH)
+
+### Données `iris`
+
+Nous utilisons encore pour exemple les données `iris`, déjà présentes dans R. 
+
+```{r}
+library(tidyverse)
+library(DT)
+datatable(iris)
+```
+
+
+### Réalisation
+
+Pour réaliser la CAH, nous utilisons la fonction `hclust()` du package `stats`, déjà présent dans R. Et comme l'ACP, la classification avec la CAH et $k$-means se réalisent uniquement que sur des variables quantitatives.
+
+Cependant, cette fonction prend en paramètre une matrice de distance. Il faut donc la calculer à l'aide de la fonction `dist()`, qui calcule par défaut la distance euclidienne (ce qui nous convient bien). Et comme les variables ne sont pas directement comparables (certes, elles ont la même unité, mais les moyennes et écart-types sont différents), on transforme les données en normalisant les variables (avec la fonction `scale()`).
+
+```{r}
+cah = hclust(dist(scale(iris[,-5])))
+cah
+```
+
+Notez que, par défaut, le critère d'agrégation est le *lien complet*, que nous n'utiliserons jamais. Pour le modifier, nous utilisons le paramètre `method`, avec la valeur `"ward.D2"`, que nous utiliserons principalement (ainsi que la valeur `"single"` pour le lien simple).
+
+
+```{r}
+cah = hclust(dist(scale(iris[,-5])), method = "ward.D2")
+cah
+```
+
+### Réalisation du dendrogramme
+
+Le véritable intérêt de cette méthode est donc la représentation visuelle de l'arbre hiérarchique, appelé *dendrogramme*. Pour l'afficher, nous utilisons la fonction `plot()` sur l'objet créé.
+
+```{r}
+plot(cah)
+```
+
+Lorsqu'on a beaucoup d'individus (tel que dans notre cas) et/ou que les individus n'ont pas d'identifiant spécifique, on peut moduler un peu l'usage de la fonction pour avoir un arbre plus lisible.
+
+> On note qu'on peut *couper* notre arbre à deux endroits différents, pour avoir 2 ou 3 classes.
+
+```{r}
+par(mar = c(0, 2, 2, 0) + .1)
+plot(cah, hang = -1, labels = FALSE, ylab = "", main = "CAH avec critère de Ward")
+abline(h = 20, lty = 2, col = "gray")
+abline(h = 10, lty = 2, col = "gray")
+```
+
+### Découpage pour récupérer la partition
+
+La fonction `cutree()` permet de récupérer la partition obtenue après découpage en $k$ classes ($k$ étant donné en valeur du paramètre `k`).
+
+> On obtient un vecteur de modalités correspondant à la classe, à intégrer aux données initiales pour calculer les centres des classes.
+
+```{r}
+cah_z2 = cutree(cah, 2)
+cah_z2
+```
+Ce qu'on peut faire avec la libraire `dplyr` comme ci-dessous.
+
+> On a une classe de grands iris (la deuxième, avec une largeur de sépale faible), et une classe de petits iris (la première, avec au contraire de larges sépales)
+
+```{r}
+cah_centre2 = iris[,-5] %>% mutate(classe2 = cah_z2) %>%
+  group_by(classe2) %>%
+  summarise_all(mean)
+datatable(round(cah_centre2, 2), rownames = FALSE, options = list(paging = F, searching = FALSE))
+```
+
+On peut faire les deux mêmes opérations en une fois pour 3 classes.
+
+> On retrouve la première classe, de petits iris. C'est la deuxième qui a donc été coupé en deux, avec de très grands iris (classe 3) et des grands iris (classe 2).
+
+```{r}
+cah_z3 = cutree(cah, 3)
+cah_centre3 = iris[,-5] %>% mutate(classe3 = cah_z3) %>%
+  group_by(classe3) %>%
+  summarise_all(mean)
+datatable(round(cah_centre3, 2), rownames = FALSE, options = list(paging = F, searching = FALSE))
+```
+
+
+## $k$-means
+
+### Réalisation
+
+La fonction `kmeans()` permet de calculer une partition directement. Comme dit dans le cours, cette méthode nécessite de connaître le nombre de classes que l'on souhaite, avec le paramètre $centers$. Il faut noter que nous devons travailler sur les données normalisées.
+
+La fonction renvoie un objet complexe, contenant la partition ainsi que d'autres informations (inertie intraclasse et interclasse, centres et taille des classes entre autres).
+
+> On obtient des classes avec un nombre d'individus quasiment identiques. Et l'inertie expliquée par la partition est de presque 77%.
+
+```{r}
+km3 = kmeans(scale(iris[,-5]), centers = 3)
+km3
+```
+
+### Caractérisation des classes
+
+Comme on le voit ci-dessous, les centres des classes sont sur les données normalisées, et donc non directement exploitable.
+
+```{r}
+km3$centers
+```
+On va donc utiliser la même méthode que pour la CAH, en utilisant ici le sous-objet  `cluster`.
+
+> On retrouve quasiment les mêmes classes. Attention cependant, puisque l'algorithme a une initialisation aléatoire, l'ordre des classes peut changer d'une exécution à l'autre.
+
+```{r}
+km3_centres = iris[,-5] %>% mutate(classe3 = km3$cluster) %>%
+  group_by(classe3) %>%
+  summarise_all(mean)
+datatable(round(km3_centres, 2), rownames = FALSE, options = list(paging = F, searching = FALSE))
+```
+
+### Recherche du nombre de classes
+
+Ici, nous allons exécuter un petit algorithme, pour chercher le nombre de classes. 
+
+1. On créé d'abord un data.frame vide dans lequel nous mettrons les résultats ;
+2. Ensuite, pour un nombre de classes compris entre 1 et 10, on lance $k$-means (on force 30 essais différents pour obtenir le meilleur résultat possible pour chaque valeur de `k`) ;
+3. Enfin, on calcule les valeurs de $R^2$, puis de $PseudoF$ ;
+4. La dernière ligne permet de transformer la valeur infinie (noté `Inf`, dû à la division par zéro) de $PsudoF$ pour 1 classe par une donnée manquante `NA`.
+
+```{r}
+res = data.frame(nbclust = NA, I = NA, W = NA, B = NA)
+for (k in 1:10) {
+  km = kmeans(scale(iris[,-5]), centers = k, nstart = 30)
+  res[k,] = c(k, km$totss, km$tot.withinss, km$betweenss)
+}
+res = res %>% 
+  mutate(r2 = B / I) %>%
+  mutate(psf = (r2 / (nbclust - 1)) / ((1 - r2) / (nrow(iris) - nbclust))) %>%
+  mutate_all(~ ifelse(is.infinite(.x), NA, .x))
+datatable(round(res, 2), rownames = FALSE, options = list(paging = F, searching = FALSE))
+```
+
+Ce data.frame nous permet de représenter l'évolution des critères en fonction du nombre de classes.
+
+> On remarque deux points d'inflexion important pour $R^2$, pour 2 et 3 classes. Un dernier point éventuellement intéressant est à noter pour 5 classes.
+
+```{r}
+ggplot(res, aes(nbclust, r2)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "R^2") +
+  theme_minimal()
+```
+
+Si on regarde l'évolution du $PseudoF$, en regardant le max, on note que ce critère nous conduit à choisir plutôt deux classes.
+
+```{r, warning=FALSE}
+ggplot(res, aes(nbclust, psf)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "R^2") +
+  theme_minimal()
+```
+
+## A FAIRE
+
+### Données `Wine`
+
+Nous allons travailler sur des données concernant 3 types de vin. Elles sont disponibles sur [cette page](https://archive.ics.uci.edu/ml/datasets/wine) de l'UCI MLR. Il s'agit de 178 vins, réparties en 3 classes donc, et décrit par 13 variables quantitatives (lire la description dans le fichier `wine.names` pour plus d'informations).
+
+Le code suivant permet de charger les données, et de nommer correctement les variables.
+
+```{r}
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+datatable(wine, options = list(scrollX = TRUE))
+```
+
+- Chercher un nombre de classes intéressant, à l'aide de la CAH
+  - Récupérer la partition ainsi obtenue
+  - Caractériser celles-ci avec les centres des classes
+- Faire de même avec $k$-means, en utilisant les critères $R^2$ et $PseudoF$
+  - Récupérer la partition ainsi obtenue
+  - Caractériser celles-ci avec les centres des classes
+- Comparer les 2 partitions ainsi obtenues
+- Représenter celles-ci, chacun séparément, sur le plan factoriel de l'ACP
+

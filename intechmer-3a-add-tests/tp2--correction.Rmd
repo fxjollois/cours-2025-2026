@@ -1,0 +1,313 @@
+---
+title: "TP2 - Correction"
+subtitle: "Applications sur données réelles - WINE"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+```{r import, include = FALSE}
+library(readr)
+library(tidyverse)
+library(FactoMineR)
+library(knitr)
+
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+```
+
+## Décrire les données
+
+::: {}
+::: {.column width="49%"}
+
+Description très succincte
+
+- 3 types de vin présents, de façon quasi-équilibrée ;
+- 13 variables quantitatives, avec des distributions proches d'une loi normale, sauf pour `Alcohol`, `Flavanoids`, `OD280/OD315` et `Total phenols` qui ont toutes les 4 une distribution dite bi-modale (à deux *pics*) ;
+- Deux variables semblent corrélées fortement (`Flavanoids` et  `Total.phenols`).
+
+Il faut noter que les échelles des variables sont différentes (ainsi que les unités d'ailleurs).
+
+:::
+::: {.column width="49%"}
+
+```{r class-graph, fig.height=4}
+ggplot(wine, aes(class, fill = factor(class))) +
+  geom_bar(show.legend = FALSE) +
+  theme_minimal() +
+  labs(x = "Type de vin", y = "")
+```
+
+:::
+:::
+
+```{r vars-density, fig.width=12}
+ggplot(wine[,-1] %>% pivot_longer(everything()),
+       aes(value)) +
+  geom_density() +
+  facet_wrap(~ name, scales = "free") +
+  theme_minimal() +
+  theme(axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+```
+
+```{r vars-correlation, fig.width=12}
+df = data.frame(cor(wine[,-1])) %>% 
+  rownames_to_column("var1") %>%
+  pivot_longer(!var1, names_to = "var2")
+ggplot(df, aes(var1, var2, fill = value)) +
+  geom_tile(color = "white") + # Ajoute des contours blancs
+  scale_fill_gradient2(low = "darkred", mid = "white", high = "darkblue", midpoint = 0) +
+  theme_minimal() +
+  labs(x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Pour la suite, on met de côté la variable `class`
+
+```{r remove-class, echo = TRUE}
+wine2 = wine[,-1]
+```
+
+## Application de l'ACP
+
+Il est nécessaire de faire une ACP normée, car les variables ne sont pas de même unité, et surtout les échelles de valeurs sont très nettement différentes (par exemple de inférieur à 0.7 pour `Nonflavanoids phenols` et jusqu'à 1500 pour `Proline`).
+
+```{r acp-run}
+acp = PCA(wine2, graph = FALSE)
+```
+
+Dans cette ACP, seulement 3 dimensions semblent intéressantes (avec une valeur propre supérieure à 1 et donc un % de variance expliquée supérieur à 100/13).
+
+::: {}
+::: {.column width="49%"}
+
+```{r acp-tab}
+eig = tibble(data.frame(acp$eig) %>% rownames_to_column("Dim"))
+names(eig) = c("Dimension", "Valeur propre", "% variance", "% cumulé")
+kable(eig, digits = 2)
+```
+
+:::
+::: {.column width="49%"}
+
+```{r acp-eig}
+ggplot(eig %>% mutate(dim = row_number()),
+       aes(factor(dim), `% variance`)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_hline(yintercept = 100 / 13, linetype = "dashed", color = "gray") +
+  labs(x = "Composantes", y = "% de variance expliquée") +
+  theme_minimal()
+```
+
+:::
+:::
+
+On observe une forme de *V* sur la représentation des vins
+
+
+::: {}
+::: {.column width="49%"}
+
+```{r acp-var}
+plot(acp, choix = "var", title = "")
+```
+
+:::
+::: {.column width="49%"}
+
+```{r acp-ind}
+ggplot(acp$ind$coord, aes(Dim.1, Dim.2)) +
+  geom_point() +
+  theme_minimal()
+```
+
+:::
+:::
+
+### Avec la représentation des classes
+
+On note les éléments suivants :
+
+- Classe 1 :
+  - Valeurs élevées pour `Alcohol`, `Total phenols`, `Flavanoids` et `Proline`
+  - Valeurs faibles pour `Alcalinity of ash`, `Nonflavanoid phenols`
+- Classe 2 :
+  - Valeurs élevées pour aucune variable
+  - Valeurs faibles pour `Alcohol`, `Ash`, `Color intensity` et `Proline`
+- Classe 3 :
+  - Valeurs élevées pour `Malic acid`, `Color intensity`
+  - Valeurs faibles pour `Total phenols`, `Flavanoids`, `Hue`, `OD280/OD315 of diluted wines`
+
+
+```{r acp-class-mean}
+wine %>% 
+  group_by(class) %>% 
+  summarise_all(mean) %>%
+  kable(digits = 2)
+```
+
+```{r acp-class, fig.width=12}
+ggplot(data.frame(acp$ind$coord) %>% mutate(class = wine$class), 
+       aes(Dim.1, Dim.2, color = factor(class))) +
+  geom_point() +
+  theme_minimal()
+```
+
+
+## Application de la CAH
+
+On remarque que le découpage en 3 classes semblent le plus intéressant. Pour autant, un découpage en 2 peut être envisagé.
+
+```{r cah}
+cah = hclust(dist(scale(wine2)), method = "ward.D2")
+par(mar = c(0, 2, 2, 0) + .1)
+plot(cah, hang = -1, labels = FALSE, ylab = "", main = "CAH avec critère de Ward")
+abline(h = 31, lty = 2, col = "gray")
+abline(h = 20, lty = 2, col = "gray")
+```
+
+::: {}
+::: {.column width="49%"}
+
+Chaque classe de la CAH semble correspondre à un seul type de vin. Seuls des vins de type 2 sont *mal classés* et répartis dans les deux autres classes.
+
+On remarque les mêmes éléments caractéristiques pour chaque classe que précédemment.
+
+:::
+::: {.column width="49%"}
+
+```{r cah-z3}
+cah_z3 = cutree(cah, 3)
+t3 = table(cah_z3, wine$class)
+rownames(t3) = paste("z_cah ", 1:3)
+kable(t3)
+```
+
+:::
+:::
+
+```{r cah-z3-centres}
+wine2 %>% 
+  mutate(z = cah_z3) %>%
+  group_by(z) %>%
+  summarise_all(mean) %>%
+  kable(digits = 2)
+```
+
+
+## Application de $k$-means
+
+```{r km}
+res = data.frame(nbclust = NA, I = NA, W = NA, B = NA)
+for (k in 1:10) {
+  km = kmeans(scale(wine2), centers = k, nstart = 30)
+  res[k,] = c(k, km$totss, km$tot.withinss, km$betweenss)
+}
+res = res %>% 
+  mutate(r2 = B / I) %>%
+  mutate(psf = (r2 / (nbclust - 1)) / ((1 - r2) / (nrow(iris) - nbclust))) %>%
+  mutate_all(~ ifelse(is.infinite(.x), NA, .x))
+```
+
+Avec les deux critères de choix $R^2$ et $PseudoF$, on décide de choisir 3 classes.
+
+::: {}
+::: {.column width="49%"}
+
+```{r km-r2}
+ggplot(res, aes(nbclust, r2)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "R^2") +
+  theme_minimal()
+```
+
+:::
+::: {.column width="49%"}
+
+```{r km-psf}
+ggplot(res, aes(nbclust, psf)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "Pseudo-F") +
+  theme_minimal()
+```
+
+:::
+:::
+
+
+
+```{r km-final}
+km3 = kmeans(scale(wine2), centers = 3, nstart = 30)
+wine2 %>% 
+  mutate(z = km3$cluster) %>%
+  group_by(z) %>%
+  summarise_all(mean) %>%
+  kable(digits = 2)
+```
+
+
+::: {}
+::: {.column width="32%"}
+
+La partition obtenue par $k$-means est très proche des types de vin déjà présents dans les données (plus proche que la CAH). Et les différences avec celle obtenue par la CAH sont minimes.
+
+:::
+::: {.column width="32%"}
+
+```{r km3-class}
+tt3a = table(km3$cluster, wine$class)
+rownames(tt3a) = paste("z_km ", 1:3)
+kable(tt3a)
+```
+
+:::
+::: {.column width="32%"}
+
+```{r km3-cah3}
+tt3b = table(km3$cluster, cah_z3)
+colnames(tt3b) = paste("z_cah ", 1:3)
+rownames(tt3b) = paste("z_km ", 1:3)
+kable(tt3b)
+```
+
+:::
+:::
+
+### Représentation sur l'ACP
+
+
+::: {}
+::: {.column width="49%"}
+
+```{r acp-cah}
+ggplot(data.frame(acp$ind$coord) %>% mutate(class = cah_z3), 
+       aes(Dim.1, Dim.2, color = factor(class))) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Partition CAH")
+```
+
+:::
+::: {.column width="49%"}
+
+```{r acp-km}
+ggplot(data.frame(acp$ind$coord) %>% mutate(class = km3$cluster), 
+       aes(Dim.1, Dim.2, color = factor(class))) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Partition k-means")
+```
+```
+
+:::
+:::
+

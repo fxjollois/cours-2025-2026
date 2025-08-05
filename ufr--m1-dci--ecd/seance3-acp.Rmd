@@ -1,0 +1,500 @@
+---
+title: "Extraction de connaissances à partir de données structurées et non structurées"
+subtitle: "Séance 3 : Analyse en Composantes Principales (ACP)"
+output: 
+  xaringan::moon_reader:
+    css: ["default", "default-fonts", "style.css"]
+    nature:
+      highlightStyle: github
+      countIncrementalSlides: false
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
+library(kableExtra)
+library(tidyverse)
+```
+
+## Que veut-on faire ?
+
+- Décrire et/ou résumer l'information contenue dans les données
+
+--
+
+- Sans formuler d'hypothèses au préalable
+
+--
+
+- Technique efficace de réduction de dimension
+
+--
+
+- Méthode de visualisation des données très pertinente
+
+--
+
+- Méthode de décorrélation des variables, utile pour certaines méthodes statistiques.
+
+---
+## Comment ?
+
+- Transformations linéaires d'un grand nombre de variables intercorrélées
+
+--
+
+- Nombre relativement limité de composantes non corrélées
+
+--
+
+- Regroupant les données en des ensembles plus petits
+
+--
+
+- Permettant d'éliminer les problèmes de multicolinéarité entre les variables.
+
+---
+## Du choix de la projection dépend l'analyse
+
+
+```{r, echo=FALSE, out.width="70%"}
+knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/6/64/Dualite.jpg")
+```
+
+.footnote[Source : <https://commons.wikimedia.org/wiki/File:Dualite.jpg>]
+
+---
+## Méthodes descriptives
+
+- Pas de modèle probabiliste, mais elles dépendent d'un modèle géométrique
+- Représentations géométriques de ces unités et de ces variables
+- Représentations des individus permettent de voir s'il existe une structure, non connue a priori
+- Représentations des variables permettent d'étudier les structures de liaisons linéaires
+
+--
+
+### Lecture
+
+- Distinguer des groupes dans l'ensemble des individus en regardant quelles sont les individus qui se ressemblent, celles qui se distinguent des autres, etc...
+- Pour les variables, on cherchera quelles sont celles qui sont très corrélées entre elles, celles qui, au contraire ne sont pas corrélées aux autres, ...
+
+--
+
+**Idée principale** : Projeter le nuage dans un sous-espace de dimension inférieure
+
+---
+## Exemple en 2D
+
+#### Repère $(0,X^{(1)},X^{(2)})$
+
+![Repère d'origine](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_plan_init.png)
+
+---
+
+#### Repère factoriel $(g,F^{(1)},F^{(2)})$ : axe 1 associé à la plus grande valeur propre, axe 2 associé à la plus petite. 
+
+![Repère factoriel](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact2.png)
+
+---
+
+#### Rotation du repère...
+
+![Repère factoriel rotation](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact.png)
+
+---
+
+#### ... et changement d'échelle.
+
+![Repère factoriel échelle](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact_final.png)
+
+
+
+---
+## Problème
+
+- Etudier simultanément $p$ variables (avec $p$ grand)
+- A l'aide d'informations sur $n$ individus (avec $n$ encore plus grand)
+
+--
+
+### Détection
+
+- d'individus atypiques
+- de liaisons entre variables
+- Recherche de *bonnes* variables
+
+--
+
+### Représentation graphique
+
+- des variables
+- des individus
+
+---
+## Objectifs
+
+- Constructions de nouvelles variables (appelées facteurs)
+    - Concentrant la variance du nuage de points
+    - Sur un petit nombre $q$ de facteurs
+
+--
+
+- Représentation graphiques des variables
+    - Dans un sous-espace de faible dimension (avec $q=2$ ou $q=3$)
+    - Explicitant les liaisons initiales entre variables
+
+--
+
+- Représentation graphiques des individus
+    - Minimisant les déformations du nuage de points
+    - Dans un sous-espace de dimension $q$ (on aura $q<p$)
+
+--
+
+- Réduction de la dimension (compression)
+    - Approximation de $X$ par un tableau de ranq $q$
+    - $q << p$
+
+---
+## Principe
+
+- **Facteurs principaux** : combinaisons linéaires non corrélées 2 à 2 des variables initiales
+
+--
+
+- 1ère **composante principale**
+    - Combinaison linéaire des variables qui explique le mieux la variabilité de l'échantillon
+    - Géométriquement, déterminée par la direction de l'allongement maximum du nuage de points
+
+--
+
+- 2ème **composante principale**
+    - Combinaison linéaire des variables expliquant au mieux la variance résiduelle
+    - Direction orthogonale à la précédente
+
+--
+
+- Itération de l'étape précédente
+
+---
+## Matrice de corrélation ou de covariance ?
+
+### Corrélation 
+
+- Variables réduites (donc sans unité) et de même dispersion (écart-type 1)
+- Choix par défaut le plus fréquent (données en général hétérogènes)
+- Diagonalisation de la matrice des corrélations
+
+--
+
+### Covariance
+
+- Variables uniquement centrées
+- Variables avec unités et dispersions différentes
+- A n'utiliser que si les données sont homogènes
+- Diagonalisation de la matrice des covariances
+
+---
+## Combien d'axes retenir ?
+
+- Question délicate, sans réponse définitive
+- Critère empirique : point d'inflexion sur les spectres des valeurs propres
+
+--
+
+### But = Représentation graphique
+
+- Conserver l'essentiel de la variabilité tout en retenant un faible nombre de facteurs
+- Représenter sur 2 axes (éventuellement 3, voire 4 maximum)
+
+--
+
+### But = Préparation des données
+    
+- Préalablement à la réalisation d'une classification
+- Pas un inconvénient de retenir beaucoup d'axes	
+- Supprimer les directions correspondant aux plus petites valeurs propres 
+    - Critère de Kaiser : vp $>$ moyenne des vp
+    - si ACP normée, vp $>$ 1
+    - Supprimer le bruit
+
+---
+## Quelques notations
+
+- $\mathbf{I}_p$ : matrice identité (diagonale = 1 et le reste = 0), $\mathbf{1}_n$ : vecteur unité (que des 1)
+- $\mathbf{X} = (x_i^j), i=1,\ldots,n, j=1,\ldots,p$ : matrice des données
+- $\mathbf{x}_i = (x_i^1,\ldots,x_i^p)$ : vecteur individu $i$
+- $\mathbf{x}^j = (x_1^j,\ldots,x_n^j)$ : vecteur variable $j$
+- $p_i, i=1,\ldots,n$ : poids des individus (très souvent égaux à $\frac{1}{n}$)
+    - représentés dans la matrice $\mathbf{D}$ (poids sur la diagonale et le reste égal à 0)
+    - si poids identiques, $\mathbf{D} = \frac{1}{n}\mathbf{I}_p$
+- $\mathbf{M}$ : métrique utilisée
+    - $\mathbf{I}_p$ : si ACP centrée uniquement
+    - $\mathbf{D}_\frac{1}{\delta}$ : si ACP centrée réduite (avec $(\frac{1}{\delta_j})$ sur la diagonale (écart-type de $j$))
+    - $\mathbf{M}'$ : transposée de $\mathbf{M}$
+
+---
+## Premiers calculs 
+
+Utilisation de moyenne arithmétique (pondérée éventuellement), de la variance (elle-aussi pondérée), et de la covariance et de la corrélation entre deux variables
+
+- $\mathbf{g} = (\bar{x}^1,\ldots,\bar{x}^p)$ : point moyen (barycentre), on a $\mathbf{g} = \mathbf{X}'\mathbf{D}\mathbf{1}_n$
+
+- Tableau centré $\mathbf{Y} = \mathbf{X}-\mathbf{1}_n\mathbf{g} = (\mathbf{I}_p - \mathbf{1}_n\mathbf{1}_n'\mathbf{D})\mathbf{X}$
+
+- Matrice de variance-covariance $\mathbf{V} = \mathbf{X}'\mathbf{D}\mathbf{X} - \mathbf{g}\mathbf{g}' = \mathbf{Y}'\mathbf{D}\mathbf{Y}$
+
+- Matrice de corrélation $\mathbf{R} = \mathbf{D_\frac{1}{s}}\mathbf{V}\mathbf{D_\frac{1}{s}}$ 
+
+- Données centrées-réduites $\mathbf{Z} = \mathbf{Y}\mathbf{D}_\frac{1}{s}$
+
+---
+## Inertie
+
+Inertie d'un nuage de points :
+
+$$I_g = \sum_{i=1}^n p_i d_\mathbf{M}^2(x_i - g) = \frac{1}{2} \sum_{i=1}^n \sum_{i'=1}^n p_i p_{i'} d_\mathbf{M}^2(x_i - x_{i'}) = Tr(\mathbf{M}\mathbf{V}\mathbf{M})$$
+
+- Si données originelles $\mathbf{Y}$ : $I_g = Tr(\mathbf{V}) = \sum_{j=1}^p \delta_j^2$.
+- Si données réduites $\mathbf{Z}$ : $I_g = Tr(\mathbf{D}_\frac{1}{\delta^2}\mathbf{V}) = Tr(\mathbf{D}_\frac{1}{\delta}\mathbf{V}\mathbf{D}_\frac{1}{\delta}) = Tr(\mathbf{R}) = p$
+
+--
+
+> L'ACP revient à chercher $F_q$, sous espace de dimension $q$ de $F_p$, tel que l'inertie du nuage projeté sur $F_q$ soit maximale.
+
+---
+## Rappel 
+
+### Vecteur et valeur propre
+
+$\mathbf{v} \ne 0$ vecteur propre de $\mathbf{A}$ 
+
+- s'il existe $\lambda$ tel que $\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$
+- $\lambda$ valeur propre associée à $\mathbf{v}$
+
+Matrice de dimension $(p,p)$ : $p$ valeurs propres
+
+---
+## Analyse de $\mathbf{M}\mathbf{V}\mathbf{M}$
+
+- Matrice carrée $(p,p)$ :
+  - Diagonalisable 
+  - Valeurs propres $\lambda_1,\ldots,\lambda_p$ réelles
+  - Axes principaux d'inertie : $p$ vecteurs propres (notés $\mathbf{a}_j$)
+  - Valeurs propres positives : tri par ordre décroissant 
+
+--
+
+- Lien avec l'inertie 
+$$I_g = Tr(\mathbf{M}\mathbf{V}\mathbf{M}) = \sum_{j=1}^p \lambda_j$$
+
+--
+
+- En ne gardant que les $q$ premiers axes d'inertie
+  - Inertie expliquée : $\sum_{j=1}^q \lambda_j$
+
+--
+
+**Remarque** : l'ACP sur $q+1$ variables est obtenue par ajout d'une variable d'inertie maximale à l'ACP sur $q$ variables. Il n'est pas nécessaire de refaire tout le calcul.
+
+
+---
+## Composantes Principales
+
+Coordonnées des individus données par projections orthogonales sur axes principaux
+
+- Composantes principales $\mathbf{c}_k$ (qui correspondent aux coordonnées des individus sur l'axe $k$) :
+
+$$
+	\mathbf{c}_k = \mathbf{Y} \mathbf{M} \mathbf{a}_k
+$$
+
+- Axe $k$ expliquant une certaine part d'inertie, déterminée par $\frac{\lambda_k}{I_g}$
+
+--
+
+ACP avec $q$ axes retenus expliquera donc une part d'inertie égale à 
+
+$$\frac{\sum_{k=1}^q \lambda_k}{\sum_{\ell=1}^p \lambda_\ell}$$
+
+
+---
+## Interprétation
+
+### Cercle des corrélations 
+
+- Sur données centrées-réduites uniquement
+  - Représentation des corrélations entre variables et composantes principales
+  - Plus variable proche de 1 ou -1 sur une composante, plus les 2 sont corrélées
+
+--
+
+### Contribution des individus et des variables
+
+- Contribution d'un individu à un axe : $\frac{p_i (c_{ik})^2}{\lambda_k}$
+  - Si supérieure à $\alpha p_i$ (avec $\alpha$ généralement entre 2 et 4), individu considéré comme fortement contributeur à la création de l'axe
+  - Si très forte, individu potentiellement aberrant (mettre de côté)
+- Contribution d'une variable à un axe : $\frac{\sqrt{\lambda_k}a_k^j}{s_j}$
+  - Si supérieure à $\frac{1}{p}$, alors variable considérée comme fortement contributrice
+
+---
+## Interprétation
+
+### Qualité de représentation
+
+- Qualité de représentation d'un individu par un axe : $\frac{(c_{ik})^2}{\sum_{\ell=1}^p (c_{i\ell})^2}$
+  - Plus elle est grande, mieux l'individu est représenté sur l'axe $k$
+- Qualité de représentation d'une variable par un axe : $\frac{\lambda_k (a_k^j)^2}{\sum_{\ell=1}^p \lambda_\ell (a_\ell^j)^2}$
+  - Idem, plus cette valeur est grande, plus la variable est bien représentée sur l'axe $k$
+
+--
+
+### Que faire pour interpréter un axe
+
+Pour comprendre ce que reprèsente un axe :
+
+- Recenser les variables qui contribuent le plus
+- Recenser celles qui sont très bien représentées
+- Chercher individus bien représentés ou contribuant fortement à l'axe
+  - si $n$ est grand, prendre individus avec valeurs très fortes
+
+
+---
+## En plus
+
+Possibilité d'introduire des éléments supplémentaires ne participant pas au calcul, mais pouvant être représentés sur les graphiques :
+
+--
+
+- **Variables quantitatives** : utile pour expliquer le lien de ces variables avec les variables de l'ACP 
+
+--
+
+- **Variables qualitatives** : idem
+
+--
+
+- **Individus** : utile pour mettre de côté des individus particuliers ou pour analyser des individus d'un autre échantillon
+
+---
+## Exemple simple
+
+Notes obtenues par 9 élèves dans 4 matières (cf Besse and Baccini)
+
+```{r donnees}
+donnees = read.table(text = "Etudiant & Math & Phys & Fran & Angl
+jean &  6.00 &  6.00 &  5.00 &  5.50
+alan &  8.00 &  8.00 &  8.00 &  8.00
+anni &  6.00 &  7.00 & 11.00 &  9.50
+moni & 14.50 & 14.50 & 15.50 & 15.00
+didi & 14.00 & 14.00 & 12.00 & 12.50
+andr & 11.00 & 10.00 &  5.50 &  7.00
+pier &  5.50 &  7.00 & 14.00 & 11.50
+brig & 13.00 & 12.50 &  8.50 &  9.50
+evel &  9.00 &  9.50 & 12.50 & 12.00", sep = "&", header = T, row.names = 1)
+
+knitr::kable(donnees, row.names = T)
+```
+
+---
+## Variance et corrélation des variables
+
+- Variances sensiblement différentes
+
+```{r var}
+knitr::kable(data.frame(Moyenne = apply(donnees, 2, mean),
+                        Variance = apply(donnees, 2, var)), 
+             digits = 2)
+```
+
+--
+
+- Deux groupes de variables.
+
+```{r cor}
+data.frame(cor(donnees)) %>%
+  mutate_all(~cell_spec(round(.x,2), bold = .x > .75)) %>%
+  kable(escape = F, align = "r") %>%
+  kable_styling()
+```
+
+```{r acp}
+library(FactoMineR)
+acp = PCA(donnees, graph = FALSE)
+```
+
+---
+## Part de la variance expliquée
+
+```{r eigentab}
+knitr::kable(round(setNames(data.frame(acp$eig), c("Valeur propre", "Variance (%)", "Cumulée (%)")), 2), row.names = TRUE)
+```
+
+```{r eigenfig, fig.height=3}
+par(mar = c(2, 2, 1, 1) + .5)
+barplot(acp$eig[,2])
+```
+
+2 axes suffisent à représenter `r round(acp$eig[2,3], 1)`% de l'information présente dans les données.
+
+---
+## Représentation graphique - Individus
+
+```{r graphs-ind}
+plot(acp)
+```
+
+---
+## Représentation graphique - Individus
+
+```{r graphs-var}
+plot(acp, choix = "var")
+```
+
+---
+## Individus importants
+
+### Contribution
+
+```{r indcontrib}
+setNames(as.data.frame(addmargins(acp$ind$contrib, 1)), paste("contrib", 1:4)) %>%
+  mutate_all(~cell_spec(round(.x, 1), bold = .x > 100/9)) %>%
+  kable(escape = F, align = "r") %>%
+  kable_styling()
+```
+
+---
+## Individus importants
+
+### Qualité de représentation
+
+```{r indcos2}
+setNames(as.data.frame(addmargins(acp$ind$cos2, 2)), c(paste("qualité", 1:4), "Somme")) %>%
+  mutate_all(~cell_spec(round(.x, 2), bold = .x > .25)) %>%
+  kable(escape = F, align = "r") %>%
+  kable_styling()
+```
+
+
+---
+## Variables importantes 
+
+### Contribution
+
+```{r varcontrib}
+setNames(as.data.frame(acp$var$contrib), paste("contrib", 1:4)) %>%
+  mutate_all(~cell_spec(round(.x, 1), bold = .x > 25)) %>%
+  kable(escape = F, align = "r") %>%
+  kable_styling()
+```
+
+---
+## Variables importantes 
+
+### Qualité de représentation
+
+```{r varcos2}
+setNames(as.data.frame(acp$var$cos2), paste("qualité", 1:4)) %>%
+  mutate_all(~cell_spec(round(.x,2), bold = .x > .25)) %>%
+  kable(escape = F, align = "r") %>%
+  kable_styling()
+```

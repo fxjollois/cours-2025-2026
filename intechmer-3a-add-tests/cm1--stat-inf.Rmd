@@ -1,0 +1,767 @@
+---
+title: "Statistique inférentielle"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output:
+  xaringan::moon_reader:
+    css: [nhsr, chocolate-fonts]
+    nature: 
+      beforeInit: "macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align='center', fig.height=4, 
+                      message = FALSE, warning = FALSE, out.width='90%')
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+data = read_delim("tips.csv", delim = ",")
+```
+
+## Sommaire
+
+
+1. Rappels de probabilité
+
+2. Lois de probabilités
+
+3. Estimation par intervalles
+
+4. Notion de tests
+
+---
+class: center, middle, section
+## Rappels de probabilité
+
+---
+## Définitions
+
+- **Expérience aléatoire** : expérience dont le résultat ne peut pas être déterminé *a priori*
+
+- **Univers de l'expérience** : ensemble des résultats possibles (noté $\Omega$)
+
+- **Résultat élémentaire** : résultat possible de l'expérience (noté $\omega$)
+
+- **Ensemble des parties** : ensemble constitué de tous les sous-ensembles possibles de $\Omega$ (noté $\mathcal{P}(\Omega)$)
+
+- **Evènement** (aléatoire) : partie (sous-ensemble) de $\Omega$ (noté $A$)
+  - On parle de *réalisation* lorsque l'évènement se produit (*i.e* le résultat $\omega$ appartient au sous-ensemble $A$)
+  - $A=\Omega$ se réalise toujours
+  - $A=\emptyset$ ne se réalise jamais
+  - $A=\{\omega\}$ s'appelle donc un évènement élémentaire
+  
+
+---
+
+## Exemple simple
+
+Lancer d'un dé à 6 faces (non pipé), avec un jeu où on doit faire un nombre pair
+
+- $\Omega = \{1, 2, 3, 4, 5, 6\}$
+
+- $\mathcal{P}(\Omega)$ : ensemble des 64 sous-ensembles possibles
+  - $\emptyset$ et $\Omega$
+  - $\{1\}, \{2\}, \ldots$
+  - $\{1, 2\}, \{1, 3\}, \ldots$
+  - $\{1, 2, 3\}, \{1, 2, 4\}, \ldots$
+  - $\ldots$
+
+- $A=\{2, 4, 6\}$
+
+---
+
+## Evènements 
+
+- $A$ : évènement constitué des éléments de $\Omega$ inclus dans $A$
+
+- **Complémentaire** de $A$ : évènement constitué des éléments de $\Omega$ non inclus dans $A$
+  - $\bar{A} = \{\omega \in \Omega, \omega \notin A \}$
+
+- **Union** de $A$ et $B$ : évènement constitué des éléments de $A$ et des éléments de $B$ (ou aux deux donc)
+  - $A \cup B = \{ w \in \Omega, \omega \in A \mbox{ ou } \omega \in B \}$
+
+- **Intersection** de $A$ et $B$ : événement constitué des éléments de $\Omega$ étant à la fois dans $A$ et dans $B$
+  - $A \cap B = \{ w \in \Omega, \omega \in A \mbox{ et } \omega \in B \}$
+
+- **Différence** entre $A$ et $B$ (non symétrique) : ensemble constitué des éléments de $A$ n'étant pas dans $B$
+  - $A \setminus B = \{ w \in \Omega, \omega \in A \mbox{ et } \omega \notin B \}$
+
+---
+
+## Evènements 
+
+- **Inclusion** : $A$ est inclus dans $B$ si tous les éléments de $A$ sont dans $B$
+  - $A \subset B \Leftrightarrow \left( \omega \in A \implies \omega \in B \right)$
+
+- **Disjonction** (ou incompatibilité) : $A$ et $B$ sont disjoints s'il n'y aucun élément commun entre les deux
+  - $A$ et $B$ disjoints $\Leftrightarrow A \cap B = \emptyset$
+
+
+### Système complet d'évènements 
+
+$(A_1, A_2, \ldots, A_n)$ constitue un système complet s'ils forment une **partition** de $\Omega$
+
+- Ils sont 2 à 2 incompatibles : $\forall p \ne q, A_p \cap A_q = \emptyset$
+
+- Leur réunion est égale à $\Omega$ : $\bigcup_{p=1}^n A_p = \Omega$
+
+---
+
+## Rappels de probabilités
+
+**Probabilité** : fonction permettant de mesurer la chance (ou le risque) de réalisation d'un évènement
+
+Quelques opérations :
+
+- $P(\emptyset) = 0$ et $P(\Omega)=1$
+
+- $0 \le P(A) \le 1$
+
+- $P(A) = \sum_{\omega_i \in A} P(\omega_i)$
+
+- $P(\bar{A}) = 1 - P(A)$
+
+- $P(A) \le P(B)$ si $A \subset B$
+
+- $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+
+- $P(\bigcup_i A_i) \le \sum_i P(A_i)$
+
+---
+
+## Rappels de probabilités
+
+- Probabilité conditionnelle de $A$ sachant $B$
+$$
+  P(A / B) = \frac{P(A \cap B)}{P(B)}
+$$
+
+- Indépendance de 2 évènements $A$ et $B$
+  - 2 évènements disjoints ne sont pas considérés comme indépendant
+  
+$$
+  P(A \cap B) = P(A) P(B)
+$$
+$$
+  P(A / B) = P(A) 
+$$
+$$
+  P(B / A) = P(B)
+$$
+
+- Théorème de Bayes
+$$
+  P(A / B) = \frac{P(B / A) P(A)}{P(B)}
+$$
+
+---
+class: middle, center, section
+## Loi de probabilité
+
+---
+
+## Variable aléatoire 
+
+Mesure d'un phénomène (*variable*) dont le résultat est déterminé par une expérience *aléatoire* (*i.e*. dépendant du hasard)
+
+- Exemples classiques : Pile/Face, Lancer de dé, Température, ...
+
+- Chaque résultat d'une expérience : **issue**
+
+- Ensemble de toutes les issues possibles : **univers des possibles** $\Omega$
+
+- Sous-ensemble de $\Omega$ : **évènement**
+  - Si ensemble à une seule issue *évènement élémentaire*
+
+- Possibilité d'associer une valeur réelle à chaque issue
+  - Notion de gain par exemple
+
+---
+
+## Variable aléatoire et loi de probabilité
+
+### Définition
+
+Une **variable aléatoire** (ou *v.a.*) $\mathbf{X}$ est une fonction définie sur $\Omega$ et à valeur dans $\mathbb{R}$, à laquelle on associe une **loi de probabilité** (ou *distribution de probabilité*) dont la masse totale est égale à 1
+
+- V.a. *continue* si les valeurs de $X$ sont quantitatives continues
+- V.a. *discrète* si le nombre de résultats est faible (ou si c'est qualitatif)
+
+### Fonction de répartition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles ou discrètes.
+
+La *fonction de répartition* $F_X$ de la v.a. est la fonction qui associe une probabilité $P(X \le x)$ à tout  $x$.
+
+---
+
+## Variable aléatoire 
+
+### Fonction de masse
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x_i$ discrètes.
+
+La *fonction de masse* de la v.a. associe une probabilité $P(X = x_i)$ à chaque résultat élémentaire $x_i$
+
+### Densité de probabilité
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles.
+
+La *fonction de densité* permet de calculer la probabilité d'appartenance à un domaine $P(a \le X \le b)$ (c'est la dérivée de la fonction de répartition).
+
+---
+
+## Loi uniforme discrète
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $k$ discrètes (avec $k=1,\ldots,n)$.
+
+$\mathbf{X}$ suit une **loi uniforme discrète** si pour chaque $k$, $P(X = k) = \frac{1}{n}$.
+
+### Exemple
+
+Dé à 6 faces (non pipé) $\rightarrow P(X = k) = \frac{1}{6}$ (avec $k=1,\ldots,6$).
+
+### Espérance et variance
+
+$$
+  E(X) = \frac{n+1}{2} \mbox{ et } V(X) = \frac{n^2 - 1}{12}
+$$
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Questions
+
+On dispose de 10 boules numérotées de 1 à 10 dans une urne.
+
+1. Quelle est la probabilité de tirer la boule 5 ?
+1. Quelle est la probabilité de tirer 2 fois de suite la boule 5 ? trois fois ?
+1. Si je tire 100 fois une boule (avec remise donc à chaque fois), quelle est valeur moyenne puis-je espérer avoir ?
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi uniforme discrète, à valeur entre 1 et 10. 
+
+1. $P(X = 5) = \frac{1}{10}$
+1. $P(X_1 = 5 \mbox{ et } X_2 = 5) = P(X_1 = 5) P(X_2 = 5) = \frac{1}{100}$ (car idépendance entre les 2 évènements)
+  - Il y a donc 1 chance sur mille d'avoir 3 cinq d'affilés
+1. $E(X) = \frac{n+1}{2} = 50.5$
+
+---
+
+## Loi de Bernouilli
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant deux valeurs $0$ ou $1$
+
+$\mathbf{X}$ suit une **loi de Bernouilli** si $P(X = 1)=p$ et $P(X = 0) = q = 1-p$.
+
+### Exemple
+
+Pile ou face avec une pièce équilibrée
+
+### Espérance et Variance
+
+$$
+  E(X) = p \mbox{ et } V(X) = pq
+$$
+
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Questions 
+
+On est en présence d'une assemblée de 250 personnes, dont 40 gauchers.
+
+1. Quelle est la probabilité qu'une personne soit gauchère ?
+1. A l'inverse, quelle est la probabilité qu'une personne soit droitière ?
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi de Bernouilli, valant 1 si la personne est gauchère, 0 sinon.
+
+1. $P(X = 1) = \frac{40}{250} = .16$
+1. $P(X = 0) = 1 - P(X = 1) = 1 - .16 = .84$ (complémentaire)
+
+---
+
+## Loi Binomiale
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant les valeurs $0$ (avec une probabilité $p$) ou $1$ (avec une probabilité $1-p$), et $n$ le nombre de tirages réalisés.
+
+$\mathbf{X}$ suit une **loi Binomiale** lorsque $P(X = k) = C_k^n p^k (1-p)^{n-k}$, somme de $n$ v.a. indépendants de loi de Bernouilli.
+
+$C_k^n = \frac{n!}{k!(n-k)!}$ se nomme le coefficient binomial, et représente le nombre d'ensembles à $k$ éléments qu'on peut obtenir dans l'ensemble des $n$ éléments.
+
+### Exemple
+
+Avec 100 tirages à pile ou face, combien de fois on aura pile ?
+
+### Espérance et Variance
+
+$$
+  E(X) = np \mbox{ et } V(X) = np(1-p)
+$$
+
+---
+
+## Loi Binomiale
+
+### Fonction de masse
+
+$$
+P(X = k) = f(k) = C_k^n p^k (1-p)^{n-k}
+$$
+### Fonction de répartition
+
+$$
+F(x) = \sum_{k=0}^{\lfloor x \rfloor} f(k) \mbox{ pour } 0 \le x \le n
+$$
+
+A noter que $F(x)=0$ pour $x < 0$ et $F(x)=1$ pour $x>n$.
+
+
+---
+
+## Loi Binomiale - *exercice*
+
+### Questions
+
+Supposons que nous avons formé 100 groupes de 2000 personnes, avec la même proportion de gaucher (16%) que précédemment.
+
+1. Si je choisis une personne de chaque groupe, combien puis-je espérer avoir de gauchers au final ?
+1. Quelle est la probabilité de n'avoir aucun gaucher ? Et 100 gauchers ?
+1. Quelle est la probabilité d'avoir 20 gauchers ?
+
+---
+
+## Loi Binomiale
+
+### Réponses
+
+Soit $\mathbf{X}$ une v.a. de loi Binomiale, avec $p = .16$ et $n = 100$
+
+1. $E(X) = np = 100 * .16 = 16$
+1. $P(X = 0) = C_0^{100} .16^0 .84^{100} = .84^{100} < 0.0001$ (très très faible) et $P(X = 100) = .16^{100} < 0.0001$ (aussi très très faible)
+1. $P(X = 20) = C_20^{100} .16^20 .84^{80} = 0.0567$
+
+---
+
+## Loi Normale
+
+### Définition
+
+Soit $\mathbf{X}$ une *v.a.* prenant des valeurs $x$ réelles.
+
+$\mathbf{X}$ suit une **loi Normale** $N(\mu, \sigma^2)$ de moyenne $\mu$ et de variance $\sigma^2$.
+
+### Exemple
+
+Mesure de la taille d'une population
+
+### Espérance et Variance
+
+$$
+  E(X) = \mu \mbox{ et } V(X) = \sigma^2
+$$
+
+---
+
+## Loi Normale
+
+### Densité de probabilité
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp \left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+$$
+
+```{r norm-dens, fig.height=4}
+x = seq(-5, 5, by = .01)
+df = data.frame(x = x, y = dnorm(x))
+ggplot(df, aes(x, y)) + 
+  geom_line(color = "steelblue", size = 2) +
+  labs(x = "", y = "") +
+  theme_minimal()
+```
+
+---
+
+## Loi Normale
+
+### Fonction de répartition
+
+$$
+ F(x) = \frac{1}{2} \left( 1 + \mbox{erf} \frac{x - \mu}{\sigma\sqrt{2}} \right)
+$$
+
+```{r norm-rep, fig.height=4}
+x = seq(-5, 5, by = .01)
+df = data.frame(x = x, y = pnorm(x))
+ggplot(df, aes(x, y)) + 
+  geom_line(color = "steelblue", size = 2) +
+  labs(x = "", y = "") +
+  theme_minimal()
+```
+
+---
+class: middle, center, section
+## Estimation par intervalles
+
+---
+## Problème à résoudre - exemple
+
+Comment puis-je connaître un indicateur sur la population française ?
+
+- Quelle est la taille moyenne de TOUS les français ?
+
+> Impossible à réaliser (trop coûteux, trop compliqué à mettre en oeuvre, ...)
+
+--
+
+Sélection d'un sous-ensemble de la population, appelé **échantillon**
+
+- Notion de *représentativité* de l'échantillon
+
+- Calcul d'un indicateur sur l'échantillon
+
+- Extrapolation à la population (avec une incertitude quantifiée)
+
+--
+
+$\rightarrow$ **Inférence statistique**
+
+---
+## Estimation
+
+**Problème statistique** : 
+
+- Estimation d'un paramètre inconnu de la population via un échantillon
+
+--
+
+2 types d'estimation, basées sur l'hypothèse de la loi de la variable :
+
+- **Ponctuelle** : unique valeur mesurée dans l'échantillon
+  - La moyenne est un bon estimateur de l'espérance d’une v.a. par exemple
+
+- **Par intervalle** : intervalle (dit de confiance) basée sur l'échantillon
+  - Il y a x % de chance que la vraie valeur (de la population) appartiennent à cet échantillon
+  - Intervalle très souvent symétrique
+  - Risque de se tromper dépendant du problème, mais très souvent 5%
+  
+---
+## Cas de la loi Normale
+
+- Pour une v.a. $N(0, 1)$, on cherche un intervalle de confiance $[a;b]$ tel que
+
+$$p(a<X<b)=1-\alpha$$
+
+- Si $\alpha$ est égal à 5% $\rightarrow$ a = -1,96 et b = 1,96
+
+> Pour une variable $X$ suivant une loi Normale $N(0, 1)$, on a donc **95%** de chances que la valeur soit comprise dans l'intervalle  $\mathbf{[−1.96 ; 1.96]}$
+
+```{r normal, fig.height=2.5, fig.align='center'}
+anno = function(graph, x0, y0, x1, y1, text) {
+  res = graph + 
+    annotate("segment", x = x0, xend = x1, y = y0, yend = y1, 
+             colour = "gray80", size = 1, alpha = 0.8, arrow = arrow()) +
+    annotate("text", x = x0, y = y0, label = text, hjust = 1) +
+    annotate("segment", x = -x0, xend = -x1, y = y0, yend = y1, 
+             colour = "gray80", size = 1, alpha = 0.8, arrow = arrow()) +
+    annotate("text", x = -x0, y = y0, label = text, hjust = 0)
+  return (res)
+}
+g = ggplot(NULL, aes(c(-5,5))) +
+  geom_area(stat = "function", fun = dnorm, fill = "gray90", alpha = .5) +
+  geom_area(stat = "function", fun = dnorm, fill="darkred", xlim = c(-5, -1.96)) +
+  geom_area(stat = "function", fun = dnorm, fill="red3", xlim = c(-1.96, -1.64)) +
+  geom_area(stat = "function", fun = dnorm, fill="salmon", xlim = c(-1.64, -1.28)) +
+  geom_area(stat = "function", fun = dnorm, fill="salmon", xlim = c(1.28, 1.64)) +
+  geom_area(stat = "function", fun = dnorm, fill="red3", xlim = c(1.64, 1.96)) +
+  geom_area(stat = "function", fun = dnorm, fill="darkred", xlim = c(1.96, 5)) +
+  theme_minimal() +
+  labs(x = "", y = "")
+
+g = anno(g, -4, 0.05, -2.5, 0.025, "2,5%")
+g = anno(g, -3, 0.15, -1.85, 0.08, "2,5%")
+g = anno(g, -2, 0.25, -1.45, 0.15, "5%")
+g
+```
+
+
+---
+## Intervalle de confiance d'une moyenne
+
+- Si $n$ est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+$$\left[m-u_{\alpha/2}\frac{s}{\sqrt{n}}\mbox{ ; }m + u_{\alpha/2}\frac{s}{\sqrt{n}}\right]$$
+
+
+- $m$ : moyenne sur l'échantillon
+
+- $s$ : écart-type sur l'échantillon
+
+- $n$ : taille de l'échantillon
+
+- $u_{\alpha/2}$  : valeur de la table de la loi Normale tel que $p(X > u_{\alpha/2}) = \alpha/2$
+  - Si $\alpha = 0,05$ (i.e. 5% donc), on aura $u_{\alpha/2} = 1,96$
+  - Autres valeurs parfois utilisées : 10% (avec $u_{\alpha/2} = 1,64$), 1%...
+
+
+---
+## Exemple
+
+### Mesure du niveau de pluie pendant 9 ans
+
+- Moyenne de **610,22**
+- Écart-type de **111,53**
+
+On considère que le niveau de pluie suit une loi Normale donc, avec un risque de 5%, on aura
+
+$$IC_{95\%} = [ 537,35 ; 683,09 ]$$
+
+--
+
+On dira la phrase suivante :
+
+> **Il y a donc 95% de chance que le niveau de pluie soit compris entre 537,35 et 683,09.**
+
+
+---
+## Intervalle de confiance d'une proportion
+
+- Si $n$ est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+$$\left[p-u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\mbox{ ; }p+u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\right]$$
+
+- $p$ : proportion sur l'échantillon
+
+- $n$ : taille de l'échantillon
+
+- $u_{\alpha/2}$  : valeur de la table de la loi Normale tel que $p(X > u_{\alpha/2}) = \alpha/2$
+  - Si $\alpha = 0,05$ (i.e. 5% donc), on aura $u_{\alpha/2}=1,96$
+  - Autres valeurs parfois utilisées : 10% (avec $u_{\alpha/2}=1,64$), 1%...
+
+---
+## Exemple
+
+### Mesure du niveau d'insatisfaction des habitants sur l'avancement des travaux
+
+- 500 personnes interrogées
+- 30% si disent mécontents
+
+On a n (largement) supérieur à 30 donc, avec un risque de 5%, on aura
+
+$$IC_{95\%}=[26.0;34.0]$$
+
+--
+
+On dira la phrase suivante :
+
+> **Il y a donc 95% de chance que le niveau d’insatisfaction soit compris entre 26% et 34%.**
+
+
+
+---
+class: center, middle, section
+# Tests statistiques
+
+---
+## Notions générales sur les tests statistiques
+
+- Idée : niveau de pluie en augmentation
+
+--
+
+- Niveau de pluie suit une loi $N(600, 100)$ (étude précédente)
+
+--
+
+- Mesure du niveau de pluie pendant 9 ans
+  - $\bar{x} = 610.2222$ et $s = 111.5289$
+
+--
+
+- Que peut-on conclure ?
+
+--
+
+- Opposer deux hypothèses contradictoires :
+  - [ $H_0$ ] le niveau de pluie n'a pas augmenté, donc $\mu = 600$
+  - [ $H_1$ ] le niveau de pluie a augmenté, donc $\mu > 600$.
+
+--
+
+- Choix d'une règle de décision
+
+
+---
+## Notions générales sur les tests statistiques
+
+### Comment tester ces hypothèses ? 
+
+- Intérêt naturel porté à $\hat\mu$, moyenne des observations, et donc estimation du niveau de pluie
+--
+
+- Variable considérée comme la **variable de décision**
+--
+
+- Si $H_0$ vrai, $\hat\mu$ suit une loi $N(600, \frac{100}{\sqrt{9}})$
+
+--
+
+### Règle de décision
+
+- Si $\hat\mu$ est trop grand, choix de l'hypothèse $H_1$
+  - Donc si $P(\hat\mu > k) = 0.05$
+  - 5% de chance de se tromper
+- Sinon, conservation de  $H_0$
+
+---
+## Notions générales sur les tests statistiques
+
+- Test avec $k = 600 + \frac{100}{\sqrt{9}} \times 1.64 = 655$
+  - Si $\hat\mu > 655$, alors on rejette $H_0$ pour conserver $H_1$
+  - Si $\hat\mu \leq 655$, alors on conserve $H_0$
+
+--
+
+### Ensemble des évènements 
+- $\{\hat\mu > 655\}$ : **région critique** ou région de rejet
+- $\{\hat\mu \leq 655\}$ : **région d'acceptation**
+
+
+--
+.example[
+### Sur les données
+$\hat\mu = 610.2$
+
+$\rightarrow$ Conservation de $H_0$ (pas d'augmentation du niveau de pluie)
+]
+
+---
+## Notions générales sur les tests statistiques
+
+### Mais il existe une possibilité de se tromper
+
+- Croire le chercheur alors qu'il avait tort
+- Ne pas croire ce chercheur alors qu'il avait raison
+
+Test présentant une forte probabilité d'être inexact
+
+--
+
+### Augmentation de la pluie
+
+Le niveau suit finalement une loi $N(650,\frac{100}{\sqrt 9})$
+
+--
+
+#### Erreur commise quand $\hat\mu$ inférieur à 655
+- Probabilité $\beta = P(\hat\mu < 655)$
+- $u = \frac{\hat\mu - 650}{100 / \sqrt 9}$ suit une loi $N(0,1)$
+- $\beta = P(u < \frac{655 - 650}{100 / \sqrt 9}) = P(u < 0.15)$
+- $\beta = 0.56$, ce qui est effectivement considérable
+
+---
+## Notions générales sur les tests statistiques
+
+- Deux probabilités d'erreur
+  - $\alpha$ : risque de première espèce
+  - $\beta$  :  risque de seconde espèce
+
+--
+
+| | $H_0$ vraie | $H_1$ vraie |
+|-|-|-|
+| Choix $H_0$    | $1 - \alpha$ | $\beta$ |
+| Choix $H_1$    | $\alpha$ | $1 - \beta$ |
+
+--
+
+- Dans la pratique, plus d'importance à l'hypothèse nulle
+
+- Calcul de $\beta$ souvent impossible
+
+- $1 - \beta$ est appelé **puissance du test**
+
+- Choix des probabilités d'erreur $\alpha$ de 5%, 1% ou 10%
+
+
+---
+## Notions générales sur les tests statistiques
+
+Pour effectuer un test, voici les étapes à suivre
+
+1. Etablir deux **hypothèses contradictoires**, 
+1. Déterminer la **variable de décision**,
+1. Calculer la **région critique** en fonction de $\alpha$,
+1. Calculer si possible la puissance $1 - \beta$,
+1. Calculer la **valeur expérimentale** de la variable de décision,
+1. **Conclure** : rejet ou acceptation de $H_0$.
+
+### Types de test
+
+- **Unilatéral** : on cherche à tester si une variable a une moyenne supérieure (ou inférieure) à une certaine valeur
+  - risque sur un seul côté
+
+- **Bilatéral** : on cherche à tester  si une variable a une moyenne égale à une certaine valeur
+  - risque des deux côtés
+
+---
+## Exemple de test
+
+- Niveau de pluie suit une loi $N(600, 100)$ (étude précédente)
+
+- Est-ce toujours le même ?
+
+--
+
+- On a mesuré le niveau de pluie pendant 9 ans, et on a obtenu les valeurs suivantes :
+  - $\bar{x} = 610.2222$ et $s = 111.5289$
+  - Intervalle de confiance à 5% : $[537.3; 683.1]$
+
+--
+
+- Hypothèses
+  - [ $H_0$ ] : le niveau n'a pas changé
+  - [ $H_1$ ] : le niveau a changé
+
+--
+
+- Région critique : en dehors de l'intervalle de confiance
+
+--
+
+$\rightarrow$ **Conservation** de $H_0$ (pas de changement du niveau de pluie)
+
+---
+## Notion de *p-value*
+
+- Version précédente des tests *traditionnelle*
+
+- Avec les outils actuels, on peut maintenant calculer directement la probabilité d'être dans la situation observée
+
+  - Test unilatéral : calcul de $P(X > valeur)$ (ou de $P(X < valeur)$)
+  - Test bilatéral : calcul de $P(|X| > valeur)$
+  
+- Comparaison de cette probabilité, nommée **_p-value_** à un seuil, choisi potentiellement a posteriori
+
+> C'est cette version des tests que nous allons utiliser dans les TPs avec le logiciel R
+

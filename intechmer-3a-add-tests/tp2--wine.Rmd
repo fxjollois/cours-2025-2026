@@ -1,0 +1,49 @@
+---
+title: "Applications sur données réelles - WINE - TP 2"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Données `Wine`
+
+Nous allons travailler sur des données concernant 3 types de vin. Elles sont disponibles sur [cette page](https://archive.ics.uci.edu/ml/datasets/wine) de l'UCI MLR. Il s'agit de 178 vins, réparties en 3 classes donc, et décrit par 13 variables quantitatives (lire la description dans le fichier `wine.names` pour plus d'informations).
+
+Le code suivant permet de charger les données, et de nommer correctement les variables.
+
+```{r}
+library(readr)
+library(DT)
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+datatable(wine, options = list(scrollX = TRUE))
+```
+
+Comme pour le TP précédent, rédiger votre travail dans un fichier Rmarkdown.
+
+## A faire
+
+Vous devez donc réaliser les étapes suivantes :
+
+1. Décrire les données
+1. Ne conserver que les variables quantitatives (donc mettre de côté la variable `class`)
+2. Réaliser une ACP centrée ou normée (choix à justifier)
+    - Produire les graphiques nécessaires à l'interprétation
+    - Identifier les classes sur le plan factoriel
+    - Que peut-on dire globalement ?
+3. Chercher un nombre de classes intéressant, à l'aide de la CAH
+    - Récupérer la partition ainsi obtenue
+    - Caractériser celles-ci avec les centres des classes
+4. Faire de même avec $k$-means, en utilisant les critères $R^2$ et $PseudoF$
+    - Récupérer la partition ainsi obtenue
+    - Caractériser celles-ci avec les centres des classes
+5. Comparer les 2 partitions ainsi obtenues
+6. Représenter celles-ci, chacune séparément, sur le plan factoriel de l'ACP
+
+

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Extraction de connaissances à partir de données structurées et non structurées</title>
+    <meta charset="utf-8" />
+    <script src="seance3-acp_files/header-attrs-2.13/header-attrs.js"></script>
+    <link href="seance3-acp_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="seance3-acp_files/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="seance3-acp_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="seance3-acp_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Extraction de connaissances à partir de données structurées et non structurées
+]
+.subtitle[
+## Séance 3 : Analyse en Composantes Principales (ACP)
+]
+
+---
+
+
+
+
+## Que veut-on faire ?
+
+- Décrire et/ou résumer l'information contenue dans les données
+
+--
+
+- Sans formuler d'hypothèses au préalable
+
+--
+
+- Technique efficace de réduction de dimension
+
+--
+
+- Méthode de visualisation des données très pertinente
+
+--
+
+- Méthode de décorrélation des variables, utile pour certaines méthodes statistiques.
+
+---
+## Comment ?
+
+- Transformations linéaires d'un grand nombre de variables intercorrélées
+
+--
+
+- Nombre relativement limité de composantes non corrélées
+
+--
+
+- Regroupant les données en des ensembles plus petits
+
+--
+
+- Permettant d'éliminer les problèmes de multicolinéarité entre les variables.
+
+---
+## Du choix de la projection dépend l'analyse
+
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Dualite.jpg" width="70%" style="display: block; margin: auto;" /&gt;
+
+.footnote[Source : &lt;https://commons.wikimedia.org/wiki/File:Dualite.jpg&gt;]
+
+---
+## Méthodes descriptives
+
+- Pas de modèle probabiliste, mais elles dépendent d'un modèle géométrique
+- Représentations géométriques de ces unités et de ces variables
+- Représentations des individus permettent de voir s'il existe une structure, non connue a priori
+- Représentations des variables permettent d'étudier les structures de liaisons linéaires
+
+--
+
+### Lecture
+
+- Distinguer des groupes dans l'ensemble des individus en regardant quelles sont les individus qui se ressemblent, celles qui se distinguent des autres, etc...
+- Pour les variables, on cherchera quelles sont celles qui sont très corrélées entre elles, celles qui, au contraire ne sont pas corrélées aux autres, ...
+
+--
+
+**Idée principale** : Projeter le nuage dans un sous-espace de dimension inférieure
+
+---
+## Exemple en 2D
+
+#### Repère `\((0,X^{(1)},X^{(2)})\)`
+
+![Repère d'origine](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_plan_init.png)
+
+---
+
+#### Repère factoriel `\((g,F^{(1)},F^{(2)})\)` : axe 1 associé à la plus grande valeur propre, axe 2 associé à la plus petite. 
+
+![Repère factoriel](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact2.png)
+
+---
+
+#### Rotation du repère...
+
+![Repère factoriel rotation](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact.png)
+
+---
+
+#### ... et changement d'échelle.
+
+![Repère factoriel échelle](https://fxjollois.github.io/cours-2016-2017/analyse-donnees/points_planfact_final.png)
+
+
+
+---
+## Problème
+
+- Etudier simultanément `\(p\)` variables (avec `\(p\)` grand)
+- A l'aide d'informations sur `\(n\)` individus (avec `\(n\)` encore plus grand)
+
+--
+
+### Détection
+
+- d'individus atypiques
+- de liaisons entre variables
+- Recherche de *bonnes* variables
+
+--
+
+### Représentation graphique
+
+- des variables
+- des individus
+
+---
+## Objectifs
+
+- Constructions de nouvelles variables (appelées facteurs)
+    - Concentrant la variance du nuage de points
+    - Sur un petit nombre `\(q\)` de facteurs
+
+--
+
+- Représentation graphiques des variables
+    - Dans un sous-espace de faible dimension (avec `\(q=2\)` ou `\(q=3\)`)
+    - Explicitant les liaisons initiales entre variables
+
+--
+
+- Représentation graphiques des individus
+    - Minimisant les déformations du nuage de points
+    - Dans un sous-espace de dimension `\(q\)` (on aura `\(q&lt;p\)`)
+
+--
+
+- Réduction de la dimension (compression)
+    - Approximation de `\(X\)` par un tableau de ranq `\(q\)`
+    - `\(q &lt;&lt; p\)`
+
+---
+## Principe
+
+- **Facteurs principaux** : combinaisons linéaires non corrélées 2 à 2 des variables initiales
+
+--
+
+- 1ère **composante principale**
+    - Combinaison linéaire des variables qui explique le mieux la variabilité de l'échantillon
+    - Géométriquement, déterminée par la direction de l'allongement maximum du nuage de points
+
+--
+
+- 2ème **composante principale**
+    - Combinaison linéaire des variables expliquant au mieux la variance résiduelle
+    - Direction orthogonale à la précédente
+
+--
+
+- Itération de l'étape précédente
+
+---
+## Matrice de corrélation ou de covariance ?
+
+### Corrélation 
+
+- Variables réduites (donc sans unité) et de même dispersion (écart-type 1)
+- Choix par défaut le plus fréquent (données en général hétérogènes)
+- Diagonalisation de la matrice des corrélations
+
+--
+
+### Covariance
+
+- Variables uniquement centrées
+- Variables avec unités et dispersions différentes
+- A n'utiliser que si les données sont homogènes
+- Diagonalisation de la matrice des covariances
+
+---
+## Combien d'axes retenir ?
+
+- Question délicate, sans réponse définitive
+- Critère empirique : point d'inflexion sur les spectres des valeurs propres
+
+--
+
+### But = Représentation graphique
+
+- Conserver l'essentiel de la variabilité tout en retenant un faible nombre de facteurs
+- Représenter sur 2 axes (éventuellement 3, voire 4 maximum)
+
+--
+
+### But = Préparation des données
+    
+- Préalablement à la réalisation d'une classification
+- Pas un inconvénient de retenir beaucoup d'axes	
+- Supprimer les directions correspondant aux plus petites valeurs propres 
+    - Critère de Kaiser : vp `\(&gt;\)` moyenne des vp
+    - si ACP normée, vp `\(&gt;\)` 1
+    - Supprimer le bruit
+
+---
+## Quelques notations
+
+- `\(\mathbf{I}_p\)` : matrice identité (diagonale = 1 et le reste = 0), `\(\mathbf{1}_n\)` : vecteur unité (que des 1)
+- `\(\mathbf{X} = (x_i^j), i=1,\ldots,n, j=1,\ldots,p\)` : matrice des données
+- `\(\mathbf{x}_i = (x_i^1,\ldots,x_i^p)\)` : vecteur individu `\(i\)`
+- `\(\mathbf{x}^j = (x_1^j,\ldots,x_n^j)\)` : vecteur variable `\(j\)`
+- `\(p_i, i=1,\ldots,n\)` : poids des individus (très souvent égaux à `\(\frac{1}{n}\)`)
+    - représentés dans la matrice `\(\mathbf{D}\)` (poids sur la diagonale et le reste égal à 0)
+    - si poids identiques, `\(\mathbf{D} = \frac{1}{n}\mathbf{I}_p\)`
+- `\(\mathbf{M}\)` : métrique utilisée
+    - `\(\mathbf{I}_p\)` : si ACP centrée uniquement
+    - `\(\mathbf{D}_\frac{1}{\delta}\)` : si ACP centrée réduite (avec `\((\frac{1}{\delta_j})\)` sur la diagonale (écart-type de `\(j\)`))
+    - `\(\mathbf{M}'\)` : transposée de `\(\mathbf{M}\)`
+
+---
+## Premiers calculs 
+
+Utilisation de moyenne arithmétique (pondérée éventuellement), de la variance (elle-aussi pondérée), et de la covariance et de la corrélation entre deux variables
+
+- `\(\mathbf{g} = (\bar{x}^1,\ldots,\bar{x}^p)\)` : point moyen (barycentre), on a `\(\mathbf{g} = \mathbf{X}'\mathbf{D}\mathbf{1}_n\)`
+
+- Tableau centré `\(\mathbf{Y} = \mathbf{X}-\mathbf{1}_n\mathbf{g} = (\mathbf{I}_p - \mathbf{1}_n\mathbf{1}_n'\mathbf{D})\mathbf{X}\)`
+
+- Matrice de variance-covariance `\(\mathbf{V} = \mathbf{X}'\mathbf{D}\mathbf{X} - \mathbf{g}\mathbf{g}' = \mathbf{Y}'\mathbf{D}\mathbf{Y}\)`
+
+- Matrice de corrélation `\(\mathbf{R} = \mathbf{D_\frac{1}{s}}\mathbf{V}\mathbf{D_\frac{1}{s}}\)` 
+
+- Données centrées-réduites `\(\mathbf{Z} = \mathbf{Y}\mathbf{D}_\frac{1}{s}\)`
+
+---
+## Inertie
+
+Inertie d'un nuage de points :
+
+`$$I_g = \sum_{i=1}^n p_i d_\mathbf{M}^2(x_i - g) = \frac{1}{2} \sum_{i=1}^n \sum_{i'=1}^n p_i p_{i'} d_\mathbf{M}^2(x_i - x_{i'}) = Tr(\mathbf{M}\mathbf{V}\mathbf{M})$$`
+
+- Si données originelles `\(\mathbf{Y}\)` : `\(I_g = Tr(\mathbf{V}) = \sum_{j=1}^p \delta_j^2\)`.
+- Si données réduites `\(\mathbf{Z}\)` : `\(I_g = Tr(\mathbf{D}_\frac{1}{\delta^2}\mathbf{V}) = Tr(\mathbf{D}_\frac{1}{\delta}\mathbf{V}\mathbf{D}_\frac{1}{\delta}) = Tr(\mathbf{R}) = p\)`
+
+--
+
+&gt; L'ACP revient à chercher `\(F_q\)`, sous espace de dimension `\(q\)` de `\(F_p\)`, tel que l'inertie du nuage projeté sur `\(F_q\)` soit maximale.
+
+---
+## Rappel 
+
+### Vecteur et valeur propre
+
+`\(\mathbf{v} \ne 0\)` vecteur propre de `\(\mathbf{A}\)` 
+
+- s'il existe `\(\lambda\)` tel que `\(\mathbf{A}\mathbf{v} = \lambda\mathbf{v}\)`
+- `\(\lambda\)` valeur propre associée à `\(\mathbf{v}\)`
+
+Matrice de dimension `\((p,p)\)` : `\(p\)` valeurs propres
+
+---
+## Analyse de `\(\mathbf{M}\mathbf{V}\mathbf{M}\)`
+
+- Matrice carrée `\((p,p)\)` :
+  - Diagonalisable 
+  - Valeurs propres `\(\lambda_1,\ldots,\lambda_p\)` réelles
+  - Axes principaux d'inertie : `\(p\)` vecteurs propres (notés `\(\mathbf{a}_j\)`)
+  - Valeurs propres positives : tri par ordre décroissant 
+
+--
+
+- Lien avec l'inertie 
+`$$I_g = Tr(\mathbf{M}\mathbf{V}\mathbf{M}) = \sum_{j=1}^p \lambda_j$$`
+
+--
+
+- En ne gardant que les `\(q\)` premiers axes d'inertie
+  - Inertie expliquée : `\(\sum_{j=1}^q \lambda_j\)`
+
+--
+
+**Remarque** : l'ACP sur `\(q+1\)` variables est obtenue par ajout d'une variable d'inertie maximale à l'ACP sur `\(q\)` variables. Il n'est pas nécessaire de refaire tout le calcul.
+
+
+---
+## Composantes Principales
+
+Coordonnées des individus données par projections orthogonales sur axes principaux
+
+- Composantes principales `\(\mathbf{c}_k\)` (qui correspondent aux coordonnées des individus sur l'axe `\(k\)`) :
+
+$$
+	\mathbf{c}_k = \mathbf{Y} \mathbf{M} \mathbf{a}_k
+$$
+
+- Axe `\(k\)` expliquant une certaine part d'inertie, déterminée par `\(\frac{\lambda_k}{I_g}\)`
+
+--
+
+ACP avec `\(q\)` axes retenus expliquera donc une part d'inertie égale à 
+
+`$$\frac{\sum_{k=1}^q \lambda_k}{\sum_{\ell=1}^p \lambda_\ell}$$`
+
+
+---
+## Interprétation
+
+### Cercle des corrélations 
+
+- Sur données centrées-réduites uniquement
+  - Représentation des corrélations entre variables et composantes principales
+  - Plus variable proche de 1 ou -1 sur une composante, plus les 2 sont corrélées
+
+--
+
+### Contribution des individus et des variables
+
+- Contribution d'un individu à un axe : `\(\frac{p_i (c_{ik})^2}{\lambda_k}\)`
+  - Si supérieure à `\(\alpha p_i\)` (avec `\(\alpha\)` généralement entre 2 et 4), individu considéré comme fortement contributeur à la création de l'axe
+  - Si très forte, individu potentiellement aberrant (mettre de côté)
+- Contribution d'une variable à un axe : `\(\frac{\sqrt{\lambda_k}a_k^j}{s_j}\)`
+  - Si supérieure à `\(\frac{1}{p}\)`, alors variable considérée comme fortement contributrice
+
+---
+## Interprétation
+
+### Qualité de représentation
+
+- Qualité de représentation d'un individu par un axe : `\(\frac{(c_{ik})^2}{\sum_{\ell=1}^p (c_{i\ell})^2}\)`
+  - Plus elle est grande, mieux l'individu est représenté sur l'axe `\(k\)`
+- Qualité de représentation d'une variable par un axe : `\(\frac{\lambda_k (a_k^j)^2}{\sum_{\ell=1}^p \lambda_\ell (a_\ell^j)^2}\)`
+  - Idem, plus cette valeur est grande, plus la variable est bien représentée sur l'axe `\(k\)`
+
+--
+
+### Que faire pour interpréter un axe
+
+Pour comprendre ce que reprèsente un axe :
+
+- Recenser les variables qui contribuent le plus
+- Recenser celles qui sont très bien représentées
+- Chercher individus bien représentés ou contribuant fortement à l'axe
+  - si `\(n\)` est grand, prendre individus avec valeurs très fortes
+
+
+---
+## En plus
+
+Possibilité d'introduire des éléments supplémentaires ne participant pas au calcul, mais pouvant être représentés sur les graphiques :
+
+--
+
+- **Variables quantitatives** : utile pour expliquer le lien de ces variables avec les variables de l'ACP 
+
+--
+
+- **Variables qualitatives** : idem
+
+--
+
+- **Individus** : utile pour mettre de côté des individus particuliers ou pour analyser des individus d'un autre échantillon
+
+---
+## Exemple simple
+
+Notes obtenues par 9 élèves dans 4 matières (cf Besse and Baccini)
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Math &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Phys &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Fran &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Angl &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; jean &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; alan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; anni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; moni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; didi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; andr &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; pier &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; brig &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; evel &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Variance et corrélation des variables
+
+- Variances sensiblement différentes
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Moyenne &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Variance &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Math &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Phys &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.06 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fran &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.57 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Angl &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.90 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+- Deux groupes de variables.
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Math &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Phys &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Fran &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Angl &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Math &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.51&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Phys &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.65&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fran &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.95&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Angl &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.65&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.95&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+---
+## Part de la variance expliquée
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Valeur propre &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Variance (%) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Cumulée (%) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; comp 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.89 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; comp 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.88 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; comp 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.97 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; comp 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="seance3-acp_files/figure-html/eigenfig-1.png" style="display: block; margin: auto;" /&gt;
+
+2 axes suffisent à représenter 99.9% de l'information présente dans les données.
+
+---
+## Représentation graphique - Individus
+
+&lt;img src="seance3-acp_files/figure-html/graphs-ind-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Représentation graphique - Individus
+
+&lt;img src="seance3-acp_files/figure-html/graphs-var-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Individus importants
+
+### Contribution
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; jean &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;29.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1.8&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;5.4&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; alan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;5.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.2&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;5.3&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; anni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;4.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;10.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;10.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; moni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;38.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;23.8&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; didi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;16.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;3.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;38&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; andr &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;3.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;22.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;2.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;19.2&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; pier &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;37.2&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;9.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.9&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; brig &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;16.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;13.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1.6&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; evel &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;6.7&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;60.2&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;5.7&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sum &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;100&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;100&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;100&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;100&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Individus importants
+
+### Qualité de représentation
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Somme &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; jean &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; alan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; anni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.49&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; moni &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; didi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.91&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; andr &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.7&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; pier &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; brig &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.19&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.81&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; evel &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.27&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.71&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.02&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+## Variables importantes 
+
+### Contribution
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; contrib 4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Math &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;22.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;30.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;4.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;42.5&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Phys &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;28.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;16.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;19.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;35.7&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fran &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;19.7&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;38.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;28.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;13.4&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Angl &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;29.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;14.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;48.1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;8.4&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Variables importantes 
+
+### Qualité de représentation
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qualité 4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Math &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.66&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Phys &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.81&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.19&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fran &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.57&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Angl &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style=" font-weight: bold;    "&gt;0.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0.16&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; &lt;span style="     "&gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

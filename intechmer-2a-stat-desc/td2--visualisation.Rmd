@@ -1,0 +1,464 @@
+---
+title: "Visualisation de données - TD 2"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      fig.align = "center", 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+Dans ce document est présenté un certain nombre de commandes concernant des packages **R** utiles pour la visualisation de données. Voici comment les charger :
+
+```{r librairies}
+library(tidyverse) # pour ggplot2 et autres déjà vus dans la séance 1
+library(scales)
+library(leaflet)
+library(geojsonio)
+```
+
+Le but de la visualisation de données étant de représenter graphiquement des données brutes (ou quasi-brutes), il est souvent nécessaire de prendre en compte plusieurs variables. Nous devons donc aller plus loin que les graphiques de base (nuage de points, ligne, boîte à moustache, diagramme en barres ou circulaires, ...), pour les combiner par exemple.
+
+## Librairie `ggplot2`
+
+Ce package reproduit la grammaire des graphiques (cf [*Grammar of Graphics*, Leland Wilkinson](http://www.springer.com/us/book/9780387245447)), avec le même formalisme. Vous pouvez trouver plus d'informations sur le [site officiel](http://had.co.nz/ggplot2/) et la [documentation](http://docs.ggplot2.org/current/). Finalement, cet [article](http://www.tandfonline.com/doi/abs/10.1198/jcgs.2009.07098) permet de bien comprendre la philosophie du package et de la grammaire.
+
+Le principe de cette grammaire est qu'un graphique est composé de couches :
+
+- les **données** à représenter, à partir desquelles nous définissons des attributs **esthétiques** (soit identique pour tous, soit fonction d'une des variables) :
+    - les axes $x$ et $y$,
+    - la couleur
+    - la taille
+    - le symbole
+- les attributs **géométriques** (point, ligne, ...)
+- les transformations **statistiques** (dénombrement, ajustement, ...)
+- les **échelles**
+- le système de **coordonnées** (linéaire, logarithmique, polaire, ...)
+- le découpage (ou non) en **facettes**
+
+Dans cette librairie, il y a deux fonctions principales :
+
+- `qplot` (ou `quickplot`) permettant de faire des graphiques rapidement
+- `ggplot` permettant d'initialiser un graphique auquel on va ajouter des couches successivement
+
+Dans cette séance, nous n'aborderons que la deuxième fonction, plus complète.
+
+### Fonction `ggplot()`
+
+La fonction `ggplot()` permet de faire plus de choses que `qplot()` mais nécessite un formalisme plus lourd, dont voici quelques détails :
+
+- `ggplot()` créé un graphique (et le renvoie, i.e. on peut stocker un graphique dans une variable pour l'afficher plus tard, éventuellement en lui ajoutant des couches)
+- `aes()` permet de définir les aspects esthétiques (`x` et `y` principalement, mais aussi `color`, `fill`, `size`, ...)
+- `geom_xxx()` indique la représentation à choisir (`xxx` étant remplacé par `histogram`, `boxplot`, ...)
+- `stat_xxx()` indique les transformations statistiques à utiliser, si besoin
+- `scale_xxx()` s'emploie pour des changements d'échelle
+- `coord_xxx()` s'utilise pour des modifications de systèmes de coordonnées
+- `facet_xxx()` découpe les données (et donc le graphique) en plusieurs facettes selon les variables fournie dans la formule
+- `theme_xxx()`, `labs()`, `xlab()`, `ylab()`, `ggtitle()`, ... pour des améliorations du graphique (annotation, couleurs, ...)
+
+Hormis la fonction `aes()`, qui s'utilise à l'intérieur des autres, toutes ces fonctions peuvent s'additionner pour compléter le graphique.
+
+Le fonctionnement de la fonction `ggplot()` est donc particulier, mais une fois compris, il est facile de créer chaque graphique statistique que l'on souhaite. 
+
+#### Fonctionnement général
+
+Dans la suite est présentée l'utilisation de différentes fonctions à travers des exemples concrets, afin de comprendre la philosophie de cette grammaire des graphiques.
+
+Par exemple, pour décrire une variable continue par un histogramme, nous pouvons utiliser le code suivant (nous utilisons ici les données `diamonds` du package `ggplot2`) :
+
+```{r ggplot1-hist}
+ggplot(data = diamonds, aes(x = carat)) +
+    geom_histogram()
+```
+
+Le premier paramètre de la fonction `ggplot()` est donc le dataframe sur lequel faire le graphique (ici `diamonds`). La fonction `aes()` permet de définir les aspects esthétiques (ici la variable `carat`). Cette fonction définit les paramètres globaux du graphiques. Ensuite, nous appliquons une transformation géométrique, en calculant donc un histogramme (avec 30 intervalles par défaut), grâce à la fonction `geom_histogram()`.
+
+#### Stockage dans une variable
+
+Un des gros intérêt de la fonction `ggplot()` est le stockage du résultat dans une variable. Pour l'afficher, on peut soit appeler la variable, soit utiliser la fonction `print()` explicitement (voir ci-dessous). 
+
+```{r ggplot2-var}
+g = ggplot(data = diamonds, aes(x = carat)) +
+    geom_histogram()
+g # ou print(g)
+```
+
+L'intérêt sera de pouvoir créer des graphiques et les stocker dans un fichier `RData`, pour les afficher plus tard et/ou les modifier.
+
+#### Personnalisation du graphique
+
+##### Thème général
+
+On peut améliorer le graphique de différentes manières. Tout d'abord, il existe différents thèmes généraux (cf `?theme_grey` - ou un autre - pour voir la liste). Voici le thème `classic` et le thème `light`:
+
+```{r ggplot3-theme}
+g + theme_classic()
+g + theme_light()
+```
+
+
+##### Labels
+
+Une autre personnalisation courante est la redéfinition des labels des axes (et des légendes, comme nous le verrons plus tard), qui peut être faite avec la fonction `labs()`.
+
+```{r ggplot4-labels}
+g + labs(x = "label en x", y = "label en y")
+```
+
+##### Plus d'options
+
+Il existe beaucoup d'autres possibilités, avec la fonction `theme()` (pas d'exemple ici car complexe).
+
+#### Aspect en fonction d'une variable
+
+L'avantage de cette grammaire est de définir les paramètres du graphiques en fonction des variables. Ceci est assez évident pour les coordonnées $x$ ou $y$, mais il est aussi possible de définir la couleur, la forme, la taille, ... en fonction de variables.
+
+Ci-dessous, nous créons un diagramme en barres (avec  `geom_bar()`) sur une constante (`x = ""`). Cela a pour le moment peut d'intérêt, sauf à montrer qu'il y a plus 50000 diamants dans le jeu de données.
+
+```{r ggplot5-bar}
+ggplot(diamonds, aes(x = "")) + 
+    geom_bar()
+```
+
+Dans le dataframe `diamonds`, nous disposons de la variable qualitative `cut`. Dans la suite, nous définissons une couleur en fonction de celle-ci (avec le paramètre esthétique `fill`). Ceci nous permet d'avoir un diagramme en barres empilées.
+
+```{r ggplot6-fill}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar()
+```
+
+#### Variable spécifique (`..xxx..`)
+
+Dans le diagramme ci-dessus est présenté le dénombrement de chaque modalité de la variable. Ceci peut ne pas être particulièrement parlant, on peut préférer vouloir avoir des proportions (valeurs entre 0 et 1). C'est une bonne occasion pour utiliser les variables spécifiques créées par les fonctions de type `geom_xxx()`, qui sont de type `..xxx..`. Ici, `geom_bar()` créée la variable `..count..` qui représente le nombre de lignes pour chaque modalité. Donc, en redéfinissant les coordonnées $y$ avec le calcul $\frac{..count..}{\sum ..count..}$, nous réajustons les valeurs entre 0 et 1 (le graphique reste bien évidemment le même finalement).
+
+```{r ggplot7-var}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(aes(y = ..count../sum(..count..)))
+```
+
+Dans ce cas, il est possible d'avoir le même graphique en précisant la valeur `"fill"` pour la position dans `geom_bar()`.
+
+```{r ggplot7-var-bis}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(position = "fill")
+```
+
+
+#### Changement d'échelle 
+
+Maintenant que nous avons des valeurs entre 0 et 1, il peut être intéressant de les passer à des valeurs en pourcentage (entre 0 et 100 donc, et avec le sigle `%`). C'est possible avec ce qu'on va appeler un changement d'échelle, réalisable avec les fonctions de type `scale_xxx_yyy()` (ou le `xxx` représente l'aspect esthétique à modifier et `yyy` le type de cet aspect). Dans notre cas, nous allons utiliser la fonction `percent()` du package `scales` pour afficher donc des valeurs en pourcentage, plutôt qu'en proportion.
+
+```{r ggplot8-scale}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(position = "fill") +
+    scale_y_continuous(labels = percent)
+```
+
+#### Changement de système de coordonnées
+
+Pour continuer le tour des différentes possibilités de cette grammaire, nous allons créer maintenant un diagramme circulaire. Celui-ci peut être vu comme un diagramme en barres empilées (comme ci-dessous), avec un changement de système de coordonnées. En effet, si on considère les données en coordonnées polaires, avec la variable $y$ définissant l'angle, nous obtenons ce que nous souhaitons. Ceci est réalisable avec les fonctions de type `coord_xxx()` (ici `coord_polar()` donc, en indiquant que l'angle `theta` dépend de $y$). Nous ajoutons l'option `width = 1` dans `geom_bar()` pour éviter d'avoir un trou au milieu du cercle.
+
+```{r ggplot9-coord}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(position = "fill", width = 1) +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = "y")
+```
+
+Suite à ce qu'on a vu précédemment, on peut donc avoir un graphique circulaire propre avec le code suivant.
+
+```{r ggplot10-resume}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(position = "fill", width = 1) +
+    scale_fill_brewer(palette = "Set2") +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = "y") +
+    theme_minimal() +
+    theme(axis.title = element_blank()) +
+    labs(fill = "Variable cut")
+```
+
+
+#### Superposition de graphique (geom_point, geom_smooth)
+
+Grâce à la logique de construction des graphiques, via la grammaire, il est aisé de superposer différentes représentations, simplement en ajoutant les couches. Ci-dessous, nous dessinons le nuage de points (via `geom_point()`) entre les variables `carat` et `price`. Nous ajoutons ensuite des indicateurs de valeurs sur chaque axe (avec `geom_rug()`), et la droite de régression linéaire (via `geom_smooth()` avec l'option `method = "lm"`).
+
+```{r ggplot11-superpose}
+ggplot(diamonds, aes(x = carat, y = price)) +
+    geom_point() +
+    geom_rug() +
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+
+#### Faceting
+
+Pour comparer des données, il est très intéressant de faire des graphiques de type [*small multiples*](http://www.juiceanalytics.com/writing/better-know-visualization-small-multiples). L'idée est de faire un même graphique, mais pour chaque modalité d'une variable. Pour faire cela facilement avec `ggplot2`, nous disposons de deux fonctions : `facet_wrap()` et `facet_grid()`.
+
+##### avec `facet_wrap()`
+
+Cette première fonction permet de s'affranchir de la réflexion du nombre de modalités dans la variable en question. Le programme choisit lui-même ce qu'il lui semble approprié. Ci-dessous, nous représentons le nuage de points entre `carat` et `price`, mais pour chaque valeur de `cut`.
+
+```{r ggplot12a-wrap}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    facet_wrap(facets = ~ cut)
+```
+
+Si le choix ne convient pas, nous pouvons forcer le nombre colonnes avec l'option `ncol` (ou le nombre de lignes avec `nrow`), comme ci-dessous.
+
+```{r ggplot12a-wrap2}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    facet_wrap(facets = ~cut, ncol = 2)
+```
+
+##### avec `facet_grid()`
+
+Mais il est utile de forcer soit une répartition sur une même ligne de ces différents graphiques, ou sur une même colonne. Dans ce cas, nous utilisons la fonction `facet_grid()`, qui permet de déterminer explicitement comment on veut répartir les différentes facettes.
+
+Ci-dessous, nous créons les boîtes à moustaches de `carat` pour chaque modalité de `color`, et ceci pour chaque modalité de `cut`. Tout est représenté sur une même ligne.
+
+```{r ggplot12b-grid-row}
+ggplot(diamonds, aes(color, carat)) +
+    geom_boxplot() +
+    facet_grid(facets = ~ cut)
+```
+
+Pour forcer la répartition en colonne, nous inversons la formule. Ici, nous représentons l'histogramme de `carat`, pour chaque valeur de `cut` (cela permet donc de bien les comparer). Comme les effectifs ne sont pas les mêmes entre les modalités, nous décidons de laisser libre l'axe des $y$ pour mieux visualiser les répartitions, grâce à l'option `scales`.
+
+```{r ggplot12b-grid-col}
+ggplot(diamonds, aes(x = carat)) +
+    geom_histogram() +
+    facet_grid(facets = cut ~ ., scales = "free_y")
+```
+
+Bien évidemment, il est possible de combiner les deux possibilités. Par exemple, ici, nous créons le nuage de point entre `carat` et `price`, pour chaque couple de modalités des variables `color` et `cut`.
+
+```{r ggplot12b-grid-both}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    geom_smooth(method = "lm", fullrange = T) +
+    facet_grid(facets = color ~ cut)
+```
+
+
+#### Effet du placement de `data` et `aes()`
+
+Dans le graphique ci-dessous, nous ne redéfinissons jamais `x` ou  `y`. Ceux-ci ayant été définis dans la fonction `ggplot()`, les fonctions ajoutées reprennent leur définition. Mais il est possible de les définir dans chaque fonction.
+
+Pour détailler ce comportement, voici trois commandes permettant de faire strictement le même graphique (le premier produit dans le paragraphe ci-dessous).
+
+```{r ggplot13-placement, eval=FALSE}
+ggplot(diamonds, aes(x = price)) + geom_histogram()
+ggplot(diamonds) + geom_histogram(mapping = aes(x = price))
+ggplot() + geom_histogram(data = diamonds, mapping = aes(x = price))
+```
+
+Voici ce qui diffère entre ces trois versions :
+
+- Dans la première, les données seront `diamonds` pour l'ensemble des commandes ajoutées, et $x$ sera la variable `price` (sauf spécification ultérieure) ;
+- Dans la seconde, on utilisera toujours `diamonds` comme données, mais $x$ n'est défini que pour l'histogramme. On devra définir $x$ pour les fonctions ultérieures si besoin ;
+- Dans la dernière, il n'y aucune spécification de base, et chaque fonction devra déterminée quelles données prendre, ainsi que les aspects esthétiques à utiliser dans celles-ci.
+
+Ce mécanisme est particulièrement intéressant lorsque nous souhaitons utiliser plusieurs jeux de données ensemble. Dans le graphique ci-dessous, nous allons afficher trois informations différentes :
+
+- les différentes valeurs de `price` en fonction de la variable `cut`, avec un aléa sur l'axe des $x$ (avec la fonction `geom_jitter()`) ;
+- les boîtes à moustaches ;
+- un indicateur de moyenne (avec la fonction `geom_point()`) et d'écart-type (avec `geom_errorbar()`). 
+
+Pour cela, nous calculons en premier lieu la moyenne et l'écart-type de `price` pour chaque modalité de `cut`, stocké dans `df`.
+
+```{r ggplot14-df}
+df = diamonds %>%
+    group_by(cut) %>%
+    summarise(
+        mean = mean(price, na.rm = T),
+        sd = sd(price, na.rm = T)
+    )
+```
+
+Nous avons donc le graphique ci-dessous, produit par un code très complet.
+
+```{r ggplot14-multipledf}
+ggplot(data = diamonds, aes(x = cut, y = price, color = cut)) +
+    scale_color_brewer(palette = "Set2") +
+    scale_fill_brewer(palette = "Set2") +
+    geom_jitter(alpha = .1) +
+    geom_boxplot(mapping = aes(fill = cut), 
+                 color = "gray40", width = .5,
+                 outlier.color = "gray70") +
+    geom_errorbar(data = df, 
+                  mapping = aes(y = mean, 
+                                ymin = mean - sd, 
+                                ymax = mean + sd), 
+                  col = "steelblue", width = .4, size = 1) +
+    geom_point(data = df, 
+               mapping = aes(y = mean), 
+               col = "steelblue", size = 2) +
+    theme_classic()
+```
+
+### Réordonner des modalités
+
+Le package [`forcats`](https://forcats.tidyverse.org/) (déjà chargé via `tidyverse`) permet, entre autres, d'ordonner des modalités d'une variable selon les valeurs sur une autre variable, grâce aux fonctions `fct_redorder()`, `fct_shuffle()`, ... Voici un exemple d'utilisation des deux précités.
+
+```{r fct_reorder}
+# Ordre original
+ggplot(df, aes(mean, cut)) +
+  geom_point()
+
+# Modalitées triées par ordre croissant de la variable mean
+ggplot(df, aes(mean, fct_reorder(cut, mean))) +
+  geom_point()
+
+# Idem mais décroissant
+ggplot(df, aes(mean, fct_reorder(cut, mean, .desc = TRUE))) +
+  geom_point()
+
+# Réparties aléatoirement
+ggplot(df, aes(mean, fct_shuffle(cut))) +
+  geom_point()
+```
+
+## Cartes choroplèthes
+
+Une [carte choroplèthe](https://fr.wikipedia.org/wiki/Carte_choropl%C3%A8the) est une carte géographique avec des zones ayant une couleur dépendant d'une mesure statistique pour cette zone. Nous allons utiliser le package `leaflet` pour voir comment en produire une.
+
+Nous commençons par charger les données géographiques, provenant d'un [open data](https://datahub.io/core/geo-countries), grâce à la fonction `geojson_read()` du package `geojsonio`.
+
+```{r}
+# Lecture des données spatiales
+json_file <- 'https://datahub.io/core/geo-countries/r/countries.geojson'
+etats = geojson_read(json_file, what = "sp")
+```
+
+Dans la variable `etats`, il y a une table avec les noms des pays et le code ISO associé. C'est cette table qui nous permettra par la suite de mettre une couleur en fonction d'une mesure statistique plus tard (en réalisant une jointure).
+
+```{r}
+head(etats@data)
+```
+
+Pour affecter une couleur en fonction d'une variable, nous décidons de tirer ici des valeurs issues d'une variable aléatoire uniforme entre 0 et 1.
+
+```{r}
+# Création d'une variable aléatoire pour tester
+etats@data$var = runif(nrow(etats@data))
+```
+
+### Graphique
+
+A partir de ces données, nous allons pouvoir représenter les pays sur un graphique avec la fonction `ggplot()`. Pour cela, nous allons devoir modifier la structure des données, avec la fonction `fortify()`.
+
+```{r}
+etats_f = fortify(etats)
+```
+
+Ensuite, nous pouvons donc créer une représentation graphique des pays.
+
+```{r}
+ggplot(etats_f, aes(long, lat, group = group)) +
+  geom_polygon(color = "white") +
+  theme_void()
+```
+
+Puisque nous avons une variable, nous pouvons choisir de colorer les pays en fonction de celle-ci automatiquement.
+
+```{r}
+etats_fj = etats_f %>%
+  inner_join(etats@data %>% rownames_to_column("id"), by = "id")
+ggplot(etats_fj, aes(long, lat, group = group, fill = var)) +
+  geom_polygon(color = "white") +
+  theme_void()
+```
+
+
+### Carte
+
+Pour créer une carte, on doit réaliser au minimum deux étapes :
+
+1. la création d'un objet de type carte, avec la fonction `leaflet()`
+1. l'ajout de tuiles (fond de carte) avec la fonction `addTiles()`
+
+Il existe différentes tuiles disponibles, que vous pouvez tester [ici](http://leaflet-extras.github.io/leaflet-providers/preview/index.html)
+
+Ensuite, puisque nous souhaitons des polygones basés sur un jeu de données déjà insérée dans la carte (lors de la création), nous ajoutons la fonction `addPolygons()`. Une fois la carte créée et stockée dans une variable, celle-ci doit être affichée.
+
+```{r}
+# Création de la carte avec un polygone par pays
+carte = leaflet(etats) %>% 
+  addTiles() %>%
+  addPolygons()
+
+# Affichage de la carte
+carte
+```
+
+Grâce à la fonction `colorBin()`, nous créons une palette qui permettra d'associer une valeur à une couleur (ici, entre jaune et rouge, puisqu'on a choisi `"YlOrRd"` - il existe d'autres palettes possibles issues de [color brewer](http://colorbrewer2.org/) ou [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)). Enfin, dans la création de la carte, on indique que la couleur de remplissage est fonction de la palette et de la variable créée.
+
+```{r}
+# Création d'une palette affectant une couleur en fonction d'une variable
+palette = colorBin("YlOrRd", domain = etats$var)
+
+# Création de la carte choroplèthe
+carte2 = leaflet(etats) %>% 
+  addTiles() %>%
+  addPolygons(fillColor = ~palette(var), fillOpacity = .5)
+# Affichage de la carte
+carte2
+```
+
+On peut améliorer cette carte en définissant la vue souhaitée (ici, on définit le point central et le niveau de zoom). On spécifie aussi la couleur, la taille et le type de ligne pour les contours des plygones. Enfin, on ajoute une légende permettant de savoir à quelle valeur correspond chaque couleur. Pour cela, nous devons spécifier les intervalles lors de la création de la palette.
+
+```{r}
+# Amélioration de la carte choroplèthe
+palette = colorBin(
+  "magma", 
+  domain = etats$var, 
+  bins = seq(0, 1, by = .2))
+
+carte3 = leaflet(etats) %>% 
+  setView(lat = 0, lng = 0, zoom = 1) %>%
+  addTiles() %>%
+  addPolygons(
+    fillColor = ~palette(var), fillOpacity = .5,
+    color = "gray30", weight = 1.5, opacity = 1, dashArray = "2"
+  ) %>%
+  addLegend(
+    pal = palette, 
+    values = ~var, 
+    opacity = 0.8, 
+    title = "Variable aléatoire",
+    position = "bottomright"
+  )
+# Affichage de la carte
+carte3
+```
+
+## A faire
+
+Reprendre les données utilisées dans la séance 1. Nous allons travailleur uniquement sur les valeurs estimées (*i.e.* `TypeCode` égal à `"EST"`).
+
+1. Créer deux tables (une large et une longue) avec uniquement les valeurs estimées
+1. Valeurs manquantes
+    1. Créer un indicateur de présence de données manquantes (`is.na()`) dans la table longue
+    1. Créer un diagramme en barres représentant cette indicatrice
+    1. Le faire en diagramme circulaire
+    1. Regarder par année l'évolution des données manquantes
+    1. Afficher les 10 pays avec le plus de données manquantes (avec le nombre de données manquantes pour ceux-ci)
+1. Contrôle de la corruption
+    1. Créer la table longue restreinte aux valeurs concernant la corruption (*i.e.* `SerieCode` égal à `"CC"`)
+    1. Décrire le contrôle de la corruption de deux façons
+    1. Le faire en fonction de l'année
+    1. Représenter la courbe de l'évolution en moyenne
+    1. Ajouter à cette courbe l'évolution des pays suivants : "France", "Somalia", "Denmark" (avec une couleur spécifique en fonction du pays)
+1. Représenter sur un graphique d'une part, et sur une carte d'autre part la valeur du contrôle de la corruption en 2016 pour chaque pays
+

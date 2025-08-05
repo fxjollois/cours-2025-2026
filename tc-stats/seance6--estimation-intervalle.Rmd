@@ -1,0 +1,174 @@
+---
+title: "Estimation par intervalle"
+author: "FX Jollois"
+date: "BUT TC - 2ème année"
+output:
+  xaringan::moon_reader:
+    css: [nhsr, chocolate-fonts]
+    nature: 
+      beforeInit: "macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(ggplot2)
+```
+
+
+## Problème à résoudre - exemple
+
+Comment puis-je connaître un indicateur sur la population française ?
+
+- Quelle est la taille moyenne de TOUS les français ?
+
+--
+
+> Impossible à réaliser (trop coûteux, trop compliqué à mettre en oeuvre, ...)
+
+--
+
+Sélection d'un sous-ensemble de la population, appelé **échantillon**
+
+- Notion de *représentativité* de l'échantillon
+
+- Calcul d'un indicateur sur l'échantillon
+
+- Extrapolation à la population (avec une incertitude quantifiée)
+
+--
+
+$\rightarrow$ **Inférence statistique**
+
+---
+## Estimation
+
+**Problème statistique** : 
+
+- Estimation d'un paramètre inconnu de la population via un échantillon
+
+--
+
+2 types d'estimation, basées sur l'hypothèse de la loi de la variable :
+
+- **Ponctuelle** : unique valeur mesurée dans l'échantillon
+  - La moyenne est un bon estimateur de l'espérance d’une v.a. par exemple
+
+--
+
+- **Par intervalle** : intervalle (dit de confiance) basée sur l'échantillon
+  - Il y a x % de chance que la vraie valeur (de la population) appartiennent à cet échantillon
+  - Intervalle très souvent symétrique
+  - Risque de se tromper dépendant du problème, mais très souvent 5%
+  
+---
+## Cas de la loi Normale
+
+- Pour une v.a. $N(0, 1)$, on cherche un intervalle de confiance $[a;b]$ tel que
+
+$$p(a<X<b)=1-\alpha$$
+
+- Si $\alpha$ est égal à 5% $\rightarrow$ a = -1,96 et b = 1,96
+
+> Pour une variable $X$ suivant une loi Normale $N(0, 1)$, on a donc **95%** de chances que la valeur soit comprise dans l'intervalle  $\mathbf{[−1.96 ; 1.96]}$
+
+```{r normal, fig.height=5, fig.align='center'}
+anno = function(graph, x0, y0, x1, y1, text) {
+  res = graph + 
+    annotate("segment", x = x0, xend = x1, y = y0, yend = y1, 
+             colour = "gray80", size = 1, alpha = 0.8, arrow = arrow()) +
+    annotate("text", x = x0, y = y0, label = text, hjust = 1) +
+    annotate("segment", x = -x0, xend = -x1, y = y0, yend = y1, 
+             colour = "gray80", size = 1, alpha = 0.8, arrow = arrow()) +
+    annotate("text", x = -x0, y = y0, label = text, hjust = 0)
+  return (res)
+}
+g = ggplot(NULL, aes(c(-5,5))) +
+  geom_area(stat = "function", fun = dnorm, fill = "gray90", alpha = .5) +
+  geom_area(stat = "function", fun = dnorm, fill="darkred", xlim = c(-5, -1.96)) +
+  geom_area(stat = "function", fun = dnorm, fill="red3", xlim = c(-1.96, -1.64)) +
+  geom_area(stat = "function", fun = dnorm, fill="salmon", xlim = c(-1.64, -1.28)) +
+  geom_area(stat = "function", fun = dnorm, fill="salmon", xlim = c(1.28, 1.64)) +
+  geom_area(stat = "function", fun = dnorm, fill="red3", xlim = c(1.64, 1.96)) +
+  geom_area(stat = "function", fun = dnorm, fill="darkred", xlim = c(1.96, 5)) +
+  theme_minimal() +
+  labs(x = "", y = "")
+
+g = anno(g, -4, 0.05, -2.5, 0.025, "2,5%")
+g = anno(g, -3, 0.15, -1.85, 0.08, "2,5%")
+g = anno(g, -2, 0.25, -1.45, 0.15, "5%")
+g
+```
+
+
+---
+## Intervalle de confiance d'une moyenne
+
+- Si $n$ est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+$$\left[m-u_{\alpha/2}\frac{s}{\sqrt{n}}\mbox{ ; }m + u_{\alpha/2}\frac{s}{\sqrt{n}}\right]$$
+
+
+- $m$ : moyenne sur l'échantillon
+
+- $s$ : écart-type sur l'échantillon
+
+- $n$ : taille de l'échantillon
+
+- $u_{\alpha/2}$  : valeur de la table de la loi Normale tel que $p(X > u_{\alpha/2}) = \alpha/2$
+  - Si $\alpha = 0,05$ (i.e. 5% donc), on aura $u_{\alpha/2} = 1,96$
+  - Autres valeurs parfois utilisées : 10% (avec $u_{\alpha/2} = 1,64$), 1%...
+
+
+---
+## Exemple
+
+### Mesure du niveau de pluie pendant 9 ans
+
+- Moyenne de **610,22**
+- Écart-type de **111,53**
+
+On considère que le niveau de pluie suit une loi Normale donc, avec un risque de 5%, on aura
+
+$$IC_{95\%} = [ 537,35 ; 683,09 ]$$
+
+--
+
+On dira la phrase suivante :
+
+> **Il y a donc 95% de chance que le niveau de pluie soit compris entre 537,35 et 683,09.**
+
+
+---
+## Intervalle de confiance d'une proportion
+
+- Si $n$ est grand (supérieur à 30), on calcule l'intervalle avec la formule ci-dessous
+
+$$\left[p-u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\mbox{ ; }p+u_{\alpha/2}\sqrt{\frac{p(1-p)}{n}}\right]$$
+
+- $p$ : proportion sur l'échantillon
+
+- $n$ : taille de l'échantillon
+
+- $u_{\alpha/2}$  : valeur de la table de la loi Normale tel que $p(X > u_{\alpha/2}) = \alpha/2$
+  - Si $\alpha = 0,05$ (i.e. 5% donc), on aura $u_{\alpha/2}=1,96$
+  - Autres valeurs parfois utilisées : 10% (avec $u_{\alpha/2}=1,64$), 1%...
+
+---
+## Exemple
+
+### Mesure du niveau d'insatisfaction des habitants sur l'avancement des travaux
+
+- 500 personnes interrogées
+- 30% si disent mécontents
+
+On a n (largement) supérieur à 30 donc, avec un risque de 5%, on aura
+
+$$IC_{95\%}=[26.0;34.0]$$
+
+--
+
+On dira la phrase suivante :
+
+> **Il y a donc 95% de chance que le niveau d’insatisfaction soit compris entre 26% et 34%.**
+
+

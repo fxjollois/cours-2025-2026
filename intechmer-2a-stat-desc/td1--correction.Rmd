@@ -1,0 +1,84 @@
+---
+title: "Visualisation de données - TD 2"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      fig.align = "center", 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+## IMPORTATION des données
+library(readr)
+pays = read_delim("WGICountry.csv", delim = ";")
+serie = read_delim("WGISerie.csv", delim = ";")
+type = read_delim("WGIType.csv", delim = ";")
+valeurs = read_delim("WGIValues.csv", delim = ";")
+
+## CREATION de la table au format long
+
+# On veut une table de ce format :
+#   pays | série | type | année | valeur
+
+library(tidyr)
+valeurs_long = valeurs %>%
+  pivot_longer(
+    cols = !c(CountryCode, SerieCode, TypeCode),
+    names_to = "Année",
+    values_to = "Valeur"
+  )
+
+
+## NOMBRE DE PAYS
+
+nrow(pays)
+library(dplyr)
+pays %>% summarise(nb_pays = n())
+valeurs %>% summarise(nb_pays = n_distinct(CountryCode))
+
+## TOP des pays sur le contrôle de la corruption
+
+topCC = pays %>%
+  # Jointure avec les données au format long
+  inner_join(valeurs_long) %>%
+  filter(!is.na(Valeur)) %>%
+  # Filtre sur l'estimation du contrôle de la corruption
+  filter(SerieCode == "CC" & TypeCode == "EST") %>%
+  # Regroupement par nom de pays
+  group_by(CountryName) %>%
+  # calcul de la moyenne (+min et max) pour chaque pays
+  summarise(
+    moyenne = mean(Valeur, na.rm = TRUE),
+    minimum = min(Valeur, na.rm = TRUE),
+    maximum = max(Valeur, na.rm = TRUE)
+  ) %>%
+  # Tri par ordre décroissant de la moyenne
+  arrange(desc(moyenne))
+View(topCC)
+
+
+arrange(
+  summarise(
+    group_by(
+      filter(
+        inner_join(pays, valeurs_long),
+        SerieCode == "CC" & TypeCode == "EST"
+      ),
+      CountryName
+    ),
+    moyenne = mean(Valeur, na.rm = TRUE),
+    minimum = min(Valeur, na.rm = TRUE),
+    maximum = max(Valeur, na.rm = TRUE)
+  ),
+  desc(moyenne)
+)
+
+

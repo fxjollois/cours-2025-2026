@@ -1,0 +1,889 @@
+---
+title: "Statistique descriptive"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output: 
+  xaringan::moon_reader:
+    css: [fc, chocolate-fonts]
+    nature: 
+      beforeInit: "../macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align='center', fig.height=4, 
+                      message = FALSE, warning = FALSE)
+library(knitr)
+library(kableExtra)
+```
+
+
+## Premier problème : décrire les données
+
+On parle de **Statistique descriptive** ou **exploratoire**
+
+### Objectifs 
+
+- Résumer l'information contenue dans les données
+- Faire ressortir des éléments intéressants
+- Poser des hypothèses sur des phénomènes potentiellement existant dans les données
+
+### Outils
+  
+- Description numérique (moyenne, occurrences, corrélation...)
+- Description graphique (histogramme, diagramme en barres, nuage de points...)
+
+---
+## Données exemple - `tips`
+
+```{r tips-import, echo = TRUE}
+library(tidyverse)
+data = read_delim("tips.csv", delim = ",")
+```
+
+```{r tips-show}
+library(DT)
+datatable(data, options = list(dom = 'p'))
+```
+
+---
+class: center, middle, inverse
+
+## Variable quantitative
+
+---
+
+## Variable quantitative
+  
+- Moyenne $\bar{x}$
+$$
+  \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i
+$$
+  
+- Variance 
+$$
+  \sigma^2(x) = \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})^2
+$$
+- Ecart-type $\sigma(x) = \sqrt{\sigma^2(x)}$
+
+
+---
+
+## Variable quantitative
+  
+- Médiane $med(x)$ : valeur permettant de séparer les observations ordonnées prises par $x$ en 2 groupes de même taille
+$$
+  med(x) = m | P(x \le m) = .5
+$$
+  - si $n$ est impair : $med(x) = x_{(n + 1) / 2}$
+  - si $n$ est pair : $med(x) = \frac{x_{n/2} + x_{n/2 + 1}}{2}$
+  
+- Quantile $q_p(x)$ : valeur pour laquelle une proportion $p$ d'observations sont inférieures
+$$
+  q_p(x) = q | P(x \le q) = p
+$$
+  - Quartiles $Q1$ et $Q3$ : respectivement 25% et 75% (utilisés dans les boîtes à moustaches)
+  - Quantiles usuels : $.01$ (1%), $.1$ (10%), $.9$ (90%) et $.99$ (99%)
+  
+
+---
+
+## Variable quantitative
+
+Exemple : montant payé par table
+
+### Représentation numérique
+
+```{r qt-num}
+x = data$total_bill
+tib = tibble(
+  Statistique = c("Moyenne", "Ecart-Type", "Variance", "Médiane", "Minimum", "Maximum"),
+  "Valeur Stat" = sapply(c(mean, sd, var, median, min, max), function(f) { f(x, na.rm = TRUE) })
+)
+
+q = c(.01, .05, .1, .9, .95, .99)
+tib2 = tibble(
+  Quantile = paste(q * 100, "%"),
+  "Valeur Quantile" = sapply(q, quantile, x = x)
+)
+kable(tib %>% bind_cols(tib2), digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+### A regarder aussi :
+
+- Si divergence moyenne et médiane, valeurs extrêmes présentes
+  - Déséquilibre de la répartition des valeurs 
+- Présence de valeurs aberrantes (nommés **outliers**)
+
+---
+
+## Variable quantitative
+  
+### Représentation graphique 
+  
+Histogramme 
+
+```{r qt-graph-hist}
+ggplot(data, aes(total_bill)) + 
+  geom_histogram(fill = "steelblue") + 
+  geom_vline(xintercept = mean(data$total_bill), alpha = .5) +
+  annotate("text", x = mean(data$total_bill), y = 20, label = "Moyenne", hjust = -.1, size = 7) +
+  labs(y = "", x = "") +
+  theme_minimal() + 
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Variable quantitative
+  
+### Représentation graphique 
+  
+Boîte à moustaches
+
+```{r qt-graph-box}
+ggplot(data, aes(total_bill, "")) + 
+  geom_boxplot(fill = "steelblue", outlier.alpha = 0.5) + 
+  labs(y = "", x = "") +
+  theme_minimal() + 
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Variable quantitative - description numérique avec R
+
+```{r uni-qt-mean, echo = TRUE}
+mean(data$total_bill) # Moyenne
+```
+
+```{r uni-qt-var, echo = TRUE}
+var(data$total_bill) # Variance
+```
+
+```{r uni-qt-sd, echo = TRUE}
+sd(data$total_bill) # Ecart-type
+```
+
+```{r uni-qt-min, echo = TRUE}
+min(data$total_bill) # Minimum
+```
+
+```{r uni-qt-max, echo = TRUE}
+max(data$total_bill) # Maximum
+```
+
+---
+
+## Variable quantitative - description numérique avec R
+
+```{r uni-qt-range, echo = TRUE}
+range(data$total_bill) # Min et Max en même temps
+```
+
+```{r uni-qt-median, echo = TRUE}
+median(data$total_bill) # Médiane
+```
+
+```{r uni-qt-summary, echo = TRUE}
+summary(data$total_bill) # Plusieurs choses en même temps
+```
+
+```{r uni-qt-q1q3, echo = TRUE}
+quantile(data$total_bill, c(.25, .75)) # Q1 et Q3
+```
+
+```{r uni-qt-quantile, echo = TRUE}
+quantile(data$total_bill, c(.01, .05, .10, .90, .95, .99)) # Quantiles usuels
+```
+
+---
+
+## Variable quantitative - description numérique avec R
+
+`summary()` applicable à plusieurs variables en même temps (intéressant dans une phase d'analyse rapide)
+
+```{r uni-qt-num-summary-df, echo = TRUE}
+data %>% select(total_bill, tip, size) %>% summary()
+```
+
+Moyenne calculable sur plusieurs variables en même temps
+
+```{r uni-qt-num-summarise, echo = TRUE}
+data %>% select(total_bill, tip, size) %>% 
+  summarise_all(mean)
+```
+
+---
+
+## Variable quantitative -- histogramme avec R
+
+```{r uni-qt-hist-base, echo = TRUE}
+ggplot(data, aes(x = total_bill)) +
+  geom_histogram()
+```
+
+---
+
+## Variable quantitative -- histogramme avec R
+
+- Trop (ou pas assez) d'intervalles peut biaiser l'analyse
+- Modification avec le paramètre `bins`
+
+```{r uni-qt-hist-bins, echo = TRUE}
+ggplot(data, aes(x = total_bill)) +
+  geom_histogram(bins = 10)
+```
+
+---
+
+## Variable quantitative -- histogramme avec R
+
+- Densité estimée par noyau
+- Intéressant car permet de plus facilement voir la tendance globale
+
+```{r uni-qt-density, echo = TRUE}
+ggplot(data, aes(x = total_bill)) +
+  geom_density()
+```
+
+
+---
+
+## Variable quantitative -- boîte à moustaches avec R
+
+```{r uni-qt-boxplot, echo = TRUE}
+ggplot(data, aes(x = total_bill)) +
+  geom_boxplot()
+```
+
+---
+class: middle, center, inverse
+
+## Variable qualitative
+
+---
+
+## Variable qualitative
+  
+### Nominale
+  
+- Modalités de la variable $x$ : $m_j$ (avec $j=1,...,p$)
+- Effectif (ou occurrences) d'une modalité $n_j$ : nombre d'individus ayant la modalité $m_j$
+  - Fréquence d'une modalité $f_j$
+$$
+f_j = \frac{n_j}{n}
+$$
+
+### Ordinale
+
+- Effectif cumulé $n_j^{cum}$ : nombre d'individus ayant une modalité entre $n_1$ et $n_j$
+  - Fréquence cumulée
+
+$$n_j^{cum} = \sum_{k=1}^j n_k \mbox{ and } f_j^{cum} = \sum_{k=1}^j f_k$$
+  
+---
+
+## Variable qualitative
+  
+Exemple : Jour de la semaine (*ordinale* de plus)
+
+### Représentation numérique
+
+```{r ql-num}
+tab = table(data$day, useNA = "ifany")
+tib = tibble(
+  Modalités = labels(tab)[[1]],
+  Effectifs = tab,
+  "Eff. cum." = cumsum(tab),
+  Fréquences = as.numeric(prop.table(tab)),
+  "Fréq. cum." = cumsum(prop.table(tab))
+)
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+### A regarder aussi :
+  
+- Différence entre les proportions 
+- Si modalités peu fréquentes, regroupement de modalités à envisager
+
+---
+
+## Variable qualitative
+  
+### Représentation graphique
+  
+Diagramme en barres
+
+```{r ql-graph-bar}
+ggplot(data, aes(day, fill = day)) +
+  geom_bar(show.legend = FALSE) +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun")) +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Variable qualitative - description numérique avec R
+
+```{r uni-ql-count, echo = TRUE}
+data %>% group_by(day) %>% count()
+```
+
+```{r uni-ql-num-more, echo = TRUE}
+data %>% group_by(day) %>% count() %>% ungroup() %>% 
+  mutate(n_cum = cumsum(n), freq = n / sum(n), freq_cum = n_cum / sum(n))
+```
+
+---
+
+## Variable qualitative - diagramme en barres avec R
+
+```{r uni-ql-bar, echo = TRUE}
+ggplot(data, aes(x = day)) +
+  geom_bar()
+```
+
+---
+
+## Variable qualitative - diagramme en barres avec R
+
+- Si beaucoup de modalités ou noms des modalités longs, intéressant en mode horizontale
+
+```{r uni-ql-bar-horiz, echo = TRUE}
+ggplot(data, aes(y = day)) +
+  geom_bar()
+```
+
+---
+
+## Variable qualitative - diagramme en barres avec R
+
+- Modification de l'ordre des modalités possible
+
+```{r uni-ql-bar-ordre, echo = TRUE}
+ggplot(data, aes(x = day)) +
+  geom_bar() +
+  scale_x_discrete(limits = c("Thur", "Fri", "Sat", "Sun"))
+```
+
+---
+
+## Variable qualitative - diagramme en barres empilées avec R
+
+- Empilement intéressant (surtout quand on va comparer)
+- Noter la fonction `fct_relevel()` pour changer l'ordre d'affichage des modalités
+
+```{r uni-ql-bar-stack, echo = TRUE}
+ggplot(data, aes(x = "", fill = fct_relevel(day, c("Thur", "Fri", "Sat", "Sun")))) +
+  geom_bar()
+```
+
+---
+
+## Variable qualitative - diagramme circulaire avec R
+
+- **ATTENTION** : à ne pas utiliser avec variable ordinale et avec trop de modalités
+
+```{r uni-ql-bar-pie, echo = TRUE}
+ggplot(data, aes(x = "", fill = sex)) +
+  geom_bar(width = 1) +
+  coord_polar(theta = "y")
+```
+
+---
+class: middle, center, inverse
+
+## Lien entre deux variables quantitatives
+
+---
+
+## Quantitative vs quantitative
+  
+### Covariance
+$$
+  cov(x,y) = \frac{1}{n} \sum_{i=1}^n (x_i - \bar{x}) (y_i - \bar{y})
+$$
+- Problème : non bornée et donc non exploitable
+
+### Coefficient de corrélation linéaire (de *Pearson*)
+$$
+  \rho(x,y) = \frac{cov(x,y)}{\sigma^2(x) \sigma^2(y)}
+$$
+- Covariance des variables normalisées
+- Valeurs comprises entre -1 et 1
+  - $0$ : pas de lien linéaire (autre type de lien possible)
+  - $1$ : lien positif fort (si $x$ augmente, $y$ augmente)
+  - $-1$ : lien négatif fort (si $x$ augmente, $y$ diminue)
+
+---
+
+## Quantitative vs quantitative
+  
+Exemple : Montant de la table et Pourboire
+
+### Représentation numérique
+
+```{r qtqt-num}
+x = data$total_bill
+y = data$tip
+tib = tibble(
+  Statistique = c("Covariance", "Corrélation"),
+  Valeur = sapply(c(cov, cor), function(f) { f(x, y) })
+)
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+### A regarder aussi :
+  
+- Présence d'**outliers** avec un comportement atypique
+
+---
+
+## Quantitative vs quantitative
+
+### Représentation graphique 
+
+Nuage de points
+
+```{r qtqt-graph}
+ggplot(data, aes(total_bill, tip)) + 
+  geom_point(color = "steelblue") + theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Anscombe
+
+La visualisation est aussi importante (voire plus) que la représentation numérique !
+
+Entre ces quatre séries :
+
+- même moyenne et même variance pour $x$ et $y$
+- même coefficient de corrélation entre les deux
+
+```{r anscombe-tab}
+a = lapply(1:4, function (i) { 
+  anscombe %>% 
+    select(ends_with(as.character(i))) %>% 
+    rename_with(function (n) { substr(n, 1, 1)}) %>%
+    mutate(id = i)
+  })
+c = sapply(a, function(df) {
+  res = c(m_x = mean(df$x), m_y = mean(df$y),
+          s_x = sd(df$x), s_y = sd(df$y),
+          cov = cov(df$x, df$y), cor = cor(df$x, df$y))
+})
+rownames(c) = c("Moyenne(x)", "Moyenne(y)", "Ecart-type(x)", "Ecart-type(y)", "Covariance", "Corrélation")
+colnames(c) = 1:4
+kable(c, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+---
+
+## Anscombe
+
+```{r anscombe-graph}
+b = Reduce(rbind, a)
+ggplot(b, aes(x, y)) +
+  geom_point(size = 4) +
+  facet_wrap(~ id) +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+
+---
+
+## Quantitative vs quantitative - description numérique avec R
+
+```{r bi-qtqt-num-cov, echo=TRUE}
+cov(data$total_bill, data$tip)
+```
+
+```{r bi-qtqt-num-corr, echo=TRUE}
+cor(data$total_bill, data$tip)
+```
+
+```{r bi-qtqt-num-corr-df, echo=TRUE}
+cor(data %>% select(total_bill, tip, size))
+```
+---
+
+## Quantitative vs quantitative - nuage de points avec R
+
+```{r bi-qtqt-scatter, echo=TRUE}
+ggplot(data, aes(x = total_bill, y = tip)) +
+  geom_point()
+```
+
+
+---
+class: middle, center, inverse
+
+## Lien entre deux variables qualitatives
+
+---
+
+## Qualitative vs qualitative
+
+### Table de contingence
+
+- Croisement des 2 ensembles de modalités, avec le nombre d'individus ayant chaque couple de modalités
+- $n_{ij}$ : Nombre d'observations ayant la modalité $i$ pour $x$ et $j$ pour $y$  
+- $n_{i.}$ : Effectif marginal (nombre d'observations ayant la modalité $i$ pour $x$)
+- $n_{.j}$ : Effectif marginal (nombre d'observations ayant la modalité $j$ pour $y$)
+- $n_{..}$ : Effectif total
+
+
+```{r}
+m = matrix("", 6, 6)
+rownames(m) = c(1, "...", "i", "...", "k", "Total")
+colnames(m) = c(1, "...", "j", "...", "l", "Total")
+m[3,3] = "n_ij"
+m[3,6] = "n_i."
+m[6,3] = "n_.j"
+m[6,6] = "n_.."
+datatable(m, options = list(dom = '', ordering = FALSE)) %>%
+  formatStyle(6, backgroundColor = "lightblue") %>%
+  formatStyle(0, backgroundColor = styleRow(6, "lightblue"), target = "row") %>%
+  formatStyle(0, backgroundColor = styleRow(1:5, "lightgray"))
+```
+
+---
+
+## Qualitative vs qualitative
+
+### Profils lignes et colonnes
+- Distribution d'une variable conditionnellement aux modalités de l'autre
+  
+### Profil ligne
+- Pour une ligne $i$ : $\frac{n_{ij}}{n_{i.}}$
+- Somme des valeurs en lignes = 100%
+
+### Profil colonne
+- Pour une colonne $j$ : $\frac{n_{ij}}{n_{.j}}$
+- Somme des valeurs en colonnes = 100%
+
+---
+
+## Qualitative vs qualitative
+
+Exemple : Jour de la semaine et Présence de fumeur
+
+### Représentation numérique
+
+```{r qlql-num}
+mat = table(data$day, data$smoker)
+tib = tibble(as.data.frame.matrix(mat) %>% rownames_to_column("day"))
+kable(tib) %>%
+  kable_styling(position = "center")
+```
+
+### A regarder aussi :
+
+- Couple de modalités très peu pris
+- Ici aussi, regroupement de modalités à envisager éventuellement
+
+---
+
+## Qualitative vs qualitative
+
+### Représentation graphique 
+
+```{r qtql-graph}
+ggplot(data, aes(day, fill = smoker)) +
+  geom_bar(position = "dodge", color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  labs(y = "") +
+  theme(text = element_text(size = 25))
+```
+
+
+---
+
+## Qualitative vs qualitative
+
+### Représentation numérique
+
+Profils colonnes ici (sommes en colonnes = 100%)
+
+```{r qlql-num-2}
+matcol = prop.table(mat, margin = 2)
+tib = tibble(as.data.frame.matrix(matcol) %>% rownames_to_column("day"))
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+---
+
+## Qualitative vs qualitative
+
+### Représentation graphique 
+
+Profils colonnes
+
+```{r qtql-graph-2}
+ggplot(data, aes(smoker, fill = day)) +
+  geom_bar(position = "fill", color = "black") +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Qualitative vs qualitative
+
+### Représentation numérique
+
+Profils lignes ici (sommes en lignes = 100%)
+
+```{r qlql-num-3}
+matlig = prop.table(mat, margin = 1)
+tib = tibble(as.data.frame.matrix(matlig) %>% rownames_to_column("day"))
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+---
+
+## Qualitative vs qualitative
+
+### Représentation graphique 
+
+Profils lignes
+
+```{r qtql-graph-3}
+ggplot(data, aes(day, fill = smoker)) +
+  geom_bar(position = "fill", color = "black") +
+  scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Qualitative vs qualitative - description numérique avec R
+
+Table de contingence 
+
+```{r bi-qlql-num, echo=TRUE}
+table(data$day, data$smoker)
+```
+
+Fréquence globale
+
+```{r bi-qlql-num-prop, echo=TRUE}
+prop.table(table(data$day, data$smoker))
+```
+
+---
+
+## Qualitative vs qualitative - description numérique avec R
+
+Profils lignes
+
+```{r bi-qlql-num-row, echo=TRUE}
+prop.table(table(data$day, data$smoker), margin = 1)
+```
+
+Profils colonnes
+
+```{r bi-qlql-num-col, echo=TRUE}
+prop.table(table(data$day, data$smoker), margin = 2)
+```
+
+---
+
+## Qualitative vs qualitative - diagramme en barres avec R
+
+Empilées par défaut, mais pas avec une somme à 100%
+
+```{r bi-qlql-bar, echo=TRUE}
+ggplot(data, aes(x = day, fill = smoker)) +
+  geom_bar()
+```
+
+---
+
+## Qualitative vs qualitative - diagramme en barres avec R
+
+On peut les séparer, mais attention si une des modalités est beaucoup trop présente (risque d'avoir un graphique illisible)
+
+```{r bi-qlql-dodge, echo=TRUE}
+ggplot(data, aes(x = day, fill = smoker)) +
+  geom_bar(position = "dodge")
+```
+
+---
+
+## Qualitative vs qualitative - diagramme en barres avec R
+
+- Empilées avec une somme à 100% (donc avec des vrais profils)
+- `x` et `fill` à inverser si on veut voir les autres profils
+
+```{r bi-qlql-profil, echo=TRUE}
+ggplot(data, aes(x = day, fill = smoker)) +
+  geom_bar(position = "fill")
+```
+
+
+---
+class: middle, center, inverse
+
+## Lien entre une variable quantitative et une variable qualitative
+
+---
+
+## Qualitative vs quantitative
+
+- Soit $Y$ la variable qualitative à $m$ modalités, et $X$ la variable quantitative
+- Sous-populations déterminées par les modalités de $Y$
+- Indicateurs calculés pour chaque modalité k
+
+
+$$\bar{x_j} = \frac{1}{n_j} \sum_{i | y_i = j} x_i$$
+
+$$\sigma^2(x_j) = \frac{1}{n_j} \sum {}_{i | y_i = j} (x_i - \bar{x_j})^2$$
+
+---
+
+## Qualitative vs quantitative
+
+Exemple : Montant payé et Jour de la semaine
+
+### Représentation numérique
+
+```{r qlqt-num}
+tib = data %>% 
+  group_by(day) %>% 
+  summarise(Moyenne = mean(total_bill), 
+            "Ecart-type" = sd(total_bill), 
+            "Médiane" = median(total_bill))
+kable(tib, digits = 2) %>%
+  kable_styling(position = "center")
+```
+
+### A regarder aussi :
+
+- Outliers
+
+---
+
+## Qualitative vs quantitative
+
+### Représentation graphique 
+Boîte à moustaches
+
+```{r qlqt-graph}
+ggplot(data, aes(day, total_bill, fill = day)) +
+  geom_boxplot() +
+  #scale_fill_brewer(palette = "Dark2") +
+  theme_minimal() +
+  theme(text = element_text(size = 25))
+```
+
+---
+
+## Qualitative vs quantitative - description numérique avec R
+
+```{r bi-qlqt-num, echo=TRUE}
+data %>%
+  group_by(day) %>%
+  summarise(Moyenne = mean(total_bill), EcartType = sd(total_bill))
+```
+
+---
+
+## Qualitative vs quantitative - densité avec R
+
+```{r bi-qlqt-densite, echo=TRUE}
+ggplot(data, aes(x = total_bill, color = day)) +
+  geom_density()
+```
+
+---
+
+## Qualitative vs quantitative - boîtes à moustaches avec R
+
+Inversion de `x` et `y` possible
+
+```{r bi-qlqt-box, echo=TRUE}
+ggplot(data, aes(x = total_bill, y = day)) +
+  geom_boxplot()
+```
+
+---
+class: middle, center, inverse
+
+## Quelques compléments
+
+---
+
+## Personnalisation des graphiques possible dans `ggplot()`
+
+```{r ggplot-theme, echo=TRUE}
+ggplot(data, aes(x = total_bill, 
+                 y = fct_relevel(day, c("Thur", "Fri", "Sat", "Sun")), 
+                 fill = fct_relevel(day, c("Thur", "Fri", "Sat", "Sun")))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("orchid", "orange", "steelblue", "limegreen")) +
+  scale_y_discrete(limits = rev) +
+  theme_minimal() + # d'autres thèmes existent
+  labs(x = "Montant facture", y = "", fill = "Jour de la\nsemaine")
+```
+
+
+---
+
+## Transformation de variable
+  
+### Quantitative en qualitative
+  
+- Courant de transformer une variable **quantitative** en variable **qualitative ordinale**
+- Ex : Catégorie d'âge, Nombre d'enfants du foyer, ...
+
+- Combien de modalités (*intervalles* ici) ? 
+  - Taille identique des intervalles ou variable (*amplitude*) ?
+  - Seuils des intervalles ?
+
+- *Plus simple* Transformer en variable binaire : présence / absence
+  - peut-être *trop* simple
+
+---
+
+## Transformation de variable
+  
+### Standardisation ou normalisation d'une variable quantitative
+  
+- Obligatoire pour l'utilisation de certaines méthodes statistiques
+
+- 2 opérations sont réalisées :
+  - Centrage : on retire la moyenne à chaque valeur
+  - Réduction : on divise par la variance
+$$
+  x_{norm} = \frac{x - \bar{x}}{\sigma^2}
+$$
+
+
+---
+
+## Transformation de variable
+
+### Beaucoup d'autres envisageables
+  
+- Division par le total ou par le maximum
+- Normalisation pour que la somme en ligne soit égale à 1
+- Utiliser les rangs
+- Transformation de Hellinger 
+$$
+y\prime_i^j = \sqrt{\frac{y_i^j}{\sum_k y_i^k}}
+$$
+- Calcul de $\log(x)$ voire $\log(1+x)$ (si valeur 0 présente par exemple)
+- Plusieurs autres possibles...

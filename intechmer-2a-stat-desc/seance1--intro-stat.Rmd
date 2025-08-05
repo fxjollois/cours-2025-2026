@@ -1,0 +1,572 @@
+---
+title: "Introduction à la Statistique"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output: 
+  xaringan::moon_reader:
+    css: [fc, chocolate-fonts]
+    nature: 
+      beforeInit: "../macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(DT)
+```
+
+## Qu'est-ce que la statistique ?
+
+> Ensemble de méthodes permettant de décrire et d'analyser des observations (communément appelées **données** de nos jours)
+
+--
+
+Utilisé maintenant dans tous les secteurs d'activités
+
+- Economie et finance : marketing, sondages...
+- Industrie : fiabilité, contrôle qualité...
+- Santé : recherche médicale, gestion des hôpitaux...
+- Environnement : prévisions climatiques et météorologiques, pollution...
+- Web : réseaux, publicité...
+- ...
+
+> Essor important avec le développement des outils informatiques et du web
+
+
+---
+  
+## Définitions de base
+  
+- **Population** : ensemble d'entités (personnes, objets, ...) étudiées
+
+--
+
+- **Individu** (ou *unité statistique*) : entité étudiée
+
+--
+
+- **Variable** : caractéristique étudiée sur chaque individu
+
+--
+
+- **Observation** : mesure 
+
+--
+
+- **Série statistique** : série d'observations recueillies sur les individus
+
+--
+
+- **Tableau de données** : stockage de la série statistique
+  - Individus croisant des variables 
+  - Chaque ligne représente un individu
+  - Chaque colonne représente une variable (ou attribut)
+  - C'est ce qu'on fait classiquement dans un tableur de type Excel
+
+---
+
+## Données `mtcars`
+
+Informations sur des voitures
+
+```{r donnees, echo = FALSE, message = FALSE, warning = FALSE}
+datatable(mtcars, options = list(scrollX = TRUE, dom = "p"))
+```
+
+---
+
+## Recensement vs Sondage
+  
+2 grandes méthodes de recueil de données
+
+--
+
+### Recensement
+  
+Etude de tous les individus d'une population
+
+- Recueil exhaustif de toutes les informations sur toutes les entités
+- Difficile à mettre en œuvre la plupart du temps
+
+--
+
+### Sondage
+
+Etude d'une partie de la population pour extrapolation sur l'ensemble de la population
+
+- Partie des individus étudiés = **échantillon**
+- Représentativité de l'échantillon ?
+
+---
+
+## Déroulement d'une étude statistique
+
+1. Définition du périmètre de l'étude 
+    - Ce qu'on étudie ?
+    - Conditions ?
+    - ...
+--
+
+1. Recueil des données
+    - Expérience, sondage, ...
+--
+
+1. Nettoyage, Pré-traitement, mise en forme des données
+    - Repérage données aberrantes
+    - Gestion données manquantes
+    - Transformation de variables
+--
+
+1. Description des données
+    - Univariée puis bivariée
+    - Méthodes multivariées ensuite
+--
+
+1. Selon étude, recherche d'un modèle, d'une partition, ...
+
+---
+
+## Type de variables
+  
+### Variable quantitative
+  
+Caractéristiques numériques : opérations de type somme ayant un sens
+
+### Continue
+  
+Mesurable
+
+- Ex : taille, poids, durée...
+
+### Discrète
+  
+Dénombrable ou mesurable en espace fini
+
+- Ex : âge, quantité en stock...
+
+---
+
+## Type de variables
+  
+### Variable qualitative
+  
+Caractéristiques non numériques : opérations de type somme n'ayant pas de sens
+
+- Valeurs possibles : **Modalités** (ou catégories)
+
+### Nominale
+
+Modalités n'ayant pas de lien entre elles (Ex : couleur des yeux, sexe...)
+
+- Cas particulier *Binaire* : 2 valeurs possibles uniquement (Ex : oui/non, présence/absence...)
+
+### Ordinale 
+
+Modalités devant être triées dans un ordre spécifique (Ex : mois, sentiment...)
+
+---
+class: center, middle, inverse
+
+## Manipuler les données
+
+---
+
+## Problème récurrent : manipuler les données
+
+Au sens mise en forme et extraction d'informations
+
+### Objectifs
+
+- Mettre en forme les données, provenant potentiellement de différentes sources
+- Extraire des informations simples (dénombrement, somme, ...)
+- Gérer les flux de données si tâches récurrentes
+
+### Outils
+
+- Programmation statistique
+- Algèbre relationnelle, applicable quelque soit les données
+
+---
+class: middle, center, inverse
+
+## Programmation statistique
+
+---
+
+## Utilisation du logiciel R
+
+Langage **R**, issu du langage *S+* (version *open source* de celui-ci)
+
+- Langage dit interprété : la *console* exécute les commandes les unes après les autres
+- Pour ceux qui connaissent, *Python* est aussi interprété
+- Dédié à la statistique, de nombreuses méthodes y sont développées, beaucoup de packages pour étendre les possibilités de l'outil
+
+--
+
+Outil de développement : **R Studio**
+
+- Interface permettant l'écriture et l'exécution des programmes
+- Intéressant car coloration syntaxique, aide à l'écriture, visualisation de l'environnement, accès à l'aide...
+
+--
+
+2 outils différents à installer donc, pour la suite des cours :
+- [Langage R](https://cran.r-project.org/)
+- [R Studio](https://posit.co/download/rstudio-desktop/)
+
+---
+
+## Méta-Librarie `tidyverse`
+
+- Suite de packages dédiés à la Science des données, développés par la même équipe que *RStudio*
+
+- [Site de la méta-librairie](https://www.tidyverse.org/)
+
+- Packages inclus :
+    - `tibble` : type `tibble` (extension de dataframe, que l'on verra plus tard)
+    - `readr` : importation de données
+    - `dplyr` : manipulation de données
+    - `ggplot2` : création de graphiques
+    - `tidyr`, `stringr`, `forcats`, `purrr` : outils complémentaires
+
+```{r install, eval = FALSE}
+install.packages(tidyverse) # A faire une seule fois
+library(tidyverse) # A faire à chaque session (= lancement de R)
+```
+
+
+---
+
+## Type de données
+
+- 3 grands types : `"int"`, `"numeric"` et `"character"` 
+- Typage faible : si modification de la variable, changement du type
+
+```{r types}
+a = 12
+class(a)
+a = "bonjour"
+class(a)
+```
+
+> Noter que les noms de variables commencent toujours par une lettre et peuvent comporter des lettres, des chiffres et certains caractères (`_` et `.`).
+
+---
+
+## Type de données
+
+- Tout est vecteur
+
+```{r vecteur}
+a = 12
+a[1]
+a[2] = 5
+a
+```
+
+- Suite de nombre facile à créer
+
+```{r suite}
+a = 1:5
+a
+```
+
+---
+
+## Travail sur vecteurs
+
+- Indexation à partir de 1
+
+```{r index}
+a = 5:15
+a
+a[1]
+a[1:3]
+a[3] = 27
+a
+```
+
+
+---
+
+## Opérations
+
+- C'est une grosse calculatrice
+
+```{r calculs}
+13 * (11 + 27) - 54 / 19
+1:5 * 2
+```
+
+- On peut faire des tests
+
+```{r tests}
+1:5 > pi
+```
+
+---
+
+## Fonctions statistiques usuelles
+
+```{r fct_stats}
+a = 1:50
+sum(a)  # somme
+mean(a) # moyenne
+sd(a)   # écart-type
+var(a)  # variance
+min(a)  # minimum
+max(a)  # maximum
+```
+
+
+---
+
+## Un peu de programmation classique
+
+> Traitement conditionnel avec `if`, `else`
+
+```{r cond}
+a = 91.15
+if (a < 100) {
+  print("a est inférieur à 100")
+}
+```
+
+```{r cond_else}
+if (a < 50) {
+  print("a est en dessous de 50")
+} else {
+  print("a est au dessus de 50")
+}
+```
+
+---
+
+## Un peu de programmation classique
+
+> Traitement itératif avec `for`
+
+```{r iteratif}
+for (i in 1:5) {
+  print(i)
+}
+print(i)
+```
+
+
+---
+
+## Un peu de programmation classique
+
+> Possible de faire des boucles aussi avec `while`
+
+```{r iteratif_while}
+i = 1
+while(i <= 5) {
+  print(i)
+  i = i + 1
+}
+print(i)
+```
+
+
+---
+
+## Notion de dataframe
+
+- Tableau statistique (ici avec des noms pour chaque ligne)
+
+```{r mtcars}
+mtcars
+```
+
+---
+
+## Colonnes d'un dataframe
+
+```{r mtcars_cols}
+names(mtcars) # noms des colonnes
+mtcars$mpg # contenu de la colonne "mpg"
+mtcars[,"mpg"] # idem
+mtcars[,1] # idem
+```
+
+
+---
+
+## Lignes d'un dataframe
+
+```{r mtcars_rows}
+mtcars[1,] # Première ligne du datagrame
+mtcars[1:5,] # Cinq premières lignes
+mtcars[1:5, c(1, 3, 7)] # idem mais avec seulement les colonnes 1, 3 et 7
+```
+
+
+---
+
+## Compléments sur les dataframes
+
+- Création possible à partir de plusieurs vecteurs
+
+```{r df_creation}
+engines = data.frame(
+  cyl = c(4, 6, 8, 12),
+  type = c("small", "medium", "large", "huge")
+)
+engines
+```
+
+
+- Importation de données au format `CSV` ou autres
+
+- Un `tibble` (de tidyverse) est un dataframe *particulier*
+    - Pas de noms de ligne
+    - Colonnes uniquement réels ou caractères
+
+
+---
+class: middle, center, inverse
+
+## Algèbre relationnelle
+
+---
+
+## Manipulation avec `dplyr`
+
+Dans la suite, nous utilisons le formalisme de `dplyr`
+
+- Plus simple à écrire
+
+- Facilité de compréhension des opérations faites
+
+- Si enchaînement d'opération, lecture aisée
+
+---
+## Tri et limite d'affichage
+
+> Tri avec la fonction `arrange()` (`desc()` permet de choisir un tri décroissant) et `slice()` permet de prendre une partie du tableau (début, fin, milieu...) 
+
+```{r tri}
+mtcars %>%
+  arrange(mpg)
+```
+
+---
+## Tri décroissant
+
+> `desc()` permet de choisir un tri décroissant
+
+```{r tridesc}
+mtcars %>%
+  arrange(desc(mpg))
+```
+
+---
+## Limite d'affichage
+
+> `slice()` permet de prendre une partie du tableau (début, fin, milieu...) 
+
+```{r slice}
+mtcars %>%
+  slice(1:3) # 5 premiers
+```
+
+---
+
+## Restriction
+
+> Sélection d'un nombre restreint de lignes d'une table, selon un ou plusieurs critères, à l'aide de `filter()`
+
+```{r restriction}
+mtcars %>%
+  filter(mpg > 25)
+```
+
+
+---
+
+## Projection
+
+> Sélection d'un nombre restreint de colonnes avec la fonction `select()`
+
+```{r project}
+mtcars %>%
+  select(mpg, cyl)
+```
+
+---
+
+## Projection - doublons
+
+> Il y a risque d'avoir des doublons (lignes identiques), qu'on peut supprimer avec `distinct()`
+
+```{r doublons}
+mtcars %>%
+  select(cyl, am) %>%
+  distinct()
+```
+
+
+---
+
+## Calcul de variables
+
+> Création d'une nouvelle variable en se basant sur un ou plusieurs autres variables de la table, avec `mutate()` (à stocker dans une variable pour réutilisation si besoin)
+
+```{r calcul}
+mtcars %>%
+  select(hp, wt) %>% # pour limiter l'affichage
+  mutate(hp_wt = hp / wt)
+```
+
+
+---
+
+## Agrégat
+
+> Calcul d'une statistique de base (moyenne, somme, ...) sur un attribut, avec `summarise()`
+
+```{r agregat}
+mtcars %>%
+  summarise(nb = n(), mpg = mean(mpg))
+```
+
+> Possibilité de le faire pour chaque valeur (modalité) d'une tierce variable (voire plus), avec `group_by()`
+
+```{r group}
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(nb = n(), mpg = mean(mpg))
+```
+
+
+---
+
+## Jointure
+
+> Regroupement d'informations présentes dans deux tables, le rapprochement entre les deux étant fait sur la base d'un attribut commun (ou plus), avec `inner_join()`, `left_join()`, `full_join()`
+
+```{r jointure}
+mtcars %>%
+  full_join(engines, by = "cyl")
+```
+
+
+---
+
+## Utilisation de plusieurs opérations
+
+> Il est courant d'enchaîner plusieurs opérations
+
+```{r enchainement}
+mtcars %>%
+  full_join(engines, by = "cyl") %>%
+  mutate(hp_wt = hp / wt) %>%
+  group_by(type) %>%
+  summarise(nb = n(), conso = mean(mpg), rapp_poids_puiss = mean(hp_wt)) %>%
+  arrange(desc(conso))
+```
+

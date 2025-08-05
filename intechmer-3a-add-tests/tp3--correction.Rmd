@@ -1,0 +1,394 @@
+---
+title: "TP 3 - correction"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Données Planctons
+
+```{r immport, warning=FALSE}
+library(readr)
+library(DT)
+library(tidyverse)
+library(maps)
+library(ggplot2)
+
+data = read_csv("103673.csv", show_col_types = FALSE)
+```
+
+On peut représenter les points de collecte de données sur une carte à l'aide du code suivant :
+
+```{r map1, warning=FALSE}
+ggplot() +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray") + 
+  geom_point(data = data, aes(x = lon, y = lat), size = 1) +
+  theme_minimal()
+```
+
+
+## Décrire les données, en particulier de concentrations
+
+On remarque que les concentrations sont très proches de 0, avec beaucoup de valeurs *aberrantes*/*outliers*. Il faut donc envisager de faire une transformation sur celles-ci pour pouvoir les étudier. Plusieurs possibilités :
+
+- Transformer en variable binaire : présence / absence
+- Faire des intervalles : aucun / peu / ... / beaucoup
+- Opérer une transformation mathématique :
+  - Division par le total ou par le maximum
+  - Normalisation pour que la somme en ligne soit égale à 1
+  - Utiliser les rangs
+  - Standardisation des variables
+  - Transformation de Hellinger 
+$$
+  y\prime_i^j = \sqrt{\frac{y_i^j}{\sum_k y_i^k}}
+$$
+  - Plusieurs autres possibles...
+  
+```{r desc-conc}
+data %>%
+  select(Acantharea:Trichodesmium) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_boxplot() +
+  facet_wrap(~name, scales = "free", ncol = 5) +
+  theme_minimal()
+```
+
+## Effectuer une transformation de Hellinger sur les données de concentrations 
+
+On utilise donc la fonction `decostand()` du package `vegan`.
+
+```{r hellinger}
+library(vegan)
+
+data_hellinger = decostand(data %>% select(Acantharea:Trichodesmium), method = "hellinger")
+```
+
+Les concentrations sont un peu *mieux* réparties.
+
+```{r vers-desc-hellinger}
+data_hellinger %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_boxplot() +
+  facet_wrap(~name, scales = "free", ncol = 5) +
+  theme_minimal()
+```
+
+## Faire quelques traitements sur les variables explicatives
+
+1. Remplacer les données manquantes par la valeur moyenne de la variable
+2. Transformer les variables `bulk_conc` et `snow_conc` en calculant $\log(1+x)$ (car valeurs parfois égales à 0)
+3. Normaliser toutes les variables
+
+Ces trois opérations sont réalisables en un code
+
+```{r modif-sup}
+data_sup = data %>%
+  select(temp:kd490) %>%
+  replace_na(as.list(colMeans(.,na.rm=T))) %>%            # étape 1
+  mutate_at(vars(snow_conc, bulk_conc), list(log1p)) %>%  # étape 2
+  transmute_all(list(scale))                              # étape 3
+```
+
+## Couche épipélagique
+
+```{r epi-data}
+data_epi = data_hellinger %>% 
+  bind_cols(data_sup) %>%
+  mutate(layer = data$layer) %>%
+  filter(layer == "epi") %>%
+  select(-layer)
+```
+
+
+### Réaliser une ACP sur les concentrations
+
+On ajoute donc les variables explicatives en variables supplémentaires (cf paramètre `quanti.sup` dans la fonction `PCA()`).
+
+```{r epi-acp}
+library(FactoMineR)
+acp_epi = PCA(data_epi, 
+          quanti.sup = 29:51, 
+          graph = FALSE,
+          scale = FALSE)
+```
+
+Les deux premières composantes expliquent 39% de variance.
+
+```{r epi-acp-eigen-tab}
+datatable(round(acp_epi$eig %>% head(10), 2), options = list(dom = 't'))
+```
+
+
+```{r epi-acp-eigen}
+ggplot(data.frame(acp_epi$eig) %>% mutate(dim = row_number()), 
+       aes(x = dim, y = percentage.of.variance)) +
+  geom_line() +
+  theme_minimal()
+```
+
+La représentation via la fonction `plot()` est difficilement exploitable.
+
+```{r epi-acp-vars}
+plot(acp_epi, choix = "var", invisible = "quanti.sup")
+```
+
+```{r epi-acp-supp}
+plot(acp_epi, choix = "var", invisible = "var")
+```
+
+```{r epi-acp-ind}
+ggplot(data.frame(acp_epi$ind$coord), aes(x = Dim.1, y = Dim.2)) +
+  geom_point() +
+  theme_minimal()
+```
+
+
+### Rechercher un nombre de classes avec une CAH (en utilisant la distance euclidienne et la méthode de *Ward*) 
+
+On choisit donc 3 classes.
+
+```{r epi-cah}
+cah_epi = hclust(dist(data_epi %>% select(Acantharea:Trichodesmium)), method = "ward.D2")
+par(mar = c(1, 2, 2, 0) + .1)
+plot(cah_epi, hang = -1, labels = FALSE)
+```
+
+### Rechercher la partition optimale à l'aide de $k$-means
+
+```{r epi-kmeans}
+km_epi = kmeans(data_epi %>% select(Acantharea:Trichodesmium), 3, iter.max = 30, nstart = 30)
+```
+
+### Décrire les classes à partir des données de concentrations
+
+Voici les 4 classes qu'on trouve :
+
+- Forte valeur sur *Copepoda*
+- Légèrement élevé sur *Collodaria* et *Acantharea*
+- Forte concentration sur *Trichodesmium*
+
+```{r epi-clusters-desc-num}
+datatable(t(round(km_epi$centers, 2)), options = list(dom = 'tp'))
+```
+
+```{r epi-clusters-desc-graph}
+data.frame(km_epi$centers) %>% 
+  rownames_to_column("cluster") %>%
+  pivot_longer(!cluster) %>%
+  ggplot(aes(x = cluster, y = name, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "orange") +
+  theme_minimal() +
+  labs(x = "classe", y = "", fill = "")
+```
+
+### Représenter la partition sur le plan factoriel
+
+- Classe *Copepoda* liée à `bulk_conc` et `chla`
+- Classe *Collodaria* et *Acantharea* liée à `ze` et `epi` 
+- Classe *Trichodesmium* liée à `temp` et `strat`
+
+```{r epi-clusters-acp}
+ggplot(data.frame(acp_epi$ind$coord) %>% mutate(classe = km_epi$cluster),
+       aes(x = Dim.1, y = Dim.2)) +
+  geom_point(aes(color = factor(classe)), alpha = .5) +
+  geom_segment(data = data.frame(acp_epi$quanti.sup$coord) %>% rownames_to_column("var"),
+               aes(x = 0, y = 0, xend = Dim.1, yend = Dim.2),
+               arrow = arrow(length = unit(0.5, "cm")), alpha = .5) + 
+  geom_text(data = data.frame(acp_epi$quanti.sup$coord) %>% rownames_to_column("var"),
+            aes(label = var), size = 5) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+
+
+### Représenter la partition sur une carte
+
+Difficile de bien distinguer sur ce graphique
+
+```{r epi-cluster-maps}
+ggplot() +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray") + 
+  geom_point(data = data %>% filter(layer == "epi") %>% mutate(classe = km_epi$cluster), 
+             aes(x = lon, y = lat, color = factor(classe)), size = 1) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+
+
+- Classe *Copepoda* plus présent vers le pôle Nord et le pôle Sud que les autres
+- Classe *Collodaria* et *Acantharea* un peu partout
+- Classe *Trichodesmium* dans les latitudes autour de l'équateur
+
+
+```{r epi-cluster-maps-wrap}
+ggplot(data = data %>% filter(layer == "epi") %>% mutate(classe = km_epi$cluster), 
+             aes(x = lon, y = lat)) +
+  geom_point(aes(color = factor(classe)), size = 1) +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray")+
+  facet_wrap(~ classe, ncol = 2) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+
+
+
+
+## Couche mésopélagique supérieure
+
+```{r meso-data}
+data_meso = data_hellinger %>% 
+  bind_cols(data_sup) %>%
+  mutate(layer = data$layer) %>%
+  filter(layer == "mesosup") %>%
+  select(-layer)
+```
+
+
+### Réaliser une ACP sur les concentrations
+
+On ajoute donc les variables explicatives en variables supplémentaires (cf paramètre `quanti.sup` dans la fonction `PCA()`).
+
+```{r meso-acp}
+library(FactoMineR)
+acp_meso = PCA(data_meso, 
+          quanti.sup = 29:51, 
+          graph = FALSE,
+          scale = FALSE)
+```
+
+Les deux premières composantes expliquent 39% de variance.
+
+```{r meso-acp-eigen-tab}
+datatable(round(acp_meso$eig %>% head(10), 2), options = list(dom = 't'))
+```
+
+
+```{r meso-acp-eigen}
+ggplot(data.frame(acp_meso$eig) %>% mutate(dim = row_number()), 
+       aes(x = dim, y = percentage.of.variance)) +
+  geom_line() +
+  theme_minimal()
+```
+
+La représentation via la fonction `plot()` est difficilement exploitable.
+
+```{r meso-acp-vars}
+plot(acp_meso, choix = "var", invisible = "quanti.sup")
+```
+
+```{r meso-acp-supp}
+plot(acp_meso, choix = "var", invisible = "var")
+```
+
+```{r meso-acp-ind}
+ggplot(data.frame(acp_meso$ind$coord), aes(x = Dim.1, y = Dim.2)) +
+  geom_point() +
+  theme_minimal()
+```
+
+
+### Rechercher un nombre de classes avec une CAH (en utilisant la distance euclidienne et la méthode de *Ward*) 
+
+On choisit donc 3 classes.
+
+```{r meso-cah}
+cah_meso = hclust(dist(data_meso %>% select(Acantharea:Trichodesmium)), method = "ward.D2")
+par(mar = c(1, 2, 2, 0) + .1)
+plot(cah_meso, hang = -1, labels = FALSE)
+```
+
+### Rechercher la partition optimale à l'aide de $k$-means
+
+```{r meso-kmeans}
+km_meso = kmeans(data_meso %>% select(Acantharea:Trichodesmium), 3, iter.max = 30, nstart = 30)
+```
+
+### Décrire les classes à partir des données de concentrations
+
+Voici les 4 classes qu'on trouve :
+
+- Forte valeur sur *Phaeodaria*
+- Légèrement élevé sur *Eumalacostraca*
+- Forte concentration sur *Copepoda*
+
+```{r meso-clusters-desc-num}
+datatable(t(round(km_meso$centers, 2)), options = list(dom = 'tp'))
+```
+
+```{r meso-clusters-desc-graph}
+data.frame(km_meso$centers) %>% 
+  rownames_to_column("cluster") %>%
+  pivot_longer(!cluster) %>%
+  ggplot(aes(x = cluster, y = name, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "orange") +
+  theme_minimal() +
+  labs(x = "classe", y = "", fill = "")
+```
+
+### Représenter la partition sur le plan factoriel
+
+- Classe *Phaeodaria* liée à `aou` et `strat`
+- Classe *Eumalacostraca* liée aucune variable 
+- Classe *Copepoda* liée à `oxy_ml`
+
+```{r meso-clusters-acp}
+ggplot(data.frame(acp_meso$ind$coord) %>% mutate(classe = km_meso$cluster),
+       aes(x = Dim.1, y = Dim.2)) +
+  geom_point(aes(color = factor(classe)), alpha = .5) +
+  geom_segment(data = data.frame(acp_meso$quanti.sup$coord) %>% rownames_to_column("var"),
+               aes(x = 0, y = 0, xend = Dim.1, yend = Dim.2),
+               arrow = arrow(length = unit(0.5, "cm")), alpha = .5) + 
+  geom_text(data = data.frame(acp_meso$quanti.sup$coord) %>% rownames_to_column("var"),
+            aes(label = var), size = 5) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+
+
+### Représenter la partition sur une carte
+
+Difficile de bien distinguer sur ce graphique
+
+```{r meso-cluster-maps}
+ggplot() +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray") + 
+  geom_point(data = data %>% filter(layer == "mesosup") %>% mutate(classe = km_meso$cluster), 
+             aes(x = lon, y = lat, color = factor(classe)), size = 1) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+
+
+- Classe *Phaeodaria* un peu partout
+- Classe *Eumalacostraca* plutôt aux latitudes faibles
+- Classe *Copepoda* plus présent vers les pôles
+
+
+```{r meso-cluster-maps-wrap}
+ggplot(data = data %>% filter(layer == "mesosup") %>% mutate(classe = km_meso$cluster), 
+             aes(x = lon, y = lat)) +
+  geom_point(aes(color = factor(classe)), size = 1) +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray")+
+  facet_wrap(~ classe, ncol = 2) +
+  theme_minimal() +
+  labs(x = "", y = "", color = "Classe")
+```
+

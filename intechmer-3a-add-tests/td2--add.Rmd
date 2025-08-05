@@ -1,0 +1,293 @@
+---
+title: "Analyse de données - TD 2"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Analyse en Composantes Principales (ACP)
+
+### Données `iris`
+
+Nous utilisons pour exemple les données `iris`, déjà présentes dans R. Elle regroupe les mesures (longueur et largeur des sépales et des pétales) de 150 iris, de trois espèces différentes (*setosa*, *versicolor* et *virginica*). Les voici présentées ci-dessous
+
+```{r}
+library(tidyverse)
+library(DT)
+datatable(iris)
+```
+
+Pour réaliser l'ACP, nous utilisons le package [`FactoMineR`](http://factominer.free.fr/index_fr.html), très complet et bien documenté. Il existe d'autres versions, mais moins intéressantes à utiliser.
+
+```{r}
+library(FactoMineR)
+```
+
+### Application de la méthode sur les données
+
+Pour mettre en oeuvre une ACP, il suffit d'utiliser la fonction `PCA()` (pour *Principal Components Analysis*), qui renvoie un objet complxe, comme nous le verrons plus tard. Nous devons bien évidemment supprimer la variable `Species`. L'opion `graph = FALSE` évite la création de deux graphiques (cercle des corrélations et premier plan factoriel, que nous créérons par la suite).
+
+```{r}
+acp = PCA(iris[,-5], graph = FALSE)
+```
+
+L'objet complexe (liste nommée) ainsi créé contient toutes les informations nécessaires. Son affichage permet de lister l'ensemble des sous-objets contenus, ainsi qu'une brève description.
+
+```{r}
+acp
+```
+
+Pour avoir un certain nombre d'informations en une fois, on peut afficher le résumé de cet objet, comme ci-dessous.
+
+```{r}
+summary(acp)
+```
+
+### Focus sur la part de variance expliquée
+
+Le sous-objet `eig` contient donc les valeurs propres (première colonne) mais aussi (et surtout) les pourcentages de variance expliquée (simple et cumulative) pour chaque composante.
+
+> Dans notre cas, on remarque que le premier axe explique à lui seul 73% de l'information. Les deux premières composantes expliquent à elles deux presque 96% de l'information.
+
+```{r}
+acp$eig
+```
+
+Comme un graphique est parfois plus agréable à lire qu'un tableau, on peut représenter cette information via un diagramme en barres. Pour cela, nous devons modifier légèrement l'objet pour le rendre compatible avec `ggplot()`, ce que fait le code ci-après.
+
+```{r}
+eig = tibble(data.frame(acp$eig) %>% rownames_to_column("comp"))
+eig
+```
+
+> On voit nettement la part importante de la première composante.
+
+Le seuil de 25% est utilisé, car si chaque composante fournissait la même quantité d'information, chacune aporterait 25% de celle-ci (100 divisé par 4 composantes, car 4 variables).
+
+```{r}
+ggplot(eig, aes(comp, percentage.of.variance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_hline(yintercept = 25, linetype = "dashed", color = "gray") +
+  annotate("text", x = 4.5, y = 27, label = "25 %") +
+  labs(x = "Composantes", y = "% de variance expliquée") +
+  theme_minimal()
+```
+
+### Représentation des individus
+
+La représentation directe des individus via la fonction `plot()` n'est pas optimal, mais permet de rapidement voir ce qu'il se passe.
+
+> On remarque ici deux groupes d'iris. 
+
+Notez qu'il est d'usage de représenter sur le plan factoriel le pourcentage de variance expliquée.
+
+```{r}
+plot(acp, choix = "ind")
+```
+
+Les coordonnées obtenues sont contenues dans le sous-dataframe `coord` du sous-objet `ind`. On va s'en servir pour réaliser un graphique plus agréable à lire.
+
+```{r}
+datatable(round(acp$ind$coord, 2))
+```
+
+En ajoutant l'information sur les espèces (contenue donc dans la variable `Species` du dataframe original), on peut utiliser un nuage de points, avec une couleur en fonction de l'espèce justement.
+
+> On remarque que la méthode sépare très clairement les *setosa* des deux autres espèces (*versicolor* et *virginica*), qui semble être légèrement séparées, mais un peu recouvrantes tout de même.
+
+```{r}
+ind = tibble(data.frame(acp$ind$coord)) %>% mutate(Species = iris$Species)
+ggplot(ind, aes(Dim.1, Dim.2, color = Species)) +
+  geom_point() +
+  theme_minimal()
+```
+
+
+### Représentation des variables
+
+Le cercle des corrélations est un outil précieux pour caractériser les axes, afin de mieux comprendre ce qui différencient les éventuels groupes d'individus. 
+
+> On voit ici que trois variables sont très proches (longueur de sépale ainsi que largeur et longueur de pétale).
+
+```{r}
+plot(acp, choix = "var")
+```
+
+La fonction `dimdesc()` permet de tester les liens entre chaque variable et chaque composante, avec un test de correlation (seule la *p-value* est affichée).
+
+> Les 4 variables sont liées au premier axe, seul deux sont liées au deuxième et au troisième (pas les mêmes).
+
+```{r}
+dimdesc(acp)
+```
+
+### Caractérisation des axes
+
+A l'aide des informations ci-dessus, il est intéressant de décrire ce que chaque axe *explique*. 
+
+> Ici, nous ferions les conclusions suivantes :
+
+- Le premier axe oppose, à droite, les grands iris (grands pétales et longs sépales, mais avec une faible largeur de sépale) aux petits iris à gauche (petits pétales et cours sépales, mais sépales très larges) ;
+- Le deuxième axe oppose, en haut, les iris avec des grands sépales aux iris avec petits sépales (en bas) ;
+- Le troisième axe expliquant très peu de variance n'est pas à prendre en considération.
+
+## Analyse Factorielle des Correspondances (AFC)
+
+### Données `USAccDeaths`
+
+Nous allons travailler sur des données accidents aux Etats-Unis sur la période 1973-1978, déjà présentes elles-aussi dans R. C'est le nombre de mort par mois, sur la période. Elles sont dans un format spécifique, qu'il faut modifier avant de pouvoir les utiliser avec `FactoMineR`.
+
+```{r}
+Acc = data.frame(matrix(USAccDeaths, ncol = 12, byrow = TRUE, dimnames = list(1973:1978, month.name)))
+datatable(Acc, options = list(scrollX = TRUE))
+```
+
+### Application de la méthode sur les données
+
+Pour appliquer l'AFC sur le tableau de données, nous utilisons ici la fonction `CA()` (pour *Correspondance Analysis*). Ici aussi, nous choississons de ne pas afficher les graphiques au début.
+
+```{r}
+afc = CA(Acc, graph = FALSE)
+```
+
+Comme précédemment, l'objet ainsi créé contient beaucoup d'informations, que nous allons utiliser.
+
+```{r}
+afc
+```
+
+Comme pour `PCA()`, le résumé permet de voir certains éléments.
+
+```{r}
+summary(afc)
+```
+
+
+### Focus sur la part de variance expliquée
+
+On peut reprendre le code précédent, pour l'appliquer directement et voir la part d'inertie expliquée par chaque axe.
+
+> Le premier axe explique un peu plus de la moitié de l'information, et les deux premiers permettent d'expliquer 80% en tout. 
+
+```{r}
+eig = tibble(data.frame(afc$eig) %>% rownames_to_column("comp"))
+eig
+```
+
+La notion de seuil est moins pertinent en AFC, et on se contentera très souvent (voire tout le temps) de ne garder que deux axes.
+
+```{r}
+ggplot(eig, aes(comp, percentage.of.variance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Composantes", y = "% de variance expliquée") +
+  theme_minimal()
+```
+
+### Représentation des modalités
+
+Dans une AFC, le but est de représenter graphiquement les modalités de la variable en ligne (ici les années), ainsi que les modalités de la variable en colonnes (ici les mois). On peut créer les graphiques séparément (en rendant l'autre variable *invisible*).
+
+> On a une opposition 1975 vs 1978 sur l'axe 1, et une opposition 1976 vs 1973/1974 sur l'axe 2.
+
+```{r}
+plot(afc, invisible = "col")
+```
+
+> Le mois de décembre semble avoir un comportement différent des autres mois, ainsi que Février et Juillet, dans une moindre mesure.
+
+```{r}
+plot(afc, invisible = "row")
+```
+
+Mais l'idéal est de représenter les deux directement sur le même graphique afin de relier les modalités des variables entre elles.
+
+> Les mois de Février et Décembre 1976 ont l'air particuliers, ainsi que le mois de juillet 1977 (et 1976).
+
+```{r}
+plot(afc)
+```
+### Si on veut aller plus loin sur ce jeu de données
+
+```{r, echo = FALSE}
+Acc2 = data.frame(matrix(USAccDeaths, ncol = 12, byrow = TRUE, dimnames = list(1973:1978, 1:12))) %>% 
+  rownames_to_column("Annee") %>%
+  pivot_longer(!Annee) %>%
+  mutate(Mois = substr(name, 2, 3)) %>%
+  mutate(Mois = as.integer(Mois), Annee = as.integer(Annee))
+ggplot(Acc2, aes(Mois, value, color = factor(Annee))) +
+  geom_line(linewidth = 1) + 
+  scale_x_continuous(breaks = 1:12) +
+  labs(x = "", y = "Nombre de morts", color = "Année") +
+  theme_minimal()
+```
+
+```{r, echo = FALSE}
+ggplot(Acc2, aes(Annee, value, color = factor(Mois))) +
+  geom_line(linewidth = 1) + 
+  scale_color_discrete() +
+  labs(x = "", y = "Nombre de morts", color = "Mois") +
+  theme_minimal()
+```
+
+
+## A FAIRE
+
+### Données `Wine` -- ACP
+
+Nous allons travailler sur des données concernant 3 types de vin. Elles sont disponibles sur [cette page](https://archive.ics.uci.edu/ml/datasets/wine) de l'UCI MLR. Il s'agit de 178 vins, réparties en 3 classes donc, et décrit par 13 variables quantitatives (lire la description dans le fichier `wine.names` pour plus d'informations).
+
+Le code suivant permet de charger les données, et de nommer correctement les variables.
+
+```{r}
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+datatable(wine, options = list(scrollX = TRUE))
+```
+
+
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Décrire les données
+- Réaliser une ACP centrée ou normée (choix à justifier)
+- Produire les graphiques nécessaires à l’interprétation
+- Identifier les classes sur le plan factoriel
+- Que peut-on dire globalement ?
+
+
+
+### Données CSP 1968 et 2014 -- AFC
+
+Nous disposons sur cette page de la répartition de la population active de 25 à 54 ans selon la catégorie socioprofessionnelle et la position vis à vis de l'emploi, par commune et département, de [1968](https://fxjollois.github.io/donnees/regions-csp/regions-csp-1968.csv) et de [2014](https://fxjollois.github.io/donnees/regions-csp/regions-csp-2014.csv).
+
+Les codes ci-dessous vous montrent comment les importer (en supprimant les données sur les chômeurs).
+
+```{r}
+regions1968 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-1968.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions1968) = sub(" RP1968", "", names(regions1968))
+datatable(regions1968, options = list(scrollX = TRUE))
+```
+
+```{r}
+regions2014 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-2014.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions2014) = sub(" RP2014", "", names(regions2014))
+datatable(round(regions2014), options = list(scrollX = TRUE))
+```
+
+
+- Réaliser une AFC sur le croisement entre la catégorie socioprofessionnelle et la région
+  - pour 1968
+  - pour 2014
+- A l'aide des outils à votre disposition (tableaux et graphiques),
+  - Décrire la situation pour chaque année,
+  - Comparer les deux situations

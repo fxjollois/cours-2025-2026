@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "UTF-8">
+        
+        {% seo %}
+        
+        <link rel = "stylesheet" type = "text/css" href = "../remarkjs-v2.css">
+        <link rel = "icon" href = "favicon-graduation-cap.ico" type = "image/x-icon">
+        <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        
+        {% include head-custom.html %}
+
+    </head>
+    <body>
+        <textarea id="source">{{ page.content }}</textarea>
+        <script src="../remark.js"></script>
+        <script>
+            var slideshow = remark.create({
+                // sourceUrl: 'seance3.md',
+                ratio: "16:9",
+                countIncrementalSlides: false, 
+                highlightStyle: 'monokai',
+                highlightLanguage: 'remark',
+                highlightLines: true
+            });
+        </script>
+        <script>
+            document.title = document.getElementsByClassName("remark-slide-container")[0].getElementsByTagName("h1")[0].innerHTML;
+        </script>
+    </body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lois de probabilité</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="FX Jollois" />
+    <script src="seance4--lois-proba_files/header-attrs-2.27/header-attrs.js"></script>
+    <link href="seance4--lois-proba_files/remark-css-0.0.1/nhsr.css" rel="stylesheet" />
+    <link href="seance4--lois-proba_files/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <script src="seance4--lois-proba_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="seance4--lois-proba_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lois de probabilité
+]
+.author[
+### FX Jollois
+]
+.date[
+### BUT TC - 2ème année
+]
+
+---
+
+
+
+
+## Variable aléatoire 
+
+Mesure d'un phénomène (*variable*) dont le résultat est déterminé par une expérience *aléatoire* (*i.e*. dépendant du hasard)
+
+- Exemples classiques : Pile/Face, Lancer de dé, Température, ...
+
+- Chaque résultat d'une expérience : **issue**
+
+- Ensemble de toutes les issues possibles : **univers des possibles** `\(\Omega\)`
+
+- Sous-ensemble de `\(\Omega\)` : **évènement**
+  - Si ensemble à une seule issue *évènement élémentaire*
+
+- Possibilité d'associer une valeur réelle à chaque issue
+  - Notion de gain par exemple
+
+---
+
+## Variable aléatoire et loi de probabilité
+
+### Définition
+
+Une **variable aléatoire** (ou *v.a.*) `\(\mathbf{X}\)` est une fonction définie sur `\(\Omega\)` et à valeur dans `\(\mathbb{R}\)`, à laquelle on associe une **loi de probabilité** (ou *distribution de probabilité*) dont la masse totale est égale à 1
+
+- V.a. *continue* si les valeurs de `\(X\)` sont quantitatives continues
+- V.a. *discrète* si le nombre de résultats est faible (ou si c'est qualitatif)
+
+### Fonction de répartition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(x\)` réelles ou discrètes.
+
+La *fonction de répartition* `\(F_X\)` de la v.a. est la fonction qui associe une probabilité `\(P(X \le x)\)` à tout  `\(x\)`.
+
+---
+
+## Variable aléatoire 
+
+### Fonction de masse
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(x_i\)` discrètes.
+
+La *fonction de masse* de la v.a. associe une probabilité `\(P(X = x_i)\)` à chaque résultat élémentaire `\(x_i\)`
+
+### Densité de probabilité
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(x\)` réelles.
+
+La *fonction de densité* permet de calculer la probabilité d'appartenance à un domaine `\(P(a \le X \le b)\)` (c'est la dérivée de la fonction de répartition).
+
+---
+
+## Exemple de cas discret
+
+On lance un dé (à 6 faces), et on calcule notre gain avec
+
+- `\(+1\)` si c'est pair
+- `\(-2\)` si c'est `\(\le 3\)`
+- `\(+5\)` si c'est 2
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt;  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; x &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; gain &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### A noter
+
+- V.a. `\(\mathbf{X}\)` *discrète* : gain d'un lancer
+- `\(\Omega\)` : `\(1, \ldots, 6\)`
+- **Issues** : `\(-2, 0, 1, 4\)`
+
+---
+
+## Exemple de cas discret
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; gain &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; p &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.3333 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.1667 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.3333 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.1667 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;img src="seance4--lois-proba_files/figure-html/ex1-plot-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Cas discret
+
+- **Loi uniforme discrète** (résultats équi-probables)
+
+- **Loi de Bernouilli**
+
+- **Loi Binomiale**
+
+- **Loi de Poisson**
+
+---
+
+## Loi uniforme discrète
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(k\)` discrètes (avec `\(k=1,\ldots,n)\)`.
+
+`\(\mathbf{X}\)` suit une **loi uniforme discrète** si pour chaque `\(k\)`, `\(P(X = k) = \frac{1}{n}\)`.
+
+### Exemple
+
+Dé à 6 faces (non pipé) `\(\rightarrow P(X = k) = \frac{1}{6}\)` (avec `\(k=1,\ldots,6\)`).
+
+### Espérance et variance
+
+$$
+  E(X) = \frac{n+1}{2} \mbox{ et } V(X) = \frac{n^2 - 1}{12}
+$$
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Questions
+
+On dispose de 10 boules numérotées de 1 à 10 dans une urne.
+
+1. Quelle est la probabilité de tirer la boule 5 ?
+1. Quelle est la probabilité de tirer 2 fois de suite la boule 5 ? trois fois ?
+1. Si je tire 100 fois une boule (avec remise donc à chaque fois), quelle est valeur moyenne puis-je espérer avoir ?
+
+---
+
+## Loi uniforme discrète - *exercice*
+
+### Réponses
+
+Soit `\(\mathbf{X}\)` une v.a. de loi uniforme discrète, à valeur entre 1 et 10. 
+
+1. `\(P(X = 5) = \frac{1}{10}\)`
+1. `\(P(X_1 = 5 \mbox{ et } X_2 = 5) = P(X_1 = 5) P(X_2 = 5) = \frac{1}{100}\)` (car idépendance entre les 2 évènements)
+  - Il y a donc 1 chance sur mille d'avoir 3 cinq d'affilés
+1. `\(E(X) = \frac{n+1}{2} = 50.5\)`
+
+---
+
+## Loi de Bernouilli
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant deux valeurs `\(0\)` ou `\(1\)`
+
+`\(\mathbf{X}\)` suit une **loi de Bernouilli** si `\(P(X = 1)=p\)` et `\(P(X = 0) = q = 1-p\)`.
+
+### Exemple
+
+Pile ou face avec une pièce équilibrée
+
+### Espérance et Variance
+
+$$
+  E(X) = p \mbox{ et } V(X) = pq
+$$
+
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Questions 
+
+On est en présence d'une assemblée de 250 personnes, dont 40 gauchers.
+
+1. Quelle est la probabilité qu'une personne soit gauchère ?
+1. A l'inverse, quelle est la probabilité qu'une personne soit droitière ?
+
+---
+
+## Loi de Bernouilli - *exercice*
+
+### Réponses
+
+Soit `\(\mathbf{X}\)` une v.a. de loi de Bernouilli, valant 1 si la personne est gauchère, 0 sinon.
+
+1. `\(P(X = 1) = \frac{40}{250} = .16\)`
+1. `\(P(X = 0) = 1 - P(X = 1) = 1 - .16 = .84\)` (complémentaire)
+
+---
+
+## Loi Binomiale
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant les valeurs `\(0\)` (avec une probabilité `\(p\)`) ou `\(1\)` (avec une probabilité `\(1-p\)`), et `\(n\)` le nombre de tirages réalisés.
+
+`\(\mathbf{X}\)` suit une **loi Binomiale** lorsque `\(P(X = k) = C_k^n p^k (1-p)^{n-k}\)`, somme de `\(n\)` v.a. indépendants de loi de Bernouilli.
+
+`\(C_k^n = \frac{n!}{k!(n-k)!}\)` se nomme le coefficient binomial, et représente le nombre d'ensembles à `\(k\)` éléments qu'on peut obtenir dans l'ensemble des `\(n\)` éléments.
+
+### Exemple
+
+Avec 100 tirages à pile ou face, combien de fois on aura pile ?
+
+### Espérance et Variance
+
+$$
+  E(X) = np \mbox{ et } V(X) = np(1-p)
+$$
+
+
+---
+
+## Loi Binomiale
+
+### Fonction de masse
+
+$$
+P(X = k) = f(k) = C_k^n p^k (1-p)^{n-k}
+$$
+### Fonction de répartition
+
+$$
+F(x) = \sum_{k=0}^{\lfloor x \rfloor} f(k) \mbox{ pour } 0 \le x \le n
+$$
+
+A noter que `\(F(x)=0\)` pour `\(x &lt; 0\)` et `\(F(x)=1\)` pour `\(x&gt;n\)`.
+
+
+---
+
+## Loi Binomiale - *exercice*
+
+### Questions
+
+Supposons que nous avons formé 100 groupes de 2000 personnes, avec la même proportion de gaucher (16%) que précédemment.
+
+1. Si je choisis une personne de chaque groupe, combien puis-je espérer avoir de gauchers au final ?
+1. Quelle est la probabilité de n'avoir aucun gaucher ? Et 100 gauchers ?
+1. Quelle est la probabilité d'avoir 20 gauchers ?
+
+---
+
+## Loi Binomiale
+
+### Réponses
+
+Soit `\(\mathbf{X}\)` une v.a. de loi Binomiale, avec `\(p = .16\)` et `\(n = 100\)`
+
+1. `\(E(X) = np = 100 * .16 = 16\)`
+1. `\(P(X = 0) = C_0^{100} .16^0 .84^{100} = .84^{100} &lt; 0.0001\)` (très très faible) et `\(P(X = 100) = .16^{100} &lt; 0.0001\)` (aussi très très faible)
+1. `\(P(X = 20) = C_20^{100} .16^20 .84^{80} = 0.0567\)`
+
+---
+
+## Loi de Poisson
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(k\)` discrètes (avec `\(k=1,2,\ldots\)`).
+
+`\(\mathbf{X}\)` suit une **loi de Poisson** `\(Pois(\lambda)\)` si pour chaque `\(k\)`, `\(P(X = k) = \frac{\lambda^k}{k!}e^{-\lambda}\)` où
+
+- `\(e\)` est la base de l'exponentielle
+- `\(\lambda\)` représente le nombre moyen d'occurences dans un intervalle de temps fixé
+
+### Exemple
+
+Nombre de personnes à l'arrêt d'un bus après une certaine durée
+
+### Espérance et Variance
+
+$$
+  E(X) = \lambda \mbox{ et } V(X) = \lambda
+$$
+
+
+---
+
+## Loi de Poisson
+
+### Fonction de masse
+
+$$
+P(X = k) = f(k) = \frac{\lambda^k}{k!}e^{-\lambda}
+$$
+
+
+### Fonction de répartition
+
+$$
+F(k) = \frac{\Gamma(\lfloor k+1 \rfloor, \lambda)}{\lfloor k \rfloor !} \mbox{ pour } k &gt; 0
+$$
+
+
+---
+
+## Cas continu
+
+- Loi uniforme
+
+- Loi Normale
+
+---
+
+## Loi uniforme continue
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(x\)` réelles dans `\([a;b]\)`.
+
+`\(\mathbf{X}\)` suit une **loi uniforme continue** `\(U(a,b)\)` si tous les intervalles de même longueur ont la même probabilité
+
+### Exemple
+
+Pas réellement de cas dans la vie de tous les jours
+
+### Espérance, Variance
+
+$$
+  E(X) = \frac{a+b}{2} \mbox{ et } V(X) = \frac{(b-a)^2}{12} 
+$$
+
+---
+
+## Loi uniforme continue
+
+### Densité de probabilité
+
+$$
+f(x) = \frac{1}{b-a}  \mbox{ pour } x \in [a;b]
+$$
+
+A noter que `\(f(x)=0\)` pour toute valeur `\(x&lt;a\)` et `\(x&gt;b\)`.
+
+![](seance4--lois-proba_files/figure-html/uni-cont-dens-1.png)&lt;!-- --&gt;
+
+---
+
+## Loi uniforme continue
+
+### Fonction de répartition
+
+$$
+F(x) = \frac{x - a}{b - a} \mbox{ pour } x \in [a;b] 
+$$
+
+A noter que `\(F(x)=0\)` pour `\(x&lt;a\)`, et `\(F(x)=1\)` pour `\(x&gt;b\)`.
+
+![](seance4--lois-proba_files/figure-html/uni-cont-rep-1.png)&lt;!-- --&gt;
+
+
+---
+
+## Loi Normale
+
+### Définition
+
+Soit `\(\mathbf{X}\)` une *v.a.* prenant des valeurs `\(x\)` réelles.
+
+`\(\mathbf{X}\)` suit une **loi Normale** `\(N(\mu, \sigma^2)\)` de moyenne `\(\mu\)` et de variance `\(\sigma^2\)`.
+
+### Exemple
+
+Mesure de la taille d'une population
+
+### Espérance et Variance
+
+$$
+  E(X) = \mu \mbox{ et } V(X) = \sigma^2
+$$
+
+---
+
+## Loi Normale
+
+### Densité de probabilité
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp \left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+$$
+
+![](seance4--lois-proba_files/figure-html/norm-dens-1.png)&lt;!-- --&gt;
+
+---
+
+## Loi Normale
+
+### Fonction de répartition
+
+$$
+ F(x) = \frac{1}{2} \left( 1 + \mbox{erf} \frac{x - \mu}{\sigma\sqrt{2}} \right)
+$$
+
+![](seance4--lois-proba_files/figure-html/norm-rep-1.png)&lt;!-- --&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

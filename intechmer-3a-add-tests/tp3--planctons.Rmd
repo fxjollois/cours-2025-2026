@@ -1,0 +1,69 @@
+---
+title: "Applications sur données réelles - Planctons - TP 3"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Données Planctons
+
+Nous disposons de données de concentrations de planctons dans l'océan, provenant d'une étude [1] de 2008 à 2019, entre 0 et 500m de profondeur. Les données sont disponibles sur le site [SEANOE](https://www.seanoe.org/data/00846/95809/) ou en téléchargeant [ce fichier](103673.csv)
+
+Voici le jeu de données une fois importé :
+
+```{r immport, warning=FALSE}
+library(readr)
+library(DT)
+
+data = read_csv("103673.csv", show_col_types = FALSE)
+datatable(data, options = list(scrollX = TRUE, dom = 'tp')) %>%
+  formatRound(c(8:58), digits = 3)  
+```
+
+Dans ces variables, nous avons différents types de variables :
+
+- Variables contextuelles : identifiant (`psampleid`), coordonnées (`lat` et `lon`), temps (`date`, `day_night`) et informations supplémentaires (`prod` et `layer`) ;
+- Variables de concentrations de planctons : de `Acantharea` à `Trichodesmium` ;
+- Variables potentiellement explicatives des concentrations : de `temp` à `kd490`.
+
+On peut représenter les points de collecte de données sur une carte à l'aide du code suivant :
+
+```{r}
+library(maps)
+library(ggplot2)
+ggplot() +
+  geom_polygon(data = map_data("world"), 
+               aes(x = long, y = lat, group = group),
+               fill = "lightgray") + 
+  geom_point(data = data, aes(x = lon, y = lat), size = 1) +
+  theme_minimal()
+```
+
+
+## A faire
+
+Nous souhaitons donc étudier les concentrations de planctons pour avoir des profils type. Pour cela, nous allons procéder aux étapes suivantes en suivant le plan de l'article initial, pour chaque couche (cf variable `layer`) :
+
+1. Décrire les données, en particulier de concentrations
+2. Effectuer une transformation de Hellinger sur les données de concentrations (cf fonction `decostand()` du package `vegan` par exemple)
+3. Faire quelques traitements sur les variables explicatives
+    - Remplacer les données manquantes par la valeur moyenne de la variable
+    - Transformer les variables `bulk_conc` et `snow_conc` en calculant $\log(1+x)$ (car valeurs parfois égales à 0)
+    - Normaliser toutes les variables
+4. Réaliser une ACP sur les concentrations, en ajoutant les variables explicatives en variables supplémentaires (cf paramètre `quanti.sup` dans la fonction `PCA()`)
+5. Rechercher un nombre de classes avec une CAH (en utilisant la distance euclidienne et la méthode de *Ward*) 
+6. Rechercher la partition optimale à l'aide de $k$-means
+7. Décrire les classes à partir des données de concentrations
+    - Représenter la partition sur le plan factoriel
+    - Représenter les variables supplémentaires
+8. Représenter la partition sur une carte
+
+Dans l'article initial [1], la partition est recherchée sur les cinq premiers facteurs de l'ACP. L'idée n'est pas nouvelle et elle est couramment mise en oeuvre. L'idée derrière est de supprimer le *bruit* éventuel présent dans les données. Essayez de comparer vos résultats avec leurs résultats.
+
+## Bibliographie
+
+1. Panaïotis, T., Babin, M., Biard, T., Carlotti, F., Coppola, L., Guidi, L., Hauss, H., Karp-Boss, L., Kiko, R., Lombard, F., McDonnell, A. M. P., Picheral, M., Rogge, A., Waite, A. M., Stemmann, L., & Irisson, J.-O. (2023). Three major mesoplanktonic communities resolved by in situ imaging in the upper 500 m of the global ocean. *Global Ecology and Biogeography*, 32, 1991–2005. <https://doi.org/10.1111/geb.13741>
