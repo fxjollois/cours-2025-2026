@@ -30,13 +30,13 @@
 
 - [Séance 1 - Présentation et requêtes SQL initiales](sae-seance1)
 <!--
-    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/rdijKnq7oDaTbmY>
+- Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/rdijKnq7oDaTbmY>
 -->
 
 - [Séance 2 - Réflexion sur le passage du modéle relationnel à un modèle à base de documents](sae-seance2)
 
 - [Séance 3 - Passage SQL <-> NoSQL sous Python](sae-seance3)
 <!--
-    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/CJCrGiYyQHPmJ5m>
+- Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/CJCrGiYyQHPmJ5m>
 -->
 
