@@ -1,11 +1,8 @@
 # Statistiques descriptives sur tableur - Univarié
 
-Nous allons travailler sur les données contenu dans le fichier `tips`, dont vous devez télécharger une version selon votre logiciel :
+Nous allons travailler sur les données contenu dans le fichier `tips`, au [format Excel](tips.xlsx). 
 
-- [Format Excel](tips.xlsx)
-- [Format Libre Office](tips.ods) (Téléchargement de [LibreOffice](https://fr.libreoffice.org/download/telecharger-libreoffice/))
-
-> Nota Bene : les noms des fonctions dans ce document sont valables dans **Libre Office**. Il est possible que certains soient différents dans les autres tableurs (me demander si cela ne fonctionne pas dans votre outil).
+> Nota Bene : les noms des fonctions dans ce document sont valables dans **Excel**. Il est possible que certains soient différents dans les autres tableurs (me demander si cela ne fonctionne pas dans votre outil).
 
 <!--
 Différence entre Libre Office et Excel
@@ -39,16 +36,16 @@ Différence entre Libre Office et Excel
 
 ### Ajout des calculs
 
-- Dans la case `B3`, écrivez la formule suivante : `=MOYENNE(tips.a:a)`
+- Dans la case `B3`, écrivez la formule suivante : `=MOYENNE(tips!a:a)`
     - notez qu'il est possible d'écrire en minuscule ou en majuscule les noms des fonctions
-    - dans **Excel** ou **Google Sheets** : `=MOYENNE(tips!a:a)` (le `"."` est remplacé par un `"!"`)
+    - **important** : `a:a` permet de choisir toute la colonne A, utile pour prendre en compte des données futures 
 - Pour l'écart-type, c'est la fonction `ECARTYPE.PEARSON()` qu'il faut utiliser (sur la même colonne)
 - Pour minimum, maximum et médiane, il existe les fonction `MIN()`, `MAX()` et `MEDIANE()`
 - Pour les quartiles, nous avons la fonction `QUARTILE()`, qui demande deux paramètres (séparés par un `";"`) :
-    - la plage des données (ici `tips.A:A`) 
+    - la plage des données (ici `tips!A:A`) 
     - le type de quartile (0 : minimum, 1 : Q1, 2 : médiane, 3 : Q3, 4 : maximum)
 - Pour les centiles, il existe la fonction `CENTILE()` qui prend 2 paramètres :
-    - la plage des données (ici toujours `tips.A:A`)
+    - la plage des données (ici toujours `tips!A:A`)
     - la valeur du centile (entre 0 et 1). Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
 ```
 =CENTILE(tips.A:A;A13/100)
@@ -68,10 +65,7 @@ Pour faire notre tableau, nous devons réaliser une première étape de créatio
 
 #### Deuxième étape
 
-Pour calculer le nombre de valeurs entre 2 seuils, nous allons utiliser la fonction `FREQUENCE()`. Elle prend en première paramètre les données (toujours `tips.A:A`) et en deuxième paramètre, la liste des seuils. Ecrivez la formule suivante en cellule `E4` :
-
-- LibreOffice : `=FREQUENCE(tips.A:A;D4:D11)`
-- Excel ou Google Sheets : `=FREQUENCE(tips!A:A;D4:D11)`
+Pour calculer le nombre de valeurs entre 2 seuils, nous allons utiliser la fonction `FREQUENCE()`. Elle prend en première paramètre les données (toujours `tips.A:A`) et en deuxième paramètre, la liste des seuils. Ecrivez la formule suivante en cellule `E4` : `=FREQUENCE(tips!A:A;D4:D11)`
 
 Une fois cela fait, vous remarquerez que des valeurs se sont ajoutées sur les cellules en dessous. La valeur en `E4` est 0 car aucune valeur n'est inférieure à 0 dans les données. Ensuite, la valeur dans la cellule `E5` indique qu'il y a 17 valeurs entre 0 et 10. Et ainsi de suite. La somme des valeurs entre `E4` et `E11` est bien égale à 244 (*i.e.* le nombre de lignes du tableau).
 
@@ -93,17 +87,17 @@ Sélectionner les occurences (cellules `E5` à `E11`) et cliquer dans le menu *I
 
 On peut améliorer ce graphique en modifiant les libellés des axes, en ajoutant un titre... N’hésitez pas à tester, en particulier ce qui est ci-dessous.
 
-##### avec LibreOffice
-
-Dans la partie *Séries de données*, après avoir cliquer dans la zone *Catégories*, cliquez sur l'icône à droite pour sélectionner la plage `F5:F11` (ou écrivez directement `F5:F11`). Puis cliquez sur *Terminer*.
-
 ##### avec Excel
 
 Dans le menu *Conception de la carte*, cliquer sur *Sélectionner des données*. Puis, dans la partie *Etiquettes*, vous pouvez soit aller sélectionner les étiquettes directement, soit écrire `F5:F11`.
 
-##### avec Google Sheets
+###### avec Google Sheets
 
 Dans l'*éditeur graphique* (à droite), cliquer sur *Ajouter Axe X*, puis cliquer l'icône tableau à droite. Puis, vous pouvez soit aller sélectionner les étiquettes directement, soit écrire `F5:F11`.
+
+###### avec LibreOffice
+
+Dans la partie *Séries de données*, après avoir cliquer dans la zone *Catégories*, cliquez sur l'icône à droite pour sélectionner la plage `F5:F11` (ou écrivez directement `F5:F11`). Puis cliquez sur *Terminer*.
 
 ### A FAIRE
 
@@ -122,14 +116,11 @@ On va faire ici une première version *à la main*. Nous verrons plus tard comme
 - On connaît les modalités donc on va écrire directement *Thur*, *Fri*, *Sat* et *Sun* dans les cellules `A4` à `A7`.
 - Dans la cellule `B4`, nous allons écrire la formule suivante qui calculer le nombre de fois qu'apparaît la valeur de la cellule `A4` dans la colonne `E` de la feuille `tips` :
 ```
-=NB.SI(tips.E:E;A4)
+=NB.SI(tips!E:E;A4)
 ```
 - Dupliquer cette formule aux cellules en dessous
 - Ecrivez dans la case `C3` le terme *Proportion*
-- Dans la cellule `C4`, nous allons calculer la part de la cellule `B4` sur la somme des cellules `B4` à `B7`, en utilisant la formule suivante :
-```
-=B4/SOMME($B$4:$B$7)
-```
+- Dans la cellule `C4`, nous allons calculer la part de la cellule `B4` sur la somme des cellules `B4` à `B7`, en utilisant la formule suivante : `=B4/SOMME($B$4:$B$7)`
     - Les `$` vont permettre de conserver les valeurs `B4` et `B7` de la formule lorsqu'on va la dupliquer aux cellules du dessous.
 - Il est possible de  mettre au format pourcentage (en cliquant sur *%* dans le menu ou dans *Format* -> *Numérique* -> *Pourcentage*)
 
