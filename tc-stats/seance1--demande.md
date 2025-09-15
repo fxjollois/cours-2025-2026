@@ -46,7 +46,8 @@ Différence entre Libre Office et Excel
     - le type de quartile (0 : minimum, 1 : Q1, 2 : médiane, 3 : Q3, 4 : maximum)
 - Pour les centiles, il existe la fonction `CENTILE()` qui prend 2 paramètres :
     - la plage des données (ici toujours `tips!A:A`)
-    - la valeur du centile (entre 0 et 1). Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
+    - la valeur du centile (entre 0 et 1).
+    - Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
 ```
 =CENTILE(tips!A:A;A13/100)
 ```
