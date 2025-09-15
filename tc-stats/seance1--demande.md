@@ -82,7 +82,7 @@ Une fois cela fait, dupliquez à l'aide de la souris cette formule aux cellules 
 
 #### Quatrième étape
 
-Sélectionner les occurences (cellules `E5` à `E11`) et cliquer dans le menu *Insertion* -> *Diagramme* (ou sur l'icône dédiée). On va garder comme type de diagramme celui en *colonne*. 
+Sélectionner les occurences (cellules `E5` à `E11`) et cliquer dans le menu *Insertion* -> *Graphiques recommandés* (ou sur l'icône dédiée). On va choisir *Histogramme*, même si c'est un diagramme en barres. 
 
 > Nous avons la répartition des valeurs selon des intervalles dont nous avons choisi les seuils.
 
