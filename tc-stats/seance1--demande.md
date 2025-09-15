@@ -48,7 +48,7 @@ Différence entre Libre Office et Excel
     - la plage des données (ici toujours `tips!A:A`)
     - la valeur du centile (entre 0 et 1). Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
 ```
-=CENTILE(tips.A:A;A13/100)
+=CENTILE(tips!A:A;A13/100)
 ```
 
 > Avec un peu de mise en page, nous avons un ensemble d'informations permettant déjà de mieux connaître la distribution du montant payé.
