@@ -29,9 +29,9 @@
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
 - [Séance 1 - Présentation et requêtes SQL initiales](sae-seance1)
-    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/tDnBGWzez9ma2dt>
+    - Rendu à faire sur cet espace : *en attente*
     - **Consignes** : 
-        - **Deadline** : 26 octobre - 23h59
+        - **Deadline** : 2 novembre - 23h59
         - **2 ou 3 étudiants par groupe**
         - Fichier notebook python `.ipynb` avec 
             - toute cellule nécessaire pour le fonctionnement de votre notebook
