@@ -435,14 +435,14 @@ pandas.DataFrame(list(c))
 
 1. Donner les styles de cuisine présent dans la collection
 1. Donner tous les grades possibles dans la base
-1. Compter le nombre de restaurants proposant de la cuisine fraçaise ("French")
+1. Compter le nombre de restaurants proposant de la cuisine française ("French")
 1. Compter le nombre de restaurants situé sur la rue "Central Avenue"
 1. Compter le nombre de restaurants ayant eu une note supérieure à 50
 1. Lister tous les restaurants, en n'affichant que le nom, l'immeuble et la rue
 1. Lister tous les restaurants nommés "Burger King" (nom et quartier uniquement)
 1. Lister les restaurants situés sur les rues "Union Street" ou "Union Square"
 1. Lister les restaurants situés au-dessus de la lattitude 40.90
-1. Lister les restaurants ayant eu un score de 0 et un grade "A"
+1. Lister les restaurants ayant eu un score de 0 et un grade "C"
 
 ### Questions complémentaires
 
@@ -450,5 +450,5 @@ Nécessitent une recherche sur la toile pour compléter ce qu'on a déjà vu dan
 
 1. Lister les restaurants (nom et rue uniquement) situés sur une rue ayant le terme "Union" dans le nom
 1. Lister les restaurants ayant eu une visite le 1er février 2014
-1. Lister les restaurants situés entre les longitudes -74.2 et -74.1 et les lattitudes 40.1 et 40.2
+1. Lister les restaurants situés entre les longitudes -74.2 et -74.1 et les lattitudes 40.5 et 40.6
 
