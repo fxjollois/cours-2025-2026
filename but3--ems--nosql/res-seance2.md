@@ -430,6 +430,7 @@ pandas.DataFrame(list(c))
 
 
 
+
 ## A faire
 
 1. Donner les styles de cuisine présent dans la collection

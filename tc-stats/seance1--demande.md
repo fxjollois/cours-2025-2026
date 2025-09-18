@@ -1,6 +1,6 @@
 # Statistiques descriptives sur tableur - Univarié
 
-Nous allons travailler sur les données contenu dans le fichier `tips`, au [format Excel](tips.xlsx). 
+Nous allons travailler sur les données contenues dans le fichier `tips`, au [format Excel](tips.xlsx) (**à télécharger** donc). 
 
 > Nota Bene : les noms des fonctions dans ce document sont valables dans **Excel**. Il est possible que certains soient différents dans les autres tableurs (me demander si cela ne fonctionne pas dans votre outil).
 
@@ -37,18 +37,19 @@ Différence entre Libre Office et Excel
 ### Ajout des calculs
 
 - Dans la case `B3`, écrivez la formule suivante : `=MOYENNE(tips!a:a)`
-    - notez qu'il est possible d'écrire en minuscule ou en majuscule les noms des fonctions
-    - **important** : `a:a` permet de choisir toute la colonne A, utile pour prendre en compte des données futures 
+    - **Important** : `tips!a:a` permet de choisir toute la colonne *A* de la feuille *tips*, utile pour prendre en compte des données futures 
+    - Notez qu'il est possible d'écrire en minuscule ou en majuscule les noms des fonctions
 - Pour l'écart-type, c'est la fonction `ECARTYPE.PEARSON()` qu'il faut utiliser (sur la même colonne)
 - Pour minimum, maximum et médiane, il existe les fonction `MIN()`, `MAX()` et `MEDIANE()`
-- Pour les quartiles, nous avons la fonction `QUARTILE()`, qui demande deux paramètres (séparés par un `";"`) :
+- Pour les quartiles, nous avons la fonction `QUARTILE.INCLUDE()`, qui demande deux paramètres (séparés par un `";"`) :
     - la plage des données (ici `tips!A:A`) 
     - le type de quartile (0 : minimum, 1 : Q1, 2 : médiane, 3 : Q3, 4 : maximum)
 - Pour les centiles, il existe la fonction `CENTILE()` qui prend 2 paramètres :
     - la plage des données (ici toujours `tips!A:A`)
-    - la valeur du centile (entre 0 et 1). Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
+    - la valeur du centile (entre 0 et 1).
+    - Nous allons donc écrire la formule suivante dans la cellule `B13`, qu'il faudra dupliquer sur les cellules en dessous donc
 ```
-=CENTILE(tips.A:A;A13/100)
+=CENTILE(tips!A:A;A13/100)
 ```
 
 > Avec un peu de mise en page, nous avons un ensemble d'informations permettant déjà de mieux connaître la distribution du montant payé.
@@ -81,7 +82,7 @@ Une fois cela fait, dupliquez à l'aide de la souris cette formule aux cellules 
 
 #### Quatrième étape
 
-Sélectionner les occurences (cellules `E5` à `E11`) et cliquer dans le menu *Insertion* -> *Diagramme* (ou sur l'icône dédiée). On va garder comme type de diagramme celui en *colonne*. 
+Sélectionner les occurences (cellules `E5` à `E11`) et cliquer dans le menu *Insertion* -> *Graphiques recommandés* (ou sur l'icône dédiée). On va choisir *Histogramme*, même si c'est un diagramme en barres. 
 
 > Nous avons la répartition des valeurs selon des intervalles dont nous avons choisi les seuils.
 
