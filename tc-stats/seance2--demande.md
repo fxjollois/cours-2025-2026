@@ -78,9 +78,10 @@ Si nous souhaitons avoir les profils lignes, nous pouvons changer le mode de cal
 
 Si vous avez fait attention, la *table dynamique* nous laisse la possibilité de calculer une moyenne dans chaque cellule.
 
-- Créez une *table dynamique* de la même façon que précédemment
-- Glissez `day` dans *Champs de ligne* et `total_bill` dans *Champs de données*
-- Double-cliquez sur *Somme - total_bill* et choisir *Moyenne*
+- Créez un *tableeau croisé dynamique* de la même façon que précédemment
+- Glissez `day` dans *Lignes* et `total_bill` dans *Valeurs*
+- Cliquez sur *Somme de total_bill* et choisir *Paramètres des champs de valeurs*
+- Choisir *Moyenne*
 - Cliquez sur *OK*
 
 > On a les moyennes des montants payés par jour de la semaine.
@@ -91,9 +92,9 @@ Renommez la feuille en `jour-montant` par exemple.
 
 Nous ne pouvons malheureusement pas faire de boîtes à moustaches. Toutefois, nous pouvons réaliser un diagramme en barres (plutôt horizontales) permettant de voir la différence entre les jours de la semaine.
 
-- Sélectionnez une des cellules de la table dynamique et insérer un diagramme
+- Sélectionnez une des cellules de la table dynamique et insérer un graphique
 - Choississez *Barre*
-- Cliquez sur *Terminer*
+- Cliquez sur *OK*
 
 > Ce graphique n'est pas correct statistiquement, mais permet tout de même de représenter la différence des moyennes entre les jours de la semaine
 
