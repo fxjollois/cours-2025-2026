@@ -6,13 +6,13 @@ Vous pouvez faire les calculs directement dans un tableur.
 
 ### Exercice 1 - Âge moyen des clients
 
-Une entreprise souhaite connaître l’âge de ces clients. Pour cela, elle réalise un sondage sur 120 personnes. Sur cet échantillon, on obtient un âge moyen de 35.0 et une variance de 15.08.
+Une entreprise souhaite connaître l’âge de ces clients. Pour cela, elle réalise un sondage sur 120 personnes. Sur cet échantillon, on obtient un âge moyen de 35.0 et un écart-type de 3.88.
 
 On souhaite avoir un intervalle de confiance de la moyenne des clients à 95%. Quel est-il ?
 
 ### Exercice 2 - Poids des bébés à la naissance
 
-Un hôpital fait une étude sur le poids des bébés à la naissance. Lors du mois écoulé, le poids moyen des 50 enfants nés a été de 3.55 kg et une variance de 0.32.
+Un hôpital fait une étude sur le poids des bébés à la naissance. Lors du mois écoulé, le poids moyen des 50 enfants nés a été de 3.55 kg et un écart-type de 0.56.
 
 - Déterminer l'intervalle de confiance à 95%
 - Une précédente étude avait conclus à un poids moyen à la naissance de 3.38 kg. Que peut-on dire ?
@@ -30,8 +30,8 @@ Peut-on dire qu’il y a une différence entre les deux ?
 
 On désire comparer la qualité de deux doseuses pour boîtes de haricots verts de quantité nominale égale à 800g. On prélève un échantillon de 200 éléments sur chacune des deux machines, ce qui donne les deux valeurs moyennes suivantes :
 
-- m1 = 807 et s = 9 pour la première machine
-- m2 = 805 et s = 8 pour la deuxième machine
+1. moyenne = 807 et écart-type = 9 pour la première machine
+2. moyenne = 805 et écart-type = 8 pour la deuxième machine
 
 Les dosages moyens de ces deux machines sont-ils différents au risque de 5% ? Sont-elles fiables par rapport au dosage de 800g à obtenir ?
 
