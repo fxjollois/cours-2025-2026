@@ -41,3 +41,13 @@
         - Séance 8 (RES) : TP Intégration dans un process dashboard
         - Séance 9 (RES) : TP noté 2
         - Séance 10 (SAE) : NoSQL -> SQL
+     
+
+--
+
+## Pour 2026-2027
+
+### BUT TC - Stats - Cherbourg
+
+- Changer de jeu de données
+- 
