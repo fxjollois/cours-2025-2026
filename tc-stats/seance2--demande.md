@@ -32,15 +32,14 @@ Nous allons continuer de travailler sur les données contenu dans le fichier `ti
 Nous pourrions faire comme précédemment, mais cela prendrait du temps et ne serait pas automatique (en cas d'ajout d'une modalité - un jour de la semaine par exemple). Nous allons utiliser une fonctionnalité très utile des tableurs, à savoir le *Tableau Croisé Dynamique*.
 
 - Dans la feuille `tips`, sélectionnez les colonnes `A` à `G`
-- Dans le menu, choississez *Insertion* -> *Table Dynamique*
+- Dans le menu, choississez *Insertion* -> *Tableau Croisé Dynamique*
 - Cliquez sur *OK* (on va garder la sélection déjà faite)
-- Glissez-déplacez `day` dans l'espace *Champs de ligne* et `sex` dans *Champs de colonnes*
-- Dans le *Champs de données*, on peut choisir `total_bill` par exemple. Vous voyez que par défaut, l'opération associé est la *Somme*. 
+- Glissez-déplacez `day` dans l'espace *Lignes* et `sex` dans *Colonnes*
+- Dans la partie *Valeurs*, on peut choisir `total_bill` par exemple. Vous voyez que par défaut, l'opération associé est la *Somme*. 
 - Pour avoir le nombre de valeurs, effectuez les opérations suivantes :
     - Cliquez sur *Somme - total_bill*
-    - Sélectionnez *Paramètres de valeurs*
+    - Sélectionnez *Paramètres des champs de valeurs*
     - Choisissez *Nombre* (puis *OK*)
-- Cliquez sur *OK*
 
 > Dans une nouvelle feuille, nous avons maintenant la table de contingence entre le jour de la semaine et le sexe de la personne qui paie la note.
 
@@ -53,9 +52,8 @@ Renommez cette feuille en lui donnant le titre `jour-sexe` par exemple.
 Si nous souhaitons avoir les profils lignes, nous pouvons changer le mode de calcul sur *total_bill*, en réalisant les opérations suivantes :
 
 - Clic droit dans le tableau dynamique
-- Dans *Champs de données*, double-cliquez sur *Compter - total_bill*
-- Cliquer sur le + de *Valeur affichée*
-- Choisissez *% de la ligne* et cliquez sur *OK*, puis *OK* encore
+- Dans *Paramètres des champs de valeurs*, allez dans l'onglet *Afficher les valeurs*
+- Choisissez *% du total de la ligne* et cliquez sur *OK*
 
 > On remarque qu'ainsi, en général (ligne du bas), la répartition est 1/3 des notes payées par des femmes et 2/3 payées par des hommes. Par contre, on remarque de grosses différences entre les jours de la semaine : la semaine, c'est 50-50, alors que le week-end (particulièrement le dimanche) c'est 3 fois sur 4 un homme qui paie.
 
