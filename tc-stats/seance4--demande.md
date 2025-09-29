@@ -75,7 +75,7 @@ Un test comporte 10 questions, avec chacune 4 choix possibles et une seule répo
 Supposons que nous avons un ensemble de 500 prospects, et on suppose qu'on a en général un taux de conversion de 20%. Nous avons 3 produits différents à vendre à ces prospects, le taux de conversion est supposé le même entre les 3. 
 
 1. Que puis-je dire de la variable aléatoire modélisant le nombre de clients, après une campagne auprès de ces prospects ?
-1. Suite à cette campagne, nous avons réussi à avoir 130 clients sur le produit 1, 110 clients sur le produit 2 et 80 clients sur le produit 3. Que peut-on dire de la performance de notre campagne pour chaque produit ?
+1. Suite à cette campagne, nous avons réussi à avoir 80 clients sur le produit 1, 110 clients sur le produit 2 et 130 clients sur le produit 3. Que peut-on dire de la performance de notre campagne pour chaque produit ?
 1. Quelle est la probabilité qu'une personne achète les 3 produits ? Seulement 2 ? Seulement 1 ? Aucun ? 
 1. Au final, combien de clients (quelque soit le produit) puis-je espérer avoir ?
 
