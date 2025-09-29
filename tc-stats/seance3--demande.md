@@ -15,7 +15,7 @@ On a vu que les tableaux (croisés) dynamiques permettent de calculer automatiqu
 - En cellule `A3`, écrire *Nombre de tables*
 - En cellule `B3`, écrire la formule `NBVAL(tips!A:A)-1`
     - `NBVAL()` permet de compter le nombre de cellules avec une valeur quelconque (donc non vide)
-    - Ici, il faut retirer un car la cellule `C1` ne doit pas être comptabilisée
+    - Ici, il faut retirer un car la première ligne ne doit pas être comptabilisée
 
 ### Compter avec une condition d'égalité
 

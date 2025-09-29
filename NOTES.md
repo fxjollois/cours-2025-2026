@@ -7,10 +7,8 @@
 
 ## BUT2 TC Cherbourg 
 
-- REVOIR séance 5 sur loi normale !!! Utilisez d'autres données
-- Tout sur Excel
+- Séance 5 à revoir !!!
 - TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
-- ATTENTION séance 5 avec le +/- 2 écart-type pouvant être incompréhensible après pour les étudiants.
 - Seance 6 : ne mettre que des écart-types
 
 ## INTECHMER
@@ -50,4 +48,4 @@
 ### BUT TC - Stats - Cherbourg
 
 - Changer de jeu de données
-- 
+- Revoir séances 1 et 2 (plus en adéquation avec Excel)
