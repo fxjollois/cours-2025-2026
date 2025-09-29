@@ -1,10 +1,7 @@
 # Rappels de probabilités
 
 
-Nous allons continuer de travailler sur les données contenu dans le fichier `tips`, dont voici les versions initiales si besoin :
-
-- [Format Excel](tips.xlsx)
-- [Format Libre Office](tips.ods)
+Nous allons continuer de travailler sur les données contenu dans le fichier `tips`, dont voici la version initiale si besoin [Format Excel](tips.xlsx).
 
 > Nota Bene : les noms des fonctions dans ce document sont valables dans **Excel**. Il est possible que certains soient différents dans les autres tableurs (me demander si cela ne fonctionne pas dans votre outil).
 
