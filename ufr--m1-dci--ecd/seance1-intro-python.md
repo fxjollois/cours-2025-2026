@@ -117,7 +117,7 @@ Il existe bien évidemment tous les opérateurs classiques, tels que présentés
 | - | - | 
 | Arithmétiques	| `+`, `-`, `*`, `/`, `//`, `%`, `**`|
 | Comparaisons	| `>`, `>=`, `<`, `<=`, `==`, `!=`| 
-| Booléens	| <code>&#124;</code>, `&`, `not()`| 
+| Booléens	| `|`, `&`, `not()`| 
     
 ---
 ## Eléments de langage
@@ -168,7 +168,7 @@ a[::]
 a[::-1]
 a[::2]
 a[1:5:2]
-a[5:1:2]
+a[5:1:-2]
 ```
 
 ---
