@@ -49,3 +49,7 @@
 
 - Changer de jeu de données
 - Revoir séances 1 et 2 (plus en adéquation avec Excel)
+- Séance 3 : mélanger Cours et Excel pour le rapprocher (et faire le début des exercices en cours)
+- Séance 4 : peut-être faire de même (exemple -> théorie -> exercice)
+    - Fournir un fichier avec les calculatrices déjà écrites
+
