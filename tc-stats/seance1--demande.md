@@ -100,10 +100,6 @@ Dans l'*éditeur graphique* (à droite), cliquer sur *Ajouter Axe X*, puis cliqu
 
 Dans la partie *Séries de données*, après avoir cliquer dans la zone *Catégories*, cliquez sur l'icône à droite pour sélectionner la plage `F5:F11` (ou écrivez directement `F5:F11`). Puis cliquez sur *Terminer*.
 
-### A FAIRE
-
-> Reproduisez les mêmes opérations pour la variable `tip` (*pourboire*) dans une nouvelle feuille
-
 
 ## Analyse d'une variable qualitative
 
@@ -131,9 +127,11 @@ De la même façon que précédemment, vous pouvez réaliser un diagramme en bar
 
 > Réaliser les deux types de graphiques
 
-### A FAIRE
+## A FAIRE
 
-> Reproduisez ces opérations pour les variables `sex` et `size` dans une nouvelle feuille à chaque fois
+> Reproduisez les mêmes opérations pour la variable quantitative `tip` (*pourboire*) dans une nouvelle feuille
+
+> Reproduisez ces opérations pour les variables qualitatives `sex` et `size` dans une nouvelle feuille à chaque fois
 
 ## Compléments
 
