@@ -41,7 +41,7 @@ Différence entre Libre Office et Excel
     - Notez qu'il est possible d'écrire en minuscule ou en majuscule les noms des fonctions
 - Pour l'écart-type, c'est la fonction `ECARTYPE.PEARSON()` qu'il faut utiliser (sur la même colonne)
 - Pour minimum, maximum et médiane, il existe les fonction `MIN()`, `MAX()` et `MEDIANE()`
-- Pour les quartiles, nous avons la fonction `QUARTILE.INCLUDE()`, qui demande deux paramètres (séparés par un `";"`) :
+- Pour les quartiles, nous avons la fonction `QUARTILE.INCLURE()`, qui demande deux paramètres (séparés par un `";"`) :
     - la plage des données (ici `tips!A:A`) 
     - le type de quartile (0 : minimum, 1 : Q1, 2 : médiane, 3 : Q3, 4 : maximum)
 - Pour les centiles, il existe la fonction `CENTILE()` qui prend 2 paramètres :
