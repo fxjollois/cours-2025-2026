@@ -20,7 +20,7 @@
 
 - Séance 4 - Lois de probabilité : [cours](seance4--lois-proba) - [tp](seance4--demande)
 
-- Séance 5 - Loi Normale : [tp](seance5--loi-normale)
+- Séance 5 - suite du TP précédent
 
 - Séance 6 - Estimation par intervalles : [cours](seance6--estimation-intervalle) - [tp](seance6--demande)
 
