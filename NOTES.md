@@ -7,6 +7,8 @@
 
 ## BUT2 TC Cherbourg 
 
+séance 3 -> faire des calculs de probabilités + recherche de dépendance (avec P(A et B) =? P(A) * P(B) et des calculs de P(A / B) et P(A / B complémentaire) par exemple)
+
 - Séance 5 à revoir !!!
 - TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
 - Seance 6 : ne mettre que des écart-types
