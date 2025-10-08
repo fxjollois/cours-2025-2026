@@ -49,7 +49,7 @@ Ici, on compte le nombre de lignes qui respectent une ou plusieurs conditions
 
 ### Lien entre le nombre de convives et le sexe de la personne qui paie
 
-1. Compter le nombre de tables à un ou deux convives, trois convives, et quatre ou plus (3 calculs donc)
+1. Compter le nombre de tables à *"un ou deux"* convives, *"trois"* convives, et *"quatre ou plus"* (3 calculs donc)
 1. Pour chaque cas ci-dessus, compter le nombre de fois où c'est une femme qui a payé
 1. Calculer le pourcentage pour chaque cas, et comparer au pourcentage de femmes
   
