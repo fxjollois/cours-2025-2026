@@ -16,7 +16,6 @@ class: middle, center, inverse, title
 - [`pandas`](https://pandas.pydata.org) : manipulation de données
 - [`seaborn`](https://seaborn.pydata.org) : visualisation statistique de données
 
-.footnote[.small[La dernière ligne permettra de voir le résultat des graphiques dans le document.]]
 
 ```python
 import matplotlib.pyplot
@@ -24,9 +23,9 @@ import scipy.stats
 import numpy
 import pandas
 import seaborn
-
-%matplotlib inline
 ```
+
+L'installation de `seaborn` doit suffire à installer tous les packages manquants.
 
 ---
 ## Données
