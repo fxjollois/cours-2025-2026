@@ -5,7 +5,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 ### M1 Informatique - Parcours DCI (Données, Connaissances, Intelligence)
 
 1. [Introduction à Python](seance1-intro-python)
-    <!-- - [correction](seance1-correction.html) -->
+    - [correction](seance1-correction.html) 
 
 2. [Manipulation et Visualisation de données](seance2-stat-python)
     <!-- - [correction](seance2-correction.html) -->
