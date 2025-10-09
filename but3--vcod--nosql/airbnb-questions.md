@@ -1,7 +1,18 @@
+# TP récapitulatif
 
 ## Données AirBnB
 
 Nous allons travailler sur des données AirBnB. Celles-ci sont stockées sur le serveur Mongo dans la collection `listingsAndReviews` de la base `sample_airbnb`.
+
+```python
+import pymongo
+URI = 'mongodb+srv://user:user@cluster0.ougec.mongodb.net'
+client = pymongo.MongoClient(URI) # enlever le paramètre URI si connexion locale
+db = client.sample_airbnb
+list(db.listingsAndReviews.find(limit = 1))
+```
+
+Elles sont aussi disponibles en téléchargement via [ce lien](https://cloud.parisdescartes.fr/index.php/s/bRYdarwyaHmBc34)
 
 > [Aide sur les données](https://docs.atlas.mongodb.com/sample-data/sample-airbnb)
 
@@ -24,3 +35,5 @@ Une fois créée la connexion à la collection dans Python, répondre aux questi
 1. On veut représenter la distribution du nombre d'avis. Il faut donc calculer pour chaque logement le nombre d'avis qu'il a eu (cf `reviews`)
 1. Compter le nombre de logement pour chaque équipement possible
 1. On souhaite connaître les 10 utilisateurs ayant fait le plus de commentaires
+
+**ATTENTION** : il est demander de stocker le résultat dans une variable (de type `list` ou `DataFrame pandas` avant de l'afficher)
