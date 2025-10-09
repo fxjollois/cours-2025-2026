@@ -58,3 +58,7 @@
     - Séance 4 que Binomiale
 - Séance 5 : que Poisson !
 
+### BUT SD - NoSQL
+
+- SAE : faire du rétro-engineering sur la base Restaurants
+
