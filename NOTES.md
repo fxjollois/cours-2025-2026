@@ -40,6 +40,13 @@
 - SAE :
     - séance 2 : faire du rétro-engineering sur la base Restaurants par exemple
  
-
+Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
+1. Intro à NoSQL (très court) et à MongoDB sur 1h/1h30 + premier pas (intégration de données via Compass + dénombrement + distinct + find) Mongo sur 1h30
+2. Cours sur aggrégat et le pipeline sur 1h/1h30 + TP 2 sur 1h30
+3. Cours sur jointure & import/export données via python sur 1h/1h30 + TP 3 sur 1h30
+4. Petit récap 1h + TP noté (intégration de données au format JSON initialement + questions bien pointues)
+5. Cours sur gestion des données imbriquées dans Python sur 1h/1h3 & accès par paquet à des grosses données + TP 4 sur 1h30
+6. Process Dashboard ? autre chose ?
+7. Evaluation finale
 
 
