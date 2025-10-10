@@ -366,7 +366,7 @@ t.plot.pie(subplots = True, figsize = (6, 6))
 ## Quantitative - quantitative
 
 ```python
-tips.corr()
+tips.corr(numeric_only = True)
 tips.total_bill.cov(tips.tip)
 tips.total_bill.corr(tips.tip)
 ```
@@ -473,7 +473,7 @@ seaborn.catplot(x = "sex", y = "value", col = "smoker", data = tm, kind = "bar")
 - Calcul des moyennes par modalités
 
 ```python
-tips.groupby("sex").mean()
+tips.groupby("sex").mean(numeric_only = True)
 tips.groupby("sex")["total_bill"].agg([numpy.mean, numpy.std, numpy.median, numpy.min, numpy.max])
 ```
 
