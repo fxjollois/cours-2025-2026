@@ -30,8 +30,9 @@
     - Faire des calculs de probabilités + recherche de dépendance (avec P(A et B) =? P(A) * P(B) et des calculs de P(A / B) et P(A / B complémentaire) par exemple)
 - Séance 4 : peut-être faire de même (exemple -> théorie -> exercice)
     - Fournir un fichier avec les calculatrices déjà écrites
-    - Séance 4 que Binomiale
-- Séance 5 : que Poisson !
+    - Séance 4 que Binomiale ?
+    - Faire en cours un semblant de test avec les étudiants
+- Séance 5 : Poisson + Normale peut-être
 
 ### BUT SD - NoSQL
 
