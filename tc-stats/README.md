@@ -10,6 +10,12 @@
     - https://learn.microsoft.com/fr-fr/power-bi/create-reports/sample-datasets
 -->
 
+Pour information, pour chaque groupe, séances réalisées :
+- ALT : 1, 2, 3, 4a et 4b
+- BI : 1, 2, 3, 4a et 4b, 6a
+- MD : 1, 2, 3, 4a et 4b
+- MPV : 1, 2, 3, 4a et 4b
+
 ### BUT2 TC - IUT de Cherbourg
 
 - Séance 1 - Statistique Univariée : [cours](seance1--stat-uni) - [tp](seance1--demande)
