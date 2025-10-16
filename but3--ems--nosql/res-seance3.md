@@ -478,7 +478,7 @@ pandas.merge(df.drop("grades", axis = 1), dfgrades.reset_index())
         3. regroupement avec `push`
         4. `slice` pour prendre une partie d'un tableau
 
-
+<!--
 ## Données AirBnB
 
 Nous allons travailler sur des données AirBnB. Celles-ci sont stockées sur le serveur Mongo dans la collection `listingsAndReviews` de la base `sample_airbnb`.
@@ -504,3 +504,5 @@ Une fois créée la connexion à la collection dans Python, répondre aux questi
 1. On veut représenter la distribution du nombre d'avis. Il faut donc calculer pour chaque logement le nombre d'avis qu'il a eu (cf `reviews`)
 1. Compter le nombre de logement pour chaque équipement possible
 1. On souhaite connaître les 10 utilisateurs ayant fait le plus de commentaires
+
+-->
