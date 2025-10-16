@@ -11,7 +11,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [correction](seance2-correction.html)
 
 3. [Représentation multidimensionnelle via l'ACP](seance3-acp.html)
-    <!-- - [sous `python`](seance3-acp-python.html) -->
+    - [sous `python`](seance3-acp-python.html)
     <!-- - [correction `Wine`](seance3-correction-wine.html) -->
     <!-- - [correction `WGI`](seance3-correction-wgi.html) -->
 
