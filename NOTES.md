@@ -52,3 +52,7 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 7. Evaluation finale
 
 
+## INTECHMER
+
+- CT2 STM018 : 
+    - CM 1 : Faire plus "théorique" et aucun code dedans !

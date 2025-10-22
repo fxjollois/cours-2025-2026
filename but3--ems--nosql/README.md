@@ -29,7 +29,7 @@
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
 - [Séance 1 - Présentation et requêtes SQL initiales](sae-seance1)
-    - Rendu à faire sur cet espace : *en attente*
+    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/Jnao9bHGGbJDr8a>
     - **Consignes** : 
         - **Deadline** : 2 novembre - 23h59
         - **2 ou 3 étudiants par groupe**

@@ -68,6 +68,17 @@ Quelques points à noter :
 
 Les données sont accessibles sur le serveur distant, dans la collection **`movies`** de la base de données **`sample_mflix`**.
 
+```python
+import pymongo
+URI = 'mongodb+srv://user:user@cluster0.ougec.mongodb.net/test'
+client = pymongo.MongoClient(URI)
+db = client.sample_mflix
+
+# Et pour y accéder (premier élément de la collection ici)
+list(db.movies.find(limit = 1))
+```
+
 **ATTENTION A BIEN METTRE LE CODE ET PAS LE RESULTAT !!!**
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdN74CskSAAAftcRNoPkmeEgQe-zHacSHOJnYmndA3G18QkmQ/viewform?embedded=true" width="800" height="2405" frameborder="0" marginheight="0" marginwidth="0">Chargement…</iframe>
+https://docs.google.com/forms/d/e/1FAIpQLSdcDcAcr8FrGFW-4sogvSIuNYO0_sn-uzUT3kGs3PGqQBn2Wg/viewform?usp=header
+

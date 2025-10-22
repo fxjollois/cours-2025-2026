@@ -66,11 +66,21 @@ Quelques points à noter :
 
 ## Questions
 
-Les données sont accessibles sur le serveur distant, dans la collection **`movies`** de la base de données **`sample_mflix`**.
+Les données sont accessibles sur le serveur distant, dans la collection **`movies`** de la base de données **`sample_mflix`**. Voici le code pour vous y connecter :
+
+```python
+import pymongo
+URI = 'mongodb+srv://user:user@cluster0.ougec.mongodb.net/test'
+client = pymongo.MongoClient(URI)
+db = client.sample_mflix
+
+# Et pour y accéder (premier élément de la collection ici)
+list(db.movies.find(limit = 1))
+```
 
 **ATTENTION A BIEN METTRE LE CODE ET PAS LE RESULTAT !!!**
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdWjDf3dPvCIjpAI2JBNbRrSn7C_TGl0jLCmsCKrQw5Ztl91g/viewform?embedded=true" width="800" height="2429" frameborder="0" marginheight="0" marginwidth="0">Chargement…</iframe>
+<iframe src="" width="800" height="2429" frameborder="0" marginheight="0" marginwidth="0">Chargement…</iframe>
 
 <!--
 - Combien y-a-t'il de films en tout dans la base ?
