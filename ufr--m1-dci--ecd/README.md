@@ -16,7 +16,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [correction `WGI`](seance3-correction-wgi.html)
 
 4. [Représentation multidimensionnelle via l'AFC](seance4-afc.html)
-    <!-- - [sous `python`](seance4-afc-python.html) -->
+    - [sous `python`](seance4-afc-python.html)
     <!-- - [correction](seance4-afc-correction.html) -->
 
 5. [Application sur données réelles](seance5-donnees-reelles-1.html)
