@@ -19,7 +19,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [sous `python`](seance4-afc-python.html)
     <!-- - [correction](seance4-afc-correction.html) -->
 
-<!-- 5. [Application sur données réelles](seance5-donnees-reelles-1.html)
+5. [Application sur données réelles](seance5-donnees-reelles-1.html)
     <!-- - [correction `pendigits`](seance5-correctionA.html) -->
     <!-- - [correction `hadCRUT5`](seance5-correctionB.html) -->
 
