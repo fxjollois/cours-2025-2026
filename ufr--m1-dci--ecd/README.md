@@ -25,18 +25,24 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 
 <!--
 6. [TP noté 1](seance6-tpnote1.html)
+-->
 
 <!--
 7. [Classification avec CAH et k-means](seance7-classif.html)
-    <!-- - [sous `python`](seance7-classif-python.html) -->
-    <!-- - [correction](seance7-correction.html) -->
+-->
+
+<!-- - [sous `python`](seance7-classif-python.html) -->
+<!-- - [correction](seance7-correction.html) -->
     
 <!--
 8. [Application sur données réelles](seance8-donnees-reelles.html)
-    <!-- - [correction](seance8-correction.html) -->
+-->
+
+<!-- - [correction](seance8-correction.html) -->
 
 <!--
 9. [Autres méthodes](seance9-autres-methodes.html)
+-->
 
 <!--
 10. <span id = "final">En attente</span>
