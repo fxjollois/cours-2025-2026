@@ -19,21 +19,26 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [sous `python`](seance4-afc-python.html)
     <!-- - [correction](seance4-afc-correction.html) -->
 
-5. [Application sur données réelles](seance5-donnees-reelles-1.html)
+<!-- 5. [Application sur données réelles](seance5-donnees-reelles-1.html)
     <!-- - [correction `pendigits`](seance5-correctionA.html) -->
     <!-- - [correction `hadCRUT5`](seance5-correctionB.html) -->
 
+<!--
 6. [TP noté 1](seance6-tpnote1.html)
 
+<!--
 7. [Classification avec CAH et k-means](seance7-classif.html)
     <!-- - [sous `python`](seance7-classif-python.html) -->
     <!-- - [correction](seance7-correction.html) -->
     
+<!--
 8. [Application sur données réelles](seance8-donnees-reelles.html)
     <!-- - [correction](seance8-correction.html) -->
 
+<!--
 9. [Autres méthodes](seance9-autres-methodes.html)
 
+<!--
 10. <span id = "final">En attente</span>
 
 <script>
@@ -42,6 +47,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
         document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
     }
 </script>
+-->
 
 <!--
 - Nouveau programme :
