@@ -14,11 +14,11 @@ Lien vers le [cours Moodle](https://par.moodle.lecnam.net/course/view.php?id=226
     3. [TD3 - Classification](td3--classif.html)
 -   **TP**
     1. [TP1 - Données Adult](tp1--adult.html)
-      - Correction : [html produit](tp1--correction.html) et [fichier Rmd](tp1--correction.Rmd)
+      <!-- - Correction : [html produit](tp1--correction.html) et [fichier Rmd](tp1--correction.Rmd) -->
     2. [TP2 - Données Wine](tp2--wine.html)
-      - Correction : [html produit](tp2--correction.html) et [fichier Rmd](tp2--correction.Rmd)
+      <!-- - Correction : [html produit](tp2--correction.html) et [fichier Rmd](tp2--correction.Rmd) -->
     3. [TP3 -- Données Planctons](tp3--planctons.html)
-      - Correction : [html produit](tp3--correction.html) et [fichier Rmd](tp3--correction.Rmd)
+      <!-- - Correction : [html produit](tp3--correction.html) et [fichier Rmd](tp3--correction.Rmd) -->
 
 <!--
 Programme à faire :
