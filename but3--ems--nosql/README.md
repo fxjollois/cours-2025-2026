@@ -39,6 +39,12 @@
         - **LES NOMS de FAMILLE des étudiants dans le NOM du FICHIER !!!**
 
 - [Séance 2 - Réflexion sur le passage du modéle relationnel à un modèle à base de documents](sae-seance2)
+    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/oymPQt42YJXG6Pi>
+    - **Consignes** : 
+        - **Deadline** : 16 novembre - 23h59
+        - **Mêmes groupes que rendu précédent**
+        - Fichier `PDF`
+        - **LES NOMS de FAMILLE des étudiants dans le NOM du FICHIER !!!**
 
 - [Séance 3 - Passage SQL <-> NoSQL sous Python](sae-seance3)
 
