@@ -7,6 +7,7 @@
 
 ## BUT2 TC Cherbourg 
 
+- Mettre tous les exercices avec des données de commerce !!
 - CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 !!!
 - TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
 
