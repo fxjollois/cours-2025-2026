@@ -153,7 +153,7 @@ pandas.DataFrame(list(db.Gymnases.aggregate([
 
 ### Importation des données dans Mongo
 
-Dans Compass, vous allez charger les données présentes dans le fichier [movies.json](https://fxjollois.github.io/donnees/movies.json). Pour cela, dans le logiciel, suivez les étapes suivantes :
+Dans Compass, vous allez charger les données présentes dans le fichier [movies.json](https://fxjollois.github.io/donnees/Movies/movies.json). Pour cela, dans le logiciel, suivez les étapes suivantes :
 
 - Cliquer sur le **+** à droite du nom de la BD `SAE`
 - Ecrire le nom de la nouvelle collection (`movies` par exemple)
