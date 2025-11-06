@@ -31,7 +31,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 
 <script>
     const date = new Date();
-    console.log(data.toJSON());
+    console.log(date.toJSON());
     if (date.toJSON().slice(0, 10) == "2025-11-06" & date.toJSON().slice(11, 13) >= 8) { 
         document.getElementById("intermediaire").href = "seance6-tpnote1.html";
     }
