@@ -168,6 +168,10 @@ Les données sont maintenant dans Mongo. On peut voir le contenu du premier docu
 db.movies.find_one()
 ```
 
+L'idée est d'avoir le schéma ER suivant à la fin.
+
+![Schéma ER de la base Movies](https://fxjollois.github.io/donnees/Movies/movies.png)
+
 ### Création de la BD SQLite
 
 ```python
