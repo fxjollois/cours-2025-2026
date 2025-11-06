@@ -69,7 +69,7 @@ seances.query('IdGymnase == @id')
 Ensuite, pour supprimer les colonnes `IdGymnase` et `IdSport`, on peut procéder ainsi.
 
 ```python
-seances.query('IdGymnase == @id').drop(columns = [["IdGymnase", "IdSport"]])
+seances.query('IdGymnase == @id').drop(columns = ["IdGymnase", "IdSport"])
 ```
 
 Enfin, pour transformer le résultat (qui est un DataFrame) en un dictionnaire python, nous utilisons la fonction `to_dict()`, avec en paramètre `orient` égal à `records`, ceci permet de faire un tableau de dictionnaires.
