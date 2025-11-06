@@ -27,6 +27,16 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 6. [TP noté 1](seance6-tpnote1.html)
 -->
 
+6. <span id = "intermediaire">TP noté 1 - sujet en attente</span>
+
+<script>
+    const date = new Date();
+    if (date.toJSON().slice(0, 10) == "2025-11-06" & date.toJSON().slice(11, 13) >= 9) { 
+        document.getElementById("intermediaire").innerHTML = "<a href='seance6-tpnote1.html'>TP noté 1</a>";
+    }
+</script>
+
+
 <!--
 7. [Classification avec CAH et k-means](seance7-classif.html)
 -->
