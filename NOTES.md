@@ -7,8 +7,6 @@
 
 ## BUT2 TC Cherbourg 
 
-- Mettre tous les exercices avec des données de commerce !!
-- CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 !!!
 - TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
 
 ## INTECHMER
@@ -26,6 +24,7 @@
 
 - DIAPOS en PowerPoint !
 - Changer de jeu de données
+- Mettre tous les exercices avec des données de commerce !!
 - Revoir séances 1 et 2 (plus en adéquation avec Excel)
     - Création histogramme et boîte à moustache dans Excel
 - Séance 3 : mélanger Cours et Excel pour le rapprocher (et faire le début des exercices en cours)
@@ -35,6 +34,9 @@
     - Séance 4 que Binomiale ?
     - Faire en cours un semblant de test avec les étudiants
 - Séance 5 : Poisson + Normale peut-être
+- Séance 6 : attention à **9** années seulement dans l'exemple sur IC moyenne
+- Découper la séance 6 en deux séances !
+- CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 ?
 
 ### BUT SD - NoSQL
 

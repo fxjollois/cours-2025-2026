@@ -28,6 +28,13 @@ Pour information, pour chaque groupe, séances réalisées :
 - Séance 8 - Application sur données réelles 1 : [tp](seance7--application1)
 - Séance 9 - Application sur données réelles 2 : [tp](seance8--application2)
 
+<!--
+Lien livres intéressants :
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007256537505141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&query=any,contains,%22techniques%20quantitatives%22&pfilter=rtype,exact,books&offset=20
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007257588505141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&isFrbr=true&tab=Everything&query=any,contains,%22techniques%20quantitatives%22&sortby=date_d&facet=frbrgroupid,include,9015636903584177683&offset=0
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007245987905141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&isFrbr=true&tab=Everything&query=any,contains,statistique%20commerce&sortby=date_d&pfilter=rtype,exact,books&offset=10
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007266139305141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&query=any,contains,statistique%20commerce&sortby=date_d&pfilter=rtype,exact,books&offset=10
+-->
 
 <!--
 
