@@ -22,9 +22,8 @@
 - [Séance 2 - Premier pas avec MongoDB](res-seance2)
 - [Séance 3 - Agrégats et plus encore](res-seance3)
 - [Séance 4 - Récapitulatif](res-seance4)
-- [Séance 5 - TP noté 1](https://moodle.u-pariscite.fr/course/view.php?id=50353) (sur Moodle)
-- [Séance 6 - Jointures, import/export de données, intégration](res-seance6)
-- [Séance 7 - TP noté 2](res-tpnote2)
+- [Séance 5 - Jointures et intégration](res-seance6)
+- [Séance 6 - TP noté]() sur Moodle
 
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
