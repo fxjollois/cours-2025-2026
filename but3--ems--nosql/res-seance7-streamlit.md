@@ -386,9 +386,9 @@ with col2:
     streamlit.dataframe(temp, hide_index = True, height = 750, use_container_width = True)
 ```
 
-# Séance 6 - Demande sur `streamlit`
+## Demande sur `streamlit`
 
-Nous allons travailler sur la production scientifique mondiale, depuis 1996. Les données ont été collectées à partir du site [SCImago Journal & Country Rank](http://www.scimagojr.com/help.php). Nous utiliserons le fichier [scimagojr.csv](https://fxjollois.github.io/donnees/scimagojr/scimagojr.csv) au format CSV (plus d'infos sur [cette page](https://fxjollois.github.io/donnees/scimagojr)). A partir de ces données, on veut produire un tableau de bord schématisé ci-dessous, avec trois graphiques :
+A partir de ces données, on veut produire un tableau de bord schématisé ci-dessous, avec trois graphiques :
 
 1. Production scientifique par région 
     - Diagramme en barres
