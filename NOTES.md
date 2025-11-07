@@ -20,6 +20,8 @@
 
 ## Pour 2026-2027
 
+> **REFAIRE LES SLIDES AVEC GOOGLE SLIDES ou POWERPOINT ou LIBRE OFFICE**
+
 ### BUT TC - Stats - Cherbourg
 
 - DIAPOS en PowerPoint !
