@@ -23,11 +23,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [correction `pendigits`](seance5-correction-pendigits.html)
     - [correction `hadCRUT5`](seance5-correction-hadcrut.html)
 
-<!--
-6. [TP noté 1](seance6-tpnote1.html)
--->
-
-6. <a href = "#" id = "intermediaire">TP noté 1 - sujet en attente</a>
+6.TP noté 1 -  <a href = "#" id = "intermediaire">sujet en attente</a>
 
 <script>
     const date = new Date();
