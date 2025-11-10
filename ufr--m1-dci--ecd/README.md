@@ -34,6 +34,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     console.log(date.toJSON());
     if (date.toJSON().slice(0, 10) == "2025-11-10" & date.toJSON().slice(11, 13) >= 9 & date.toJSON().slice(14, 16) >= 30) { 
         document.getElementById("intermediaire").href = "seance6-tpnote1.html";
+        document.getElementById("intermediaire").innerHTML = "Cliquer ici pour voir le sujet";
     }
 </script>
 
