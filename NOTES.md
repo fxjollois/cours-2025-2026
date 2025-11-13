@@ -56,6 +56,11 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 6. Process Dashboard ? autre chose ?
 7. Evaluation finale
 
+**OU ALORS**
+- Intro NoSQL très courte + MongoDB sur 3 séances (premiers pas ; agrégats ; récap + tp noté)
+- Cassandra sur 2 séances (premiers pas ; récap + tp noté)
+- Neo4J sur 2 séances (premiers pas ; récap + tp noté)
+
 
 ## INTECHMER
 
