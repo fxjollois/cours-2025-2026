@@ -25,16 +25,6 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 
 6. TP noté 1 -  <a href = "#" id = "intermediaire">sujet en attente</a>
 
-<script>
-    const date = new Date();
-    console.log(date.toJSON());
-    if (date.toJSON().slice(0, 10) == "2025-11-10" & date.toJSON().slice(11, 13) >= 9) { 
-        console.log("Sujet à afficher")
-        document.getElementById("intermediaire").href = "seance6-tpnote1.html";
-        document.getElementById("intermediaire").innerHTML = "Cliquer ici pour voir le sujet";
-    }
-</script>
-
 7. [Classification avec CAH et k-means](seance7-classif.html)
 
 <!-- - [sous `python`](seance7-classif-python.html) -->
@@ -81,4 +71,14 @@ Lien vers les plateformes de l'UFR Math-Info :
 - [JupyterHub](https://jupyter.ens.math-info.univ-paris5.fr/)
 - [RStudio](https://rstudio.ens.math-info.univ-paris5.fr/)
 -->
+
+<script>
+    const date = new Date();
+    console.log(date.toJSON());
+    if (date.toJSON().slice(0, 10) == "2025-11-10" & date.toJSON().slice(11, 13) >= 9) { 
+        console.log("Sujet à afficher")
+        document.getElementById("intermediaire").href = "seance6-tpnote1.html";
+        document.getElementById("intermediaire").innerHTML = "Cliquer ici pour voir le sujet";
+    }
+</script>
 
