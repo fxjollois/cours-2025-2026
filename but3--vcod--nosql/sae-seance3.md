@@ -259,4 +259,3 @@ Vous pouvez ouvrir votre base de données avec DBeaver (par exemple) pour voir l
 - On va faire de même pour le champs `tomatoes`.
 
 
-
