@@ -42,13 +42,6 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 
 <!--
 10. <span id = "final">En attente</span>
-
-<script>
-    const date = new Date();
-    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
-        document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
-    }
-</script>
 -->
 
 <!--
@@ -73,6 +66,7 @@ Lien vers les plateformes de l'UFR Math-Info :
 -->
 
 <script>
+    // SCRIPT POUR TP NOTE 1 - CC
     const date = new Date();
     console.log(date.toJSON());
     if (date.toJSON().slice(0, 10) == "2025-11-10" & date.toJSON().slice(11, 13) >= 9) { 
@@ -82,3 +76,10 @@ Lien vers les plateformes de l'UFR Math-Info :
     }
 </script>
 
+<script>
+    // SCRIPT POUR TP NOTE 2 - EXAMEN FINAL
+    const date = new Date();
+    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
+        document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
+    }
+</script>
