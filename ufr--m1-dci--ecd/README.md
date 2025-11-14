@@ -35,10 +35,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     }
 </script>
 
-
-<!--
 7. [Classification avec CAH et k-means](seance7-classif.html)
--->
 
 <!-- - [sous `python`](seance7-classif-python.html) -->
 <!-- - [correction](seance7-correction.html) -->
