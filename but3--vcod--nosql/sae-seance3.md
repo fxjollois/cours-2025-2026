@@ -88,7 +88,7 @@ liste
 On peut maintenant ajouter ceci au DataFrame `gymnases`, comme ci-dessous.
 
 ```python
-gymnases = gymnases.assign(Seances = liste)
+gymnases2 = gymnases.assign(Seances = liste)
 gymnases.head()
 ```
 
@@ -97,7 +97,7 @@ gymnases.head()
 Grâce à la même fonction `to_dict()` et la fonction `insert_many()` sur une collection, nous allons pouvoir intégrer les données à Mongo. Le code suivant va donc créer la BD `SAE` (car vide pour le moment), puis la collection `Gymnases`, et ensuite y placer toutes les données.
 
 ```python
-db.Gymnases.insert_many(gymnases.to_dict(orient = "records"))
+db.Gymnases.insert_many(gymnases2.to_dict(orient = "records"))
 ```
 
 Vous pouvez aller voir le résultat dans Compass. Vous pouvez aussi tester directement en interrogeant Mongo pour le nombre de documents de la collection :
