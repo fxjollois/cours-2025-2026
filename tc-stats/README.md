@@ -19,21 +19,22 @@ Pour information, pour chaque groupe, séances réalisées :
 ### BUT2 TC - IUT de Cherbourg
 
 - Séance 1 - Statistique Univariée : [cours](seance1--stat-uni) - [tp](seance1--demande)
-
 - Séance 2 - Statistique Bivariée : [cours](seance2--stat-bi) - [tp](seance2--demande)
-
 - Séance 3 - Rappels de probabilité : [cours](seance3--rappels-proba) - [tp](seance3--demande)
-
 - Séance 4 - Lois de probabilité : [cours](seance4--lois-proba) - [tp](seance4--demande)
-
 - Séance 5 - suite du TP précédent
-
 - Séance 6 - Estimation par intervalles : [cours](seance6--estimation-intervalle) - [tp](seance6--demande)
+- Séance 7 - suite du TP précédent
+- Séance 8 - Application sur données réelles 1 : [tp](seance7--application1)
+- Séance 9 - Application sur données réelles 2 : [tp](seance8--application2)
 
-- Séance 7 - Application sur données réelles 1 : [tp](seance7--application1)
-
-- Séance 8 - Application sur données réelles 2 : [tp](seance8--application2)
-
+<!--
+Lien livres intéressants :
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007256537505141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&query=any,contains,%22techniques%20quantitatives%22&pfilter=rtype,exact,books&offset=20
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007257588505141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&isFrbr=true&tab=Everything&query=any,contains,%22techniques%20quantitatives%22&sortby=date_d&facet=frbrgroupid,include,9015636903584177683&offset=0
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007245987905141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&isFrbr=true&tab=Everything&query=any,contains,statistique%20commerce&sortby=date_d&pfilter=rtype,exact,books&offset=10
+https://catalogue.unicaen.fr/discovery/fulldisplay?docid=alma991007266139305141&context=L&vid=33PNU_UDC_INST:33PNU_UDC_INST&lang=fr&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&query=any,contains,statistique%20commerce&sortby=date_d&pfilter=rtype,exact,books&offset=10
+-->
 
 <!--
 

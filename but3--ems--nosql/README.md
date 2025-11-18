@@ -22,9 +22,9 @@
 - [Séance 2 - Premier pas avec MongoDB](res-seance2)
 - [Séance 3 - Agrégats et plus encore](res-seance3)
 - [Séance 4 - Récapitulatif](res-seance4)
-- [Séance 5 - TP noté 1](res-tpnote1)
-- [Séance 6 - Jointures, import/export de données, intégration](res-seance6)
-- [Séance 7 - TP noté 2](res-tpnote2)
+- [Séance 5 - Jointures et intégration](res-seance5)
+- [Séance 6 - TP noté]() sur Moodle
+- [Séance 7 - Streamlit](res-seance7-streamlit)
 
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
@@ -39,8 +39,31 @@
         - **LES NOMS de FAMILLE des étudiants dans le NOM du FICHIER !!!**
 
 - [Séance 2 - Réflexion sur le passage du modéle relationnel à un modèle à base de documents](sae-seance2)
+    - Rendu à faire sur cet espace : <https://cloud.parisdescartes.fr/index.php/s/oymPQt42YJXG6Pi>
+    - **Consignes** : 
+        - **Deadline** : 16 novembre - 23h59
+        - **Mêmes groupes que rendu précédent**
+        - Fichier `PDF`
+        - **LES NOMS de FAMILLE des étudiants dans le NOM du FICHIER !!!**
 
 - [Séance 3 - Passage SQL <-> NoSQL sous Python](sae-seance3)
+
+### RENDU FINAL
+
+**DEADLINE** : **11 janvier 2026 - 23h59**
+
+Espace de rendu : <>
+
+**LIVRABLES ATTENDUS** :
+
+- **Rapport** (court) présentant les choix faits (nombre de collections, organisation générale) et les difficultés rencontrées
+    - **Les noms des étudiants doivent être indiqués dans le rapport !!** 
+- **1 seul fichier migration** (au format `ipynb`) contenant le code permettant le passage de la BD SQL à la BD Mongo
+    - Il doit être automatisé -> une exécution complète doit permettre de réaliser la migration complète
+    - Les paramètres (nom du fichier de la BD d'origine, nom de la base de données cible) doivent être placés en début de code
+    - Il doit y avoir le code + le résultat correspondant à chaque cellule
+- **1 seul fichier requêtes** (au format `ipynb`) contenant le code permettant de répondre aux 10 questions vues dans la séance 1
+ 
 
 <!--
 - Rendu à faire sur cet espace : <>

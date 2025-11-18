@@ -53,9 +53,9 @@ Le gérant a posé comme condition, pour augmenter le prix, qu’il y ait plus d
 
 ### Exercice 3 - Référendum
 
-On prévoit de réaliser un référendum. On sait que la réponse Oui se situe autour de 50 %. On se demande donc combien de personnes faudrait-il interroger pour que la proportion de Oui soit connue à 1 % près (en plus ou en moins).
+On prévoit de réaliser un référendum. On sait que la réponse *Oui* se situe autour de 50 %. On se demande donc combien de personnes faudrait-il interroger pour que la proportion de Oui soit connue à 1 % près (en plus ou en moins).
 
-Lors de la réalisation de ce sondage, finalement pratiqué sur 1000 personnes, nous avons obtenu 55 % pour le Oui et 45 % pour le Non. Peut-on prévoir le résultat du référendum, avec un taux de confiance de 95 % ?
+Lors de la réalisation de ce sondage, finalement pratiqué sur 1000 personnes, nous avons obtenu 55 % pour le *Oui* et 45 % pour le *Non*. Peut-on prévoir le résultat du référendum, avec un taux de confiance de 95 % ?
 
 ### Exercice 4 - Efficacité d’un médicament
 
@@ -65,7 +65,7 @@ Pour mesurer l’effet d’un nouveau médicament, on créé 3 groupes de 100 pe
 - Groupe C : médicament de référence
 - Groupe P : placebo (comprimé sans principe actif)
 
-Après analyse, on observe que les patients ayant guéri :
+Après analyse, on observe que le nombre de patients ayant guéri par groupe. Voici les résultats :
 
 - Groupe N : 68
 - Groupe C : 56
@@ -83,7 +83,7 @@ Dans l'échantillon, nous observons les valeurs suivantes :
 - Âge moyen : 43,8 ans (avec un écart-type de 25,3)
 - Part de femmes : 53,4%
 - Taux de chômage : 7,9%
-- Salaire net horaire moyen : 16,5 € (avec un écart-type de 19.8)
+- Salaire net horaire moyen : 16,5 € (avec un écart-type de 19,8)
 - Propriétaires : 56,5%
 
 Après un recherche sur le site de l'INSEE et d'autres sources, on trouve les valeurs suivantes pour la population du Cotentin

@@ -21,16 +21,9 @@
 - [Séance 1 - Introduction au NoSQL](https://docs.google.com/presentation/d/e/2PACX-1vRi9gT1ZSwXgaDcRYQ4q-srOtJYtdT6hOlo0E6cYt5E9Vk11LJYusYaxa0FNWM95pyO9Jg9SZc9faWJ/pub?start=false&loop=false&delayms=3000)
 - [Séance 2 - Premier pas avec MongoDB](res-seance2)
 - [Séance 3 - Agrégats et plus encore](res-seance3)
-<<<<<<< Updated upstream
 - [Séance 4 - Récapitulatif](res-seance4)
-- [Séance 5 - TP noté 1](res-tpnote1)
-- [Séance 6 - Jointures, import/export de données, intégration](res-seance6)
-=======
-- [Séance 4 - TP noté 1](https://moodle.u-pariscite.fr/course/view.php?id=50353) (sur Moodle)
-- [Séance 5 - Jointures et import/export de données](res-seance5)
-- [Séance 6 - Intégration dans un process dashboard](res-seance6)
->>>>>>> Stashed changes
-- [Séance 7 - TP noté 2](res-tpnote2)
+- [Séance 5 - Jointures et intégration](res-seance5)
+- [Séance 6 - TP noté]() sur Moodle
 
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
@@ -54,7 +47,19 @@
 
 - [Séance 3 - Passage SQL <-> NoSQL sous Python](sae-seance3)
 
-<!--
-- Rendu à faire sur cet espace : <>
--->
+### RENDU FINAL
 
+**DEADLINE** : **21 décembre 2025 - 23h59**
+
+Espace de rendu : <>
+
+**LIVRABLES ATTENDUS** :
+
+- **Rapport** (court) présentant les choix faits (nombre de collections, organisation générale) et les difficultés rencontrées
+    - **Les noms des étudiants doivent être indiqués dans le rapport !!** 
+- **1 seul fichier migration** (au format `ipynb`) contenant le code permettant le passage de la BD SQL à la BD Mongo
+    - Il doit être automatisé -> une exécution complète doit permettre de réaliser la migration complète
+    - Les paramètres (nom du fichier de la BD d'origine, nom de la base de données cible) doivent être placés en début de code
+    - Il doit y avoir le code + le résultat correspondant à chaque cellule
+- **1 seul fichier requêtes** (au format `ipynb`) contenant le code permettant de répondre aux 10 questions vues dans la séance 1
+ 

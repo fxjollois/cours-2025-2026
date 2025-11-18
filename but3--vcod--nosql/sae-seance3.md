@@ -69,7 +69,7 @@ seances.query('IdGymnase == @id')
 Ensuite, pour supprimer les colonnes `IdGymnase` et `IdSport`, on peut procéder ainsi.
 
 ```python
-seances.query('IdGymnase == @id').drop(columns = [["IdGymnase", "IdSport"]])
+seances.query('IdGymnase == @id').drop(columns = ["IdGymnase", "IdSport"])
 ```
 
 Enfin, pour transformer le résultat (qui est un DataFrame) en un dictionnaire python, nous utilisons la fonction `to_dict()`, avec en paramètre `orient` égal à `records`, ceci permet de faire un tableau de dictionnaires.
@@ -88,7 +88,7 @@ liste
 On peut maintenant ajouter ceci au DataFrame `gymnases`, comme ci-dessous.
 
 ```python
-gymnases = gymnases.assign(Seances = liste)
+gymnases2 = gymnases.assign(Seances = liste)
 gymnases.head()
 ```
 
@@ -97,7 +97,7 @@ gymnases.head()
 Grâce à la même fonction `to_dict()` et la fonction `insert_many()` sur une collection, nous allons pouvoir intégrer les données à Mongo. Le code suivant va donc créer la BD `SAE` (car vide pour le moment), puis la collection `Gymnases`, et ensuite y placer toutes les données.
 
 ```python
-db.Gymnases.insert_many(gymnases.to_dict(orient = "records"))
+db.Gymnases.insert_many(gymnases2.to_dict(orient = "records"))
 ```
 
 Vous pouvez aller voir le résultat dans Compass. Vous pouvez aussi tester directement en interrogeant Mongo pour le nombre de documents de la collection :
@@ -153,7 +153,7 @@ pandas.DataFrame(list(db.Gymnases.aggregate([
 
 ### Importation des données dans Mongo
 
-Dans Compass, vous allez charger les données présentes dans le fichier [movies.json](https://fxjollois.github.io/donnees/movies.json). Pour cela, dans le logiciel, suivez les étapes suivantes :
+Dans Compass, vous allez charger les données présentes dans le fichier [movies.json](https://fxjollois.github.io/donnees/Movies/movies.zip) (compressé au format ZIP - à décompresser donc). Pour cela, dans le logiciel, suivez les étapes suivantes :
 
 - Cliquer sur le **+** à droite du nom de la BD `SAE`
 - Ecrire le nom de la nouvelle collection (`movies` par exemple)
@@ -167,6 +167,10 @@ Les données sont maintenant dans Mongo. On peut voir le contenu du premier docu
 ```python
 db.movies.find_one()
 ```
+
+L'idée est d'avoir le schéma ER suivant à la fin.
+
+![Schéma ER de la base Movies](https://fxjollois.github.io/donnees/Movies/movies.png)
 
 ### Création de la BD SQLite
 
@@ -253,6 +257,5 @@ Vous pouvez ouvrir votre base de données avec DBeaver (par exemple) pour voir l
 - Le champs `awards` doit devenir 3 colonnes de la table `Film` à produire au final (`wins`, `nominations` et `text`) ;
 - On va créer une table `imdb` intégrant les informations du champs `imdb` et donc l'identifiant du film concerné ;
 - On va faire de même pour le champs `tomatoes`.
-
 
 

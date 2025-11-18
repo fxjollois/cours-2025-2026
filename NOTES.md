@@ -7,7 +7,6 @@
 
 ## BUT2 TC Cherbourg 
 
-- CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 !!!
 - TCD avec moyenne, écart-type et nombre en modifiant la structure pour séance 7 et 8
 
 ## INTECHMER
@@ -21,10 +20,13 @@
 
 ## Pour 2026-2027
 
+> **REFAIRE LES SLIDES AVEC GOOGLE SLIDES ou POWERPOINT ou LIBRE OFFICE**
+
 ### BUT TC - Stats - Cherbourg
 
 - DIAPOS en PowerPoint !
 - Changer de jeu de données
+- Mettre tous les exercices avec des données de commerce !!
 - Revoir séances 1 et 2 (plus en adéquation avec Excel)
     - Création histogramme et boîte à moustache dans Excel
 - Séance 3 : mélanger Cours et Excel pour le rapprocher (et faire le début des exercices en cours)
@@ -34,6 +36,9 @@
     - Séance 4 que Binomiale ?
     - Faire en cours un semblant de test avec les étudiants
 - Séance 5 : Poisson + Normale peut-être
+- Séance 6 : attention à **9** années seulement dans l'exemple sur IC moyenne
+- Découper la séance 6 en deux séances !
+- CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 ?
 
 ### BUT SD - NoSQL
 
@@ -51,8 +56,18 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 6. Process Dashboard ? autre chose ?
 7. Evaluation finale
 
+**OU ALORS**
+- Intro NoSQL très courte + MongoDB sur 3 séances (premiers pas ; agrégats ; récap + tp noté)
+- Cassandra sur 2 séances (premiers pas ; récap + tp noté)
+- Neo4J sur 2 séances (premiers pas ; récap + tp noté)
+
 
 ## INTECHMER
 
 - CT2 STM018 : 
     - CM 1 : Faire plus "théorique" et aucun code dedans !
+- CT3 GEM104 :
+    - CM 1 : Moins théorique !! Expliquer la notion de test en général (Hypothèse nulle vs hypothèse alternative) puis parler de la *p-value*, puis enchaîner sur les différents tests utiles (normalité, corrélation, chi-deux, t-test...)
+    
+    
+    

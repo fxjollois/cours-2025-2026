@@ -23,15 +23,11 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [correction `pendigits`](seance5-correction-pendigits.html)
     - [correction `hadCRUT5`](seance5-correction-hadcrut.html)
 
-<!--
-6. [TP noté 1](seance6-tpnote1.html)
--->
+6. TP noté 1 -  <a href = "#" id = "intermediaire">sujet en attente</a>
 
-<!--
 7. [Classification avec CAH et k-means](seance7-classif.html)
--->
+    - [sous `python`](seance7-classif-python.html)
 
-<!-- - [sous `python`](seance7-classif-python.html) -->
 <!-- - [correction](seance7-correction.html) -->
     
 <!--
@@ -46,13 +42,6 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
 
 <!--
 10. <span id = "final">En attente</span>
-
-<script>
-    const date = new Date();
-    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
-        document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
-    }
-</script>
 -->
 
 <!--
@@ -76,3 +65,21 @@ Lien vers les plateformes de l'UFR Math-Info :
 - [RStudio](https://rstudio.ens.math-info.univ-paris5.fr/)
 -->
 
+<script>
+    // SCRIPT POUR TP NOTE 1 - CC
+    const date = new Date();
+    console.log(date.toJSON());
+    if (date.toJSON().slice(0, 10) == "2025-11-10" & date.toJSON().slice(11, 13) >= 9) { 
+        console.log("Sujet à afficher")
+        document.getElementById("intermediaire").href = "seance6-tpnote1.html";
+        document.getElementById("intermediaire").innerHTML = "Cliquer ici pour voir le sujet";
+    }
+</script>
+
+<script>
+    // SCRIPT POUR TP NOTE 2 - EXAMEN FINAL
+    const date = new Date();
+    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
+        document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
+    }
+</script>
