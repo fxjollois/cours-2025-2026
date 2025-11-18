@@ -66,6 +66,7 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 
 - CT2 STM018 : 
     - CM 1 : Faire plus "théorique" et aucun code dedans !
+    - TD 1 : faire plus simple pour les questions du début 
 - CT3 GEM104 :
     - CM 1 : Moins théorique !! Expliquer la notion de test en général (Hypothèse nulle vs hypothèse alternative) puis parler de la *p-value*, puis enchaîner sur les différents tests utiles (normalité, corrélation, chi-deux, t-test...)
     
