@@ -1,5 +1,5 @@
 ---
-title: "Compléments sur R - TP 1"
+title: "Compléments sur R - TD 3"
 author: "Traitement des données"
 date: "INTECHMER - CT2 GEM/PVRM"
 output:
@@ -201,7 +201,7 @@ ls()
 
 Dans votre document, penser à nommer chaque chunk différemment. Et n'hésiter pas à commenter le document pour le rendre plus conforme à ce qu'on pourrait vouloir produire comme document.
 
-Vous trouverez sur le site [rmarkdown](https://daringfireball.net/projects/markdown/) beaucoup d'informations et de compléments sur cette librairie. Beaucoup sont résumées dans ce [document](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf).
+Vous trouverez sur le site [rmarkdown](https://daringfireball.net/projects/markdown/) beaucoup d'informations et de compléments sur cette librairie. Beaucoup sont résumées dans ce [document](https://utstat.utoronto.ca/reid/sta2201s/rmarkdown-reference.pdf) et [celui-ci](https://posit.co/wp-content/uploads/2022/10/rmarkdown-1.pdf).
 
 Nous allons travailler sur les données `varespec` et `varechem` présente dans le package `vegan`. Quelques informations sont disponibles sur [cette page](https://vegandevs.github.io/vegan/reference/varechem.html). Pour les charger dans R, vous devez exécuter les commandes suivantes :
 
