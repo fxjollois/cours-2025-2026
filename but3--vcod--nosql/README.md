@@ -53,13 +53,16 @@
 
 Espace de rendu : <https://cloud.parisdescartes.fr/index.php/s/etJdYfYD55dcPno>
 
+> Vous devez déposer un **fichier ZIP**, avec les noms des étudiants dans le nom de fichier
+
 **LIVRABLES ATTENDUS** :
 
 - **Rapport** (court) présentant les choix faits (nombre de collections, organisation générale) et les difficultés rencontrées
     - **Les noms des étudiants doivent être indiqués dans le rapport !!** 
 - **1 seul fichier migration** (au format `ipynb`) contenant le code permettant le passage de la BD SQL à la BD Mongo
-    - Il doit être automatisé -> une exécution complète doit permettre de réaliser la migration complète
+    - Il doit être **automatisé** -> une exécution complète doit permettre de réaliser proprement la migration complète 
     - Les paramètres (nom du fichier de la BD d'origine, nom de la base de données cible) doivent être placés en début de code
     - Il doit y avoir le code + le résultat correspondant à chaque cellule
 - **1 seul fichier requêtes** (au format `ipynb`) contenant le code permettant de répondre aux 10 questions vues dans la séance 1
+    - Il doit y avoir le code + le résultat correspondant à chaque cellule
  
