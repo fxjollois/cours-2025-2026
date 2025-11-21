@@ -51,7 +51,7 @@
 
 **DEADLINE** : **21 décembre 2025 - 23h59**
 
-Espace de rendu : <>
+Espace de rendu : <https://cloud.parisdescartes.fr/index.php/s/etJdYfYD55dcPno>
 
 **LIVRABLES ATTENDUS** :
 
