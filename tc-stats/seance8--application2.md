@@ -9,20 +9,24 @@ Dans ce fichier, nous avons des données provenant d’une étude sur une enquê
 ### Demandes
 
 #### Variables quantitatives
-    
+
+- Décrire à l'aide de valeurs numériques et de graphiques l'âge et le nombre d'heures de travail
 - Donner un intervalle de confiance de l'âge et du nombre d'heures de travail
 - Peut-on dire que le nombre d'heures de travail aux USA est supérieur à celui en France ?
 
 #### Variables qualitatives
 
+- Décrire la répartition du sexe et du salaire, toujours à l'aide de valeurs numériques et de graphiques
 - Donner un intervalle de confiance de la proportion de femmes et des personnes gagnant plus de 50K$ 
 - Est-il vrai qu'un quart des personnes gagnent plus de 50K$ ? 
 
 #### Lien entre variables
 
+- Décrire le lien entre l'âge et le salaire, ainsi qu'entre le nombre d'heures de travail et le salaire
 - Donner un intervalle de confiance de l'âge en fonction du salaire
 - Est-ce le même entre ceux qui gagnent plus et ceux qui gagnent moins de 50K$ ?
 - Peut-on dire la même chose du nombre d'heures de travail ?
 
+- Décrire le lien entre le sexe et le salaire
 - Donner un intervalle de confiance de la proportion de femmes en fonction du salaire
 - Cette proportion est-elle la même ?
