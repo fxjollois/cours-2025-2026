@@ -483,7 +483,7 @@ knitr::kable(round(du), row.names = TRUE)
 ---
 ## Iris
 
-```{r, fig.height=10, fig.width=15}
+```{r}
 par(mar = c(0, 0, 0, 0))
 plot(hclust(dist(iris[-5]), "ward.D2"), 
      hang = -1, labels = FALSE, main = "", axes = FALSE)
