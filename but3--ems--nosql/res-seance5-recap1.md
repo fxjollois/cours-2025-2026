@@ -1,6 +1,6 @@
-## Requêtage simple
+# Requêtage simple
 
-#### Simple
+## Simple
 
 ##### Lister le contenu de la table Seances
 
@@ -26,7 +26,7 @@ SELECT *
     LIMIT 5;
 ```
 
-#### Restriction
+## Restriction
 
 ##### Lister les sportifs (nom et prénom) agés strictement de plus de 30 ans
 
@@ -52,7 +52,7 @@ SELECT Nom, Prenom
     WHERE IdSportifConseiller IS NULL;
 ```
 
-#### Projection
+## Projection
 
 ##### Lister les sports pratiqués (uniquement le libellé de chaque sport)
 
@@ -72,7 +72,7 @@ SELECT DISTINCT Sexe
 
 ## Calculs et fonctions
 
-#### Calculs arithmétiques
+### Calculs arithmétiques
 
 ##### Afficher en heure la durée de chaque séance (stockée en minute dans la table)
 
@@ -103,7 +103,7 @@ SELECT NomGymnase, Surface,
     FROM Gymnases;
 ```
 
-#### Fonctions sur chaînes de caractères
+### Fonctions sur chaînes de caractères
 
 ##### Concaténer le nom des sportifs avec la première lettre du prénom suivie d'un point, le tout en minuscules (par exemple "jollois f.")
 
@@ -121,7 +121,7 @@ SELECT *
     WHERE INSTR(LOWER(Adresse), "place") > 0;
 ```
 
-#### Fonctions sur les dates
+### Fonctions sur les dates
 
 ##### Donner la date du jour
 
@@ -148,7 +148,7 @@ SELECT Age,
     FROM Sportifs;
 ```
 
-#### Traitement conditionnel
+### Traitement conditionnel
 
 ##### Afficher une nouvelle variable nommée TitreCourtoisie, qui prendra "M." pour les hommes et "Mme" pour les femmes
 
@@ -177,7 +177,7 @@ SELECT *,
 
 ## Agrégats
 
-#### Dénombrements
+### Dénombrements
 
 ##### Compter le nombre de sportifs
 
@@ -241,7 +241,7 @@ SELECT Ville,
     GROUP BY Ville;
 ```
 
-#### Restriction sur agrégats
+### Restriction sur agrégats
 
 ##### Lister les villes ayant plus de 5 gymnases, dans l'ordre décroissant du nombre de gymnases
 
