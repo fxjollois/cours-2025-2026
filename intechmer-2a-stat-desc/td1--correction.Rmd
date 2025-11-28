@@ -1,5 +1,5 @@
 ---
-title: "Visualisation de données - TD 2"
+title: "Correction - TD 1"
 author: "Traitement des données"
 date: "INTECHMER - CT2 GEM/PVRM"
 output:
@@ -17,17 +17,23 @@ knitr::opts_chunk$set(eval = TRUE,
 ```
 
 ## IMPORTATION des données
+
+```{r}
 library(readr)
 pays = read_delim("WGICountry.csv", delim = ";")
 serie = read_delim("WGISerie.csv", delim = ";")
 type = read_delim("WGIType.csv", delim = ";")
 valeurs = read_delim("WGIValues.csv", delim = ";")
+```
 
 ## CREATION de la table au format long
 
-# On veut une table de ce format :
-#   pays | série | type | année | valeur
+On veut une table de ce format :
+  
+| pays | série | type | année | valeur |
+|-|-|-|-|-|
 
+```{r}
 library(tidyr)
 valeurs_long = valeurs %>%
   pivot_longer(
@@ -35,17 +41,30 @@ valeurs_long = valeurs %>%
     names_to = "Année",
     values_to = "Valeur"
   )
+head(valeurs_long)
+```
 
 
 ## NOMBRE DE PAYS
 
+Voici trois façons différentes d'arriver au même résultat.
+
+```{r}
 nrow(pays)
+```
+
+```{r}
 library(dplyr)
 pays %>% summarise(nb_pays = n())
-valeurs %>% summarise(nb_pays = n_distinct(CountryCode))
+```
+```{r}
+valeurs %>% 
+  summarise(nb_pays = n_distinct(CountryCode))
+```
 
 ## TOP des pays sur le contrôle de la corruption
 
+```{r}
 topCC = pays %>%
   # Jointure avec les données au format long
   inner_join(valeurs_long) %>%
@@ -62,23 +81,40 @@ topCC = pays %>%
   ) %>%
   # Tri par ordre décroissant de la moyenne
   arrange(desc(moyenne))
-View(topCC)
+head(topCC)
+```
 
+## Evolution des indicateurs de la France sur la période analysée
 
-arrange(
-  summarise(
-    group_by(
-      filter(
-        inner_join(pays, valeurs_long),
-        SerieCode == "CC" & TypeCode == "EST"
-      ),
-      CountryName
-    ),
-    moyenne = mean(Valeur, na.rm = TRUE),
-    minimum = min(Valeur, na.rm = TRUE),
-    maximum = max(Valeur, na.rm = TRUE)
-  ),
-  desc(moyenne)
-)
+```{r}
+valeurs %>%
+  # Jointure avec pays pour ne sélectionner que la France
+  inner_join(pays) %>%
+  filter(CountryName == "France") %>%
+  # Jointure avec type pour ne sélectionner que les valeurs "Estimate"
+  inner_join(type) %>%
+  filter(TypeName == "Estimate") %>%
+  # Jointure avec serie pour avoir le nom de chaque série
+  inner_join(serie) %>%
+  # Nom de la série en premier et uniquement les informations intéressantes (valeurs par année)
+  select(SerieName, starts_with("Y")) %>%
+  pivot_longer(cols = !SerieName) %>%
+  pivot_wider(
+    names_from = SerieName, 
+    values_from = value
+  ) -> infoFrance
+infoFrance
+```
+
+## Quel pays a des données manquantes ?
+
+```{r}
+valeurs_long %>%
+  inner_join(pays) %>%
+  group_by(CountryName) %>%
+  summarise(NbValManq = sum(is.na(Valeur))) %>%
+  arrange(desc(NbValManq)) %>%
+  filter(NbValManq > 0)
+```
 
 

@@ -1,0 +1,101 @@
+---
+title: "Correction - TD 1"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE,
+                      fig.align = "center", 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+## IMPORTATION des données
+
+```{r}
+library(tidyverse)
+valeurs = read_delim("WGIValues.csv", delim = ";")
+valeurs_long = valeurs %>%
+  pivot_longer(
+    cols = !c(CountryCode, SerieCode, TypeCode),
+    names_to = "Année",
+    values_to = "Valeur"
+  )
+```
+
+## Valeurs manquantes
+
+### Création de l'indicatrice
+
+```{r}
+valeurs_long_bis = valeurs_long %>%
+  mutate(Manquant = is.na(Valeur))
+```
+
+### Diagramme en barres de cette indicatrice
+
+```{r}
+ggplot(valeurs_long_bis, aes(x = "", fill = Manquant)) +
+  geom_bar()  
+```
+### En diagramme circulaire
+
+```{r}
+library(scales)
+ggplot(valeurs_long_bis, aes(x = "", fill = Manquant)) +
+  geom_bar(position = "fill", width = 1) +
+  scale_y_continuous(labels = percent) +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = c("red3", "green3"))
+```
+
+### Evolution par année
+
+```{r}
+ggplot(valeurs_long_bis, 
+       aes(x = Année, fill = Manquant)) +
+  geom_bar() 
+```
+
+### Top 10 des pays avec le plus de données manquantes
+
+```{r}
+# Récupération des noms de pays
+pays = read_delim("WGICountry.csv", delim = ";")
+
+valeurs_long_bis %>%
+  # Jointure pour avoir les noms de pays
+  inner_join(pays) %>%
+  # Regroupement par pays
+  group_by(CountryName) %>%
+  # Calcul du nombre de données manquantes
+  summarise(nbManquant = sum(Manquant)) %>%
+  # Tri par ordre décroissant
+  arrange(desc(nbManquant)) %>%
+  # On prend que les 10 premiers
+  # Et on stocke dans une variable
+  head(10) -> topManquant
+
+# Chargement de la library forcats (pour tri)
+library(forcats)
+
+# TOP 10 représenté graphiquement
+ggplot(topManquant, 
+       aes(x = nbManquant, 
+           y = fct_reorder(CountryName, nbManquant),
+           fill = nbManquant)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(y = "", x = "", 
+       fill = "Nb de données\nmanquantes") +
+  scale_fill_gradient(low = "lightblue",
+                      high = "darkblue")
+```
+
