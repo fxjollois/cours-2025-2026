@@ -1,4 +1,4 @@
-# Requêtage Complexe
+# Requêtage complexe
 
 ## Simple
 
