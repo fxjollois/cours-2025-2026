@@ -24,6 +24,7 @@
 
 ### BUT TC - Stats - Cherbourg
 
+- TOUT SUR eCAMPUS ! RIEN SUR MON SITE !
 - GENERAL
     - DIAPOS en PowerPoint !
     - Changer de jeu de données
