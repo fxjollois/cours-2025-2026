@@ -29,9 +29,8 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     - [sous `python`](seance7-classif-python.html)
     - [correction](seance7-correction.html)
     
-<!--
 8. [Application sur données réelles](seance8-donnees-reelles.html)
--->
+
 
 <!-- - [correction](seance8-correction.html) -->
 
