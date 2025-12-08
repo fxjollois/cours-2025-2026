@@ -44,6 +44,7 @@
 - Séance 6 : attention à **9** années seulement dans l'exemple sur IC moyenne
 - Découper la séance 6 en deux séances !
 - CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 ?
+- INVERSER séances 7 et 8 !!
 
 ### BUT SD - NoSQL
 
