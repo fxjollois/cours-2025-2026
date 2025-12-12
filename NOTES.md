@@ -72,7 +72,11 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 
 - CT2 STM018 : 
     - CM 1 : Faire plus "théorique" et aucun code dedans !
+    - Mettre le début du TD2 dans un CMs et les codes dans les TDs
+    - **AUTRE JEU DE DONNEES** pour TD1 et TD2 !!!
     - TD 1 : faire plus simple pour les questions du début 
+    - TD 2 : pareil
+    - TD 3 : plus simple aussi (mais je ne sais pas comment faire...)
 - CT3 GEM104 :
     - CM 1 : Moins théorique !! Expliquer la notion de test en général (Hypothèse nulle vs hypothèse alternative) puis parler de la *p-value*, puis enchaîner sur les différents tests utiles (normalité, corrélation, chi-deux, t-test...)
     

@@ -1,0 +1,175 @@
+---
+title: "TD1 - Correction"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+## Chargement des packages et des données
+
+```{r import}
+library(tidyverse)
+library(DT)
+adult = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv")
+```
+
+## Tester les éléments suivants :
+
+### Normalité de l’âge
+
+L'échantillon est trop grand pour appliquer la fonction `shapiro.test()`, mais on peut analyser la distribution de la variable `age` graphiquement.
+
+```{r age-graph}
+ggplot(adult, aes(age)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 fill = "lightgray", bins = 20) +
+  geom_density() +
+  theme_minimal()
+```
+
+### Normalité du nombre d’heures par semaine
+
+Idem que pour `age`. Il faut noter qu'il y a un (très grand) pic à 40 heures.
+
+```{r hwork-graph}
+ggplot(adult, aes(hours_per_week)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 fill = "lightgray", bins = 20) +
+  geom_density() +
+  theme_minimal()
+```
+
+
+### Equi-répartition du sexe
+
+On remarque qu'il y a bien plus d'hommes que de femmes.
+
+```{r sexe-graph}
+ggplot(adult, aes(sex, fill = sex)) +
+  geom_bar() +
+  scale_fill_manual(values = c("orange", "mediumaquamarine")) +
+  coord_flip() +
+  theme_minimal()
+```
+
+La *p-value* est clairement inférieure à 5%.
+
+```{r sexe-test}
+chisq.test(table(adult$sex))
+```
+
+### Equi-répartition du salaire (variable class)
+
+On remarque qu'il y a bien plus de personnes gagnant moins de 50k$ que gagnant plus.
+
+```{r class-graph}
+ggplot(adult, aes(class, fill = class)) +
+  geom_bar() +
+  scale_fill_manual(values = c("brown", "darkolivegreen")) +
+  coord_flip() +
+  theme_minimal()
+```
+
+La *p-value* est ici aussi clairement inférieure à 5%.
+
+```{r class-test}
+chisq.test(table(adult$class))
+```
+
+
+
+## Identifier si les liens suivants sont réels :
+
+### Âge et salaire
+
+Les personnes gagnant plus de 50k$ sont globalement plus âgées que les autres.
+
+```{r age-class-graph}
+ggplot(adult, aes(x = age, y = class, fill = class)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("brown", "darkolivegreen")) +
+  theme_minimal()
+```
+
+On obtient une *p-value* largement inférieure à 5%, qui  nous confirme notre observation.
+
+```{r age-class-test}
+t.test(data = adult, age ~ class)
+```
+
+
+### Nombre d’heures de travail par semaine et salaire
+
+Les personnes gagnant plus de 50k$ travaillent plus longtemps que les autres.
+
+```{r hwork-class-graph}
+ggplot(adult, aes(x = hours_per_week, y = class, fill = class)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("brown", "darkolivegreen")) +
+  theme_minimal()
+```
+
+On obtient une *p-value* largement inférieure à 5%, qui  nous confirme notre observation.
+
+```{r hwork-class-test}
+t.test(data = adult, hours_per_week ~ class)
+```
+
+
+### Sexe et salaire
+
+Il est clair que les hommes gagnent plus souvent plus de 50k$ que les femmes.
+
+```{r sexe-class-graph}
+ggplot(adult, aes(sex, fill = class)) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  scale_fill_manual(values = c("brown", "darkolivegreen")) +
+  theme_minimal()
+```
+
+Ce qui est confirmé par le test du $\chi^2$.
+
+```{r sexe-class-test}
+chisq.test(table(adult$sex, adult$class))
+```
+
+### Catégorisation ethnique (variable race) et salaire
+
+Les personnes *blanches* et d'origine *asiatiques* gagnent plus souvent plus de 50k$ que les autres origines.
+
+```{r race-class-graph}
+ggplot(adult, aes(race, fill = class)) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  scale_fill_manual(values = c("brown", "darkolivegreen")) +
+  theme_minimal()
+```
+
+Idem, le test nous confirme la dépendance entre les deux variables.
+
+```{r race-class-test}
+chisq.test(table(adult$race, adult$class))
+```
+
+
+### Âge et nombre d’heures de travail par semaine
+
+Il ne semble pas très clair qu'il y ait un lien entre les deux variables
+
+```{r age-hwork-graph}
+ggplot(adult, aes(age, hours_per_week)) +
+  geom_point()
+```
+
+Le coefficient de corrélation est très faible (0.069) mais le test nous indique qu'il est différent de 0. Toutefois, le lien est très très faible.
+
+```{r age-hwork-test}
+cor.test(adult$age, adult$hours_per_week)
+```
+
+

@@ -23,8 +23,8 @@
 - [Séance 3 - Agrégats et plus encore](res-seance3)
 - [Séance 4 - Récapitulatif](res-seance4)
 - [Séance 5 - Jointures et intégration](res-seance5)
-- [Séance 6 - TP noté]() sur Moodle
-- [Séance 7 - Streamlit](res-seance7-streamlit)
+- [Séance 6 - Streamlit](res-seance7-streamlit)
+- [Séance 7 - TP noté]() sur Moodle
 
 ## Partie SAE : *Migration de données vers ou depuis un environnement NoSQL*
 
