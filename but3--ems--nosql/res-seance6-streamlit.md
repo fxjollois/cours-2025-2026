@@ -1,4 +1,4 @@
-# Séance 7 - Introduction à `streamlit`
+# Séance 6 - Introduction à `streamlit`
 
 Nous allons voir l'utilisation du package [`streamlit`](https://streamlit.io/), équivalent Python de `shiny` pour R. Pour réaliser notre application, nous allons utiliser un environnement de développement, de type VS Code (utilisé ici) ou Spyder.
 
