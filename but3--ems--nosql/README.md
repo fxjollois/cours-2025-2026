@@ -52,7 +52,7 @@
 
 **DEADLINE** : **11 janvier 2026 - 23h59**
 
-Espace de rendu : <>
+Espace de rendu : <https://cloud.parisdescartes.fr/index.php/s/BXDNfkiSPLgk6AP>
 
 **LIVRABLES ATTENDUS** :
 
