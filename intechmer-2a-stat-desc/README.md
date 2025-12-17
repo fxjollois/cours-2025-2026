@@ -4,10 +4,14 @@
 
 - [CM1 - Introduction à la Statistique](seance1--intro-stat.html)
 - [CM2 - Statistique descriptive](seance2--stat-desc.html)
+- [CM3 - Etude de cas](seance3--etude-de-cas.html)
+    - [fichier source du CM3](seance3--etude-de-cas.Rmd)
+    
 
 - [TD1 - Manipulation de données](td1--manip.html)
 - [TD2 - Visualisation de données](td2--visualisation.html)
 - [TD3 - Compléments](td3--complements.html)
+
 
 - [TP2 - Application sur données réelles](tp2--application.html)
 

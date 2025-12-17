@@ -1,0 +1,510 @@
+---
+title: "Etude de cas -- Pesticides dans l'air"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output: 
+  xaringan::moon_reader:
+    css: [fc, chocolate-fonts]
+    nature: 
+      beforeInit: "../macros.js"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align='center', fig.height=4, 
+                      message = FALSE, warning = FALSE)
+```
+
+<style>
+/* Pour centrer les cartes */
+.leaflet {
+    margin: auto;
+}
+</style>
+
+## Introduction
+
+Pourquoi une étude de cas ?
+
+- Usage de données réelles
+
+- Description des différentes étapes
+
+- Description des codes générés
+
+- Discussion sur les bonnes pratiques à mettre en place
+
+### A FAIRE
+
+N'hésitez pas à regarder le fichier source `.Rmd` pour voir comment créer les tables et graphiques.
+
+---
+## Librairies
+
+Attention à l'ordre car la fonction `filter()` est présente dans plusieurs packages. 
+
+```{r librairies}
+library(knitr)      # Pour la fonction kable()
+library(kableExtra) # Pour améliorer l'affichage des tables
+library(leaflet)    # Pour les cartes
+library(sf)         # Pour le changement de coordonnées
+library(tidyverse)  # Pour les graphiques et les manipulations de données
+```
+
+### NOTE BENE
+
+Ici, `tidyverse` est chargé en dernier pour être sûr que la fonction `filter()` utilisée sera bien celle du package `dplyr` (chargé en même temps que plusieurs autres par `tidyverse`)
+
+---
+## Données
+
+Les données sont disponibles à l'adresse suivante :
+
+<https://www.data.gouv.fr/datasets/base-de-donnee-de-surveillance-de-pesticides-dans-l-air-par-les-aasqa-a-partir-de-2002/>
+
+- **Base Phytatmo **
+
+- Mesures en pesticides dans l'air ambiant des AASQA à partir de 2002
+  - *AASQA* : *Associations agréées de surveillance de la qualité de l'air*
+  - Fractions gazeuse et particulaire
+
+- 321 substances actives recherchées 
+
+- Plus de 10 000 prélèvements effectuées 
+
+- 176 sites sur toute la France métropolitaine et outre-mer.
+
+
+Les chiffres ci-dessus sont ceux sur la page web
+
+---
+## Lexique
+
+| Variable | Description |
+|-|-|
+| Commune | Nom de la commune où a eu lieu le prélèvement |
+| Code INSEE | Code INSEE de la commune où a eu lieu le prélèvement |
+| xlamb93, ylamb93 | Coordonnées du prélèvement - système Lambert 93 |
+| Debut prelevement | Date et heure du début du prélèvement |
+| Fin prelevement | Date et heure de la fin du prélèvement |
+| Annee | Année de prélèvement |
+| Semaine | Numéro de la semaine de prélèvement |
+| Nbre de jours de prelevement | Durée du prélèvement en jours (arrondie à la journée) |
+| Coupure PM | Taille des particules prélevées : |
+| | TSP  = particules totales en suspension |
+| | PM10 = particules de diamètre aérodynamique < 10 µm |
+| LD (ng/m3) | Limite de détection (en ng/m3) = concentration la plus basse à laquelle il est possible de détecter un composé |
+| LQ (ng/m3) | Limite de quantification (en ng/m3) = concentration la plus basse à laquelle il est possible de quantifier avec exactitude un composé |
+| Detection/quantification | Indication si la concentration est inférieure à la limite de détection ou inférieure à la limite de quantification |
+
+
+---
+## Chargement
+
+Les deux premières commandes (importation et sauvegarde) sont à faire un script à part du fichier Rmd.
+
+```{r import, eval = FALSE}
+library(readxl)
+data = read_excel("pesticides-2002-2022-v03-2024-vf.xlsx", 
+                  sheet = "pesticides_2002_2022_v-03-2024") %>%
+  mutate(Concentration = as.numeric(`Concentration (ng/m3)`))
+```
+
+Le chargement étant assez long, on va stocker les données chargées dans un fichier **RData**.
+
+```{r save, eval = FALSE}
+save(data, file = "pesticides.RData")
+```
+
+Dans le Rmd, on peut donc maintenant charger les données facilement et plus rapidement (ce qui diminue le temps de création du nouveau fichier HTML à chaque **Knit**)
+
+```{r chargement}
+load("pesticides.RData")
+```
+
+---
+## Données
+
+```{r data}
+data %>%
+  head(50) %>%                      # Pour ne pas surcharger inutilement 
+  kable("html") %>%                 # Affichage "joli" du tableau de données
+  kable_styling(font_size = 7) %>%  # Réduction de la taille d'écriture
+  scroll_box(height = "400px")      # Pour pouvoir naviguer de haut en bas
+```
+
+
+---
+## Description rapide des données
+
+```{r infos}
+# On calcule avant d'écrire la phrase qui suit 
+# (et qui sera rempli automatiquement avec les bonnes valeurs)
+# (même si les données évoluent)
+info1 = n_distinct(data$AASQA)
+info2 = n_distinct(data$Commune)
+info3 = n_distinct(data$`Substance active`)
+info4 = format(min(data$`Debut prelevement`), "%B %Y")
+info5 = format(max(data$`Fin prelevement`), "%B %Y")
+```
+
+### Informations générées dont automatiquement
+
+Mesures faites par `r info1` AASQA, sur `r info2` communes et pour `r info3` substances analysées, de `r info4` à `r info5`.
+
+Quelques différences par rapport à ce qui est annoncé sur la page web...
+
+---
+## Description rapide des données
+
+Beaucoup de mesures faites par certaines AASQA, et très peu par d'autres.
+
+```{r data-aasqa}
+ggplot(data, aes(y = AASQA)) +
+  geom_bar() +
+  theme_minimal() +
+  labs(x = "Nombre de mesures", y = "")
+```
+
+---
+## Description rapide des données
+
+De plus en plus de mesures, mais pas de façon importante, avec des *moments* de mesures continues et des pauses parfois
+
+```{r data-date}
+data %>% group_by(`Debut prelevement`) %>%
+  summarise(Nb = n()) %>%
+  ggplot(aes(`Debut prelevement`, Nb)) +
+  geom_line() +
+  theme_minimal() +
+  labs(y = "Nombre de mesures", x = "")
+```
+
+
+---
+## Description rapide des données
+
+C'est un peu plus clair sur ce graphique
+
+```{r data-date-aasqa}
+data %>% group_by(`Debut prelevement`, AASQA) %>%
+  summarise(Nb = n()) %>%
+  ggplot(aes(`Debut prelevement`, AASQA, colour = Nb)) +
+  geom_point() +
+  theme_minimal() +
+  labs(y = "", x = "", color = "Nombre de\n mesures") +
+  scale_color_gradient(low = "yellow", high = "darkred")
+```
+
+
+---
+## Description rapide des données
+
+Énormément de substances, avec beaucoup de valeurs très faibles en général
+
+```{r data-substances, fig.width = 11, fig.height = 5}
+data %>%
+  ggplot(aes(x = Concentration)) +
+  geom_boxplot(fill = "gray70") +
+  facet_wrap(~ `Substance active`, scales = "free_x") +
+  theme_void() +
+  theme(strip.text.x = element_text(size = 7))
+```
+
+
+---
+## Description rapide des données
+
+Plusieurs substances n'ont pas d'évolution réelle, et peu ont des valeurs au-delà de 0
+
+```{r data-date-concentration, fig.width = 11, fig.height = 5}
+data %>%
+  ggplot(aes(`Debut prelevement`, Concentration)) +
+  geom_line() +
+  facet_wrap(~ `Substance active`, scales = "free") +
+  theme_void() +
+  theme(strip.text.x = element_text(size = 7))
+```
+
+
+---
+## Quelques statistiques par AASQA
+
+### Création d'un dataframe résumant quelques informations par AASQA
+
+```{r stat-par-aasqa}
+stats_aasqa = data %>%
+  # Regroupement par AASQA
+  group_by(AASQA) %>%
+  
+  # Calcul des informations voulues
+  summarise(
+    `Nombre de mesures` = n(),
+    `Nombre de communes` = n_distinct(Commune),
+    `Nombre de substances étudiées` = n_distinct(`Substance active`),
+    `Début` = date(min(`Debut prelevement`)), 
+    `Fin` = date(max(`Fin prelevement`))
+  ) %>%
+  
+  # Tri par ordre décroissant du nombre de mesures
+  arrange(desc(`Nombre de mesures`))
+```
+
+---
+## Quelques statistiques par AASQA
+
+```{r stat-par-aasqa-table}
+# Commandes déjà vues au-dessus
+stats_aasqa %>% kable("html") %>% kable_styling(font_size = 12) %>% 
+  
+  # Surlignage de la ligne 12
+  row_spec(12, background = "lightsalmon")
+```
+
+---
+## Quelques statistiques par AASQA
+
+```{r stat-par-aasqa-graph}
+stats_aasqa %>% 
+  ggplot(aes(x = `Nombre de mesures`, 
+             y = fct_reorder(AASQA, `Nombre de mesures`), 
+             fill = (AASQA == "ATMO NORMANDIE"))) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  theme_minimal() +
+  labs(y = "") +
+  scale_fill_manual(values = c("gray70", "lightsalmon"))
+```
+
+---
+## En Normandie
+
+### Création d'un dataframe avec les données de Normandie uniquement
+
+```{r data-normandie}
+data_normandie = data %>%
+  # Filtre sur la variable AASQA donc
+  filter(AASQA == "ATMO NORMANDIE")
+```
+
+### Création d'un dataframe avec uniquement les coordonnées des communes
+
+```{r communes_coord}
+communes = data_normandie %>%
+  group_by(Commune) %>%
+  # normalement, les communes ne bougent pas géographiquement
+  # donc on prend la première valeur observée pour X et pour Y
+  summarise(
+    lng = xlamb93[1],
+    lat = ylamb93[1]
+  ) %>%
+  # Création d'une variable spécifique de coordonnées
+  st_as_sf(coords = c("lng", "lat")) %>%
+  # Indication que les X et Y sont dans le système Lambert 93
+  # voir EPSG : https://epsg.org/
+  st_set_crs(2154) %>%
+  # Transformation dans le système WGS 84
+  st_transform(crs = 4326)
+```
+
+---
+## Cartes des stations normandes
+
+Voir [cette page](https://leaflet-extras.github.io/leaflet-providers/preview/#filter=CartoDB.Positron) pour les tuiles de fond utilisées (et en tester d'autres éventuellement)
+
+```{r carte-stations}
+carte = leaflet(communes) %>% 
+  # On change le fournisseur de tuiles
+  addProviderTiles("CartoDB.Positron") %>%
+  # Nom du marqueur = nom de la commune
+  addCircleMarkers(label = ~Commune)
+carte
+```
+
+---
+## Substances observées par station
+
+On obtient un tableau à 3 variables :
+
+- Commune
+- Substance
+- Nombre de mesures
+
+Mais trop long pour être affiché correctement
+
+```{r substances, fig.height = 5, fig.width = 15}
+substances_station = data_normandie %>%
+  group_by(Commune, `Substance active`) %>%
+  summarise(NB = n())
+
+substances_station %>% 
+  kable("html")
+```
+
+
+---
+## Substances observées par station
+
+```{r substances_tab}
+# Restructuration en table WIDE pour affichage
+substances_station %>%
+  mutate(NB = cell_spec(NB, background = if_else(!is.na(NB), "orange", "gray90"))) %>%
+  pivot_wider(names_from = Commune, values_from = NB) %>%
+  arrange(`Substance active`) %>%
+  kable("html", escape = FALSE) %>%
+  kable_styling(font_size = 8) %>%
+  scroll_box(height = "400px")
+```
+
+---
+## Substances observées par station
+
+Commençant par un chiffre ou une lettre entre A et D
+
+```{r substances1, fig.height = 5, fig.width = 11}
+ggplot(substances_station %>% filter(str_detect(`Substance active`, "^[0-9A-D]")), 
+       aes(`Substance active`, Commune, fill = NB)) +
+  geom_tile(show.legend = FALSE) +
+  theme_minimal() +labs(x = "", y = "") +
+  scale_fill_gradient(low = "gray80", high = "steelblue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 8))
+```
+
+---
+## Substances observées par station
+
+Commençant par une lettre entre E et M
+
+```{r substances2, fig.height = 5, fig.width = 11}
+ggplot(substances_station %>% filter(str_detect(`Substance active`, "^[E-M]")), 
+       aes(`Substance active`, Commune, fill = NB)) +
+  geom_tile(show.legend = FALSE) +
+  theme_minimal() +labs(x = "", y = "") +
+  scale_fill_gradient(low = "gray80", high = "steelblue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 8))
+```
+
+
+---
+## Substances observées par station
+
+Commençant par une lettre entre N et Z
+
+```{r substances3, fig.height = 5, fig.width = 11}
+ggplot(substances_station %>% filter(str_detect(`Substance active`, "^[N-Z]")), 
+       aes(`Substance active`, Commune, fill = NB)) +
+  geom_tile(show.legend = FALSE) +
+  theme_minimal() +labs(x = "", y = "") +
+  scale_fill_gradient(low = "gray80", high = "steelblue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 8))
+```
+
+
+
+---
+## Substances observées par station
+
+### Table regroupant les coordonnées et le nombre de substances
+
+```{r substances-map-table}
+# Calcul du nombre de substances par commune
+substances_station_communes = substances_station %>%
+  group_by(Commune) %>%
+  summarise(NB_substances = n_distinct(`Substance active`))
+
+# Nécessaire de commencer par communes car leaflet ne comprend pas sinon
+communes_nbsubstances = communes %>% 
+  inner_join(substances_station_communes)
+```
+
+
+---
+## Substances observées par station
+
+### Création de la carte
+
+```{r substances-map-create}
+# Création d'une palette de couleur pour le nombre de substances
+palette = colorBin("YlOrRd", domain = communes_nbsubstances$NB_substances)
+
+# Création de la carte
+carte2 = communes_nbsubstances %>%
+  leaflet(options = leafletOptions(zoomControl = FALSE)) %>% 
+  addProviderTiles("CartoDB.Positron") %>%
+  
+  # Couleur en fonction du nombre de substances
+  addCircleMarkers(fillColor = ~palette(NB_substances), 
+                   color = "black", weight = 1,
+                   
+                   # Popup avec nom de la commune et nombre de substances
+                   popup = ~paste("<strong>", Commune, 
+                                  "</strong><br>Nombre de substances : ", 
+                                  NB_substances)) %>%
+  
+  # Ajout de la légende
+  addLegend(pal = palette, values = ~NB_substances, opacity = 0.8, 
+            title = "Nombre de substances", position = "topleft"
+  )
+```
+
+
+---
+## Substances observées par station
+
+### Affichage de la carte créée
+
+```{r substances-map-affiche, fig.width = 11, fig.height = 6}
+carte2
+```
+
+---
+## Concentration sur CAEN
+
+Idem qu'au général, beaucoup de substances, plusieurs autour de 0 tout le temps, et quelques unes avec des valeurs parfois élevées
+
+```{r susbtances-caen, fig.width = 11, fig.height = 4}
+data_normandie %>%
+  filter(Commune == "Caen") %>%
+  select(`Substance active`, Concentration) %>%
+  ggplot(aes(x = Concentration)) +
+  geom_boxplot(fill = "gray70") +
+  facet_wrap(~ `Substance active`, scales = "free_x") +
+  theme_void()
+```
+
+
+---
+## Lindane à CAEN
+
+On voit ici en plus les périodes de mesures
+
+```{r lindane-caen}
+data_normandie %>%
+  filter(Commune == "Caen") %>%
+  filter(`Substance active` == "Lindane") %>%
+  ggplot(aes(`Debut prelevement`, Concentration)) +
+  geom_rect(aes(xmin = `Debut prelevement`, xmax = `Fin prelevement`,
+                ymin = 0, ymax = max(Concentration)), fill = "gray90") +
+  geom_line() +
+  theme_classic()
+```
+
+
+---
+## Lindane sur chaque commune
+
+Mesures faites dans des périodes différentes selon les communes
+
+```{r lindane-communes, fig.width = 11}
+data_normandie %>%
+  filter(`Substance active` == "Lindane") %>%
+  ggplot(aes(`Debut prelevement`, Concentration)) +
+  geom_rect(aes(xmin = `Debut prelevement`, xmax = `Fin prelevement`,
+                ymin = 0, ymax = max(Concentration)), fill = "gray90") +
+  geom_line() +
+  theme_minimal() + labs(x = "", y = "") +
+  facet_grid(Commune ~ ., scales = "free_y") +
+  theme(strip.text.y.right = element_text(angle = 0))
+```
+
