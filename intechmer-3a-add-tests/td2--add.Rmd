@@ -214,7 +214,13 @@ Mais l'idéal est de représenter les deux directement sur le même graphique af
 ```{r}
 plot(afc)
 ```
+
 ### Si on veut aller plus loin sur ce jeu de données
+
+#### Globalement
+
+- 1973 année la plus mortelle
+- Pic de morts en été et au plus bas en février
 
 ```{r, echo = FALSE}
 Acc2 = data.frame(matrix(USAccDeaths, ncol = 12, byrow = TRUE, dimnames = list(1973:1978, 1:12))) %>% 
@@ -229,12 +235,17 @@ ggplot(Acc2, aes(Mois, value, color = factor(Annee))) +
   theme_minimal()
 ```
 
+#### Plus finement
+
+- Février 1976 plus haut que *prévu*
+- Pour plusieurs mois (janvier, de mars à juin et d'août à décembre,), hausse à partir de 1975 ou 1976
+
 ```{r, echo = FALSE}
-ggplot(Acc2, aes(Annee, value, color = factor(Mois))) +
+ggplot(Acc2, aes(Annee, value)) +
   geom_line(linewidth = 1) + 
-  scale_color_discrete() +
-  labs(x = "", y = "Nombre de morts", color = "Mois") +
-  theme_minimal()
+  labs(x = "", y = "Nombre de morts") +
+  theme_minimal() +
+  facet_wrap(~ Mois)
 ```
 
 
