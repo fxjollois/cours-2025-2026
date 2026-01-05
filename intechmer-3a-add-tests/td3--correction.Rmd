@@ -1,0 +1,185 @@
+---
+title: "TD3 - Correction"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.align = "center")
+```
+
+```{r packages}
+library(tidyverse)
+library(DT)
+library(FactoMineR)
+library(gridExtra)
+```
+
+
+## Importation des données
+
+```{r import}
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+datatable(wine, options = list(scrollX = TRUE))
+```
+
+
+## Recherche d'une partition via CAH
+
+Dans le dendrogramme ci-dessous, le découpage en 3 classes est le plus évident. Toutefois, on remarque qu'il est envisageable de découper en 9 classe, si on souhaite avoir des classes très restreintes et donc une vision très détaillée.
+
+```{r cah}
+cah = wine[,-1] %>%
+  scale() %>%
+  dist() %>%
+  hclust(method = "ward.D2")
+
+par(mar = c(0, 2, 2, 0) + .1)
+plot(cah, hang = -1, labels = FALSE, main = "Dendrogramme - Ward")
+abline(h = 20, lty = 2, col = "gray")
+abline(h = 9, lty = 2, col = "gray")
+```
+
+
+### En choississant 3 classes
+
+On remarque de nettes différences entre les 3 classes. 
+
+```{r cah3}
+cah_z3 = cutree(cah, 3)
+
+cah_centre3 = wine[,-1] %>%
+  mutate(classe = cah_z3) %>%
+  group_by(classe) %>%
+  summarise_all(mean) %>%
+  pivot_longer(-classe) %>%
+  pivot_wider(names_from = classe, values_from = value)
+  
+datatable(cah_centre3, 
+          options = list(paging = F, searching = FALSE)) %>%
+  formatRound(2:4, digits = 2)
+```
+
+La partition obtenue par la CAH est très proche de la répartition des types de vin, à part pour 13 (5 + 8) vins mal classés (CAH en ligne et type de départ en colonne)
+
+```{r cah3-tab}
+table(cah_z3, wine$class)
+```
+
+
+### En choississant 9 classes
+
+La lecture est ici plus ardue et exige une bonne connaissance du domaine.
+
+```{r cah9}
+cah_z9 = cutree(cah, 9)
+
+cah_centre9 = wine[,-1] %>%
+  mutate(classe = cah_z9) %>%
+  group_by(classe) %>%
+  summarise_all(mean) %>%
+  pivot_longer(-classe) %>%
+  pivot_wider(names_from = classe, values_from = value)
+  
+datatable(cah_centre9, 
+          options = list(paging = F, searching = FALSE)) %>%
+  formatRound(2:10, digits = 2)
+```
+
+Les classes obtenues sont parfois très petites (3 vins au minimum), et il y a tout de même quelques classes sur 2 types de vin.
+
+```{r cah9-tab}
+table(cah_z9, wine$class)
+```
+
+
+## Recherche d'une partition via $k$-means
+
+On voit très bien dans les graphiques ci-dessous que le choix de 3 classes s'impose.
+
+```{r kmeans, fig.height=3}
+res = data.frame(nbclust = NA, I = NA, W = NA, B = NA)
+for (k in 1:10) {
+  km = kmeans(scale(wine[,-1]), centers = k, nstart = 30)
+  res[k,] = c(k, km$totss, km$tot.withinss, km$betweenss)
+}
+res = res %>% 
+  mutate(r2 = B / I) %>%
+  mutate(psf = (r2 / (nbclust - 1)) / ((1 - r2) / (nrow(wine) - nbclust))) %>%
+  mutate_all(~ ifelse(is.infinite(.x), NA, .x))
+
+g_r2 = ggplot(res, aes(nbclust, r2)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "R^2") +
+  theme_minimal()
+g_psf = ggplot(res, aes(nbclust, psf)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "Pseudo-F") +
+  theme_minimal()
+grid.arrange(g_r2, g_psf, ncol = 2)
+```
+
+Les différences entre classes sont ici aussi très nettes.
+ 
+```{r kmeans3}
+km3 = kmeans(scale(wine[,-1]), centers = 3)
+
+km3_centres = wine[,-1] %>% 
+  mutate(classe = km3$cluster) %>%
+  group_by(classe) %>%
+  summarise_all(mean) %>%
+  pivot_longer(-classe) %>%
+  pivot_wider(names_from = classe, values_from = value)
+datatable(km3_centres, rownames = FALSE, 
+          options = list(paging = F, searching = FALSE)) %>%
+  formatRound(columns = 2:4, digits = 2)
+```
+
+On retrouve très bien la répartition en 3 types de vin, avec toutefois 6 (3 + 3) vins *mal classés*.
+
+```{r kmeans3-tab}
+table(km3$cluster, wine$class)
+```
+
+## Comparaison des deux partitions
+
+Les partitions sont globalement les mêmes, avec quelques différences (pour un total de 9 vins classés différement).
+
+```{r cah_kmeans}
+table(cah_z3, km3$cluster)
+```
+
+## Représentation sur l'ACP
+
+Il est très clair que les classes obtenus sont globalement les mêmes (ne pas tenir compte des couleurs qui ne signifient rien). Les classes sont tout de même mieux séparées par $k$-means (ceci est globalement toujours vrai).
+
+```{r acp, fig.height = 4}
+acp = PCA(wine[,-1], graph = FALSE)
+
+g_cah = acp$ind$coord %>%
+  data.frame() %>%
+  mutate(classe = as.character(cah_z3)) %>%
+  ggplot(aes(Dim.1, Dim.2, color = classe)) +
+  geom_point(show.legend = FALSE) +
+  theme_minimal() +
+  ggtitle("CAH")
+g_kmeans = acp$ind$coord %>%
+  data.frame() %>%
+  mutate(classe = as.character(km3$cluster)) %>%
+  ggplot(aes(Dim.1, Dim.2, color = classe)) +
+  geom_point(show.legend = FALSE) +
+  theme_minimal() +
+  ggtitle("k-Means")
+
+grid.arrange(g_cah, g_kmeans, ncol = 2)
+```
+

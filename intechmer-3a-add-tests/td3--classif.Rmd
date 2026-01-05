@@ -10,7 +10,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE)
 ```
 
 ## Classification Ascendante Hiérarchique (CAH)
@@ -138,7 +140,7 @@ Ici, nous allons exécuter un petit algorithme, pour chercher le nombre de class
 1. On créé d'abord un data.frame vide dans lequel nous mettrons les résultats ;
 2. Ensuite, pour un nombre de classes compris entre 1 et 10, on lance $k$-means (on force 30 essais différents pour obtenir le meilleur résultat possible pour chaque valeur de `k`) ;
 3. Enfin, on calcule les valeurs de $R^2$, puis de $PseudoF$ ;
-4. La dernière ligne permet de transformer la valeur infinie (noté `Inf`, dû à la division par zéro) de $PsudoF$ pour 1 classe par une donnée manquante `NA`.
+4. La dernière ligne permet de transformer la valeur infinie (noté `Inf`, due à la division par zéro) de $PseudoF$ pour 1 classe par une donnée manquante `NA`.
 
 ```{r}
 res = data.frame(nbclust = NA, I = NA, W = NA, B = NA)
@@ -171,7 +173,7 @@ Si on regarde l'évolution du $PseudoF$, en regardant le max, on note que ce cri
 ggplot(res, aes(nbclust, psf)) +
   geom_line() +
   scale_x_continuous(breaks = 1:10) +
-  labs(x = "Nombre de classes", y = "R^2") +
+  labs(x = "Nombre de classes", y = "Pseudo-F") +
   theme_minimal()
 ```
 
@@ -185,7 +187,7 @@ Le code suivant permet de charger les données, et de nommer correctement les va
 
 ```{r}
 wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
-names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+names(wine) = c("type", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
                 "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
                 "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
 datatable(wine, options = list(scrollX = TRUE))
