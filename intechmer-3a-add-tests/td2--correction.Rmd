@@ -1,0 +1,169 @@
+---
+title: "TD2 - Correction"
+author: "Outils de surveillance et analyses statistiques"
+date: "INTECHMER - CT3 GEM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
+                      fig.align = "center")
+```
+
+## Données Wine – ACP
+
+### Importation des données
+
+```{r import}
+library(tidyverse)
+library(FactoMineR)
+
+wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data",
+                col_names = FALSE)
+names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+                "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
+                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
+```
+
+### Description rapide des données
+
+3 classes de vin presque équilibrées.
+
+```{r des-class}
+ggplot(wine, aes(class, fill = factor(class))) +
+  geom_bar() +
+  theme_minimal() +
+  labs(x = "", y = "", fill = "Classe")
+```
+
+Des variables avec des échelles très différentes, et des différences entre les classes.
+
+
+```{r desc-var}
+wine %>%
+  pivot_longer(-class) %>%
+  ggplot(aes(value, fill = factor(class))) +
+  geom_boxplot(show.legend = FALSE) +
+  facet_wrap(~ name, scale = "free_x") +
+  theme_void()
+```
+
+
+### Réalisation de l'ACP
+
+On doit réaliser une ACP normée (avec matrice de corrélation), car les variables ont des échelles des différentes.
+
+```{r acp}
+acp_wine = PCA(wine[,-1], graph = FALSE)
+```
+
+```{r aic-variance}
+acp_wine$eig %>%
+  data.frame() %>%
+  mutate(comp = 1:13) %>%
+  ggplot(aes(factor(comp), percentage.of.variance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "Composantes", y = "% de variance expliquée") +
+  theme_minimal()
+```
+
+```{r acp-individus}
+data.frame(acp_wine$ind$coord) %>% 
+  mutate(Classe = wine$class) %>%
+  ggplot(aes(Dim.1, Dim.2, color = factor(Classe))) +
+  geom_point() +
+  theme_minimal()
+```
+
+```{r acp-variables}
+plot(acp_wine, choix = "var")
+```
+
+```{r acp-variables-bis}
+library(ggforce) # pour le cercle
+acp_wine$var$cor %>%
+  data.frame() %>%
+  transmute(interet = (Dim.1 > .6) | (Dim.2 > .6)) %>%
+  bind_cols(data.frame(acp_wine$var$coord)) %>%
+  rownames_to_column("Dim") %>%
+  ggplot(aes(Dim.1, Dim.2, colour = interet)) +
+  geom_circle(aes(x0 = 0, y0 = 0, r = 1),
+              col = "black") +
+  geom_segment(aes(x = 0, y = 0, 
+                   xend = Dim.1, yend = Dim.2),
+               arrow = arrow(),
+               alpha = .5,
+               show.legend = FALSE
+  ) +
+  xlim(-1, 1) + ylim(-1, 1) + coord_fixed() +
+  geom_text(aes(label = Dim), show.legend = FALSE) +
+  scale_color_manual(values = c("gray80", "darkred")) +
+  theme_minimal() 
+```
+
+## Données CSP 1968 et 2014 – AFC
+
+### Importation des données
+
+```{r import-CSP}
+regions1968 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-1968.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions1968) = sub(" Actifs ayant un emploi RP1968", "", names(regions1968))
+
+regions2014 = read_csv("https://fxjollois.github.io/donnees/regions-csp/regions-csp-2014.csv") %>%
+  select(!contains("Chômeurs")) %>%
+  column_to_rownames("Région")
+names(regions2014) = sub(" Actifs ayant un emploi RP2014", "", names(regions2014))
+```
+
+
+### Réalisation de l'AFC sur 1968
+
+```{r afc1968}
+afc_1968 = CA(regions1968)
+```
+
+```{r afc2014}
+afc_2014 = CA(regions2014)
+```
+
+
+
+```{r afc1968-bis}
+ggplot(mapping = aes(Dim.1, Dim.2, label = text)) +
+  geom_text(data = afc_1968$row$coord %>%
+              data.frame() %>%
+              rownames_to_column("text"),
+            color = "steelblue") +
+  geom_text(data = afc_1968$col$coord %>%
+              data.frame() %>%
+              rownames_to_column("text"),
+            color = "darkred") +
+  xlim(-1, 1) + coord_fixed() +
+  theme_minimal() -> g1968
+g1968
+```
+
+```{r afc2014-bis}
+ggplot(mapping = aes(Dim.1, Dim.2, label = text)) +
+  geom_text(data = afc_2014$row$coord %>%
+              data.frame() %>%
+              rownames_to_column("text"),
+            color = "steelblue") +
+  geom_text(data = afc_2014$col$coord %>%
+              data.frame() %>%
+              rownames_to_column("text"),
+            color = "darkred") +
+  xlim(-.5, .75) + coord_fixed() +
+  theme_minimal() -> g2014
+g2014
+```
+
+
+
+
+```{r double-plot, fig.width=11}
+library(gridExtra)
+grid.arrange(g1968, g2014, ncol = 1)
+```

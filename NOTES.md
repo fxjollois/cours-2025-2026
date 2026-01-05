@@ -45,6 +45,7 @@
 - Découper la séance 6 en deux séances !
 - CREER une séance 7 récapitulatve d'un peu tout avant les anciennes séances 7 et 8 ?
 - INVERSER séances 7 et 8 !!
+- EVALUATION SUR PAPIER !
 
 ### BUT SD - NoSQL
 
@@ -71,14 +72,24 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
 ## INTECHMER
 
 - CT2 STM018 : 
-    - CM 1 : Faire plus "théorique" et aucun code dedans !
-    - Mettre le début du TD2 dans un CMs et les codes dans les TDs
+    - CM : 
+        - Faire plus "théorique" et aucun code dedans !
+        - CM1 : Manip'
+        - CM2 : Visu
+            - Mettre le début du TD2 dans un CMs et les codes dans les TDs
+        - CM3 : Rmarkdown et autres (TD3)
     - **AUTRE JEU DE DONNEES** pour TD1 et TD2 !!!
     - TD 1 : faire plus simple pour les questions du début 
     - TD 2 : pareil
     - TD 3 : plus simple aussi (mais je ne sais pas comment faire...)
 - CT3 GEM104 :
     - CM 1 : Moins théorique !! Expliquer la notion de test en général (Hypothèse nulle vs hypothèse alternative) puis parler de la *p-value*, puis enchaîner sur les différents tests utiles (normalité, corrélation, chi-deux, t-test...)
+    - TD 2 : plus complet
+        - sur les variables supplémentaires par exemple
+        - sur ACP normée classique ou juste centrée
+        - Choisir d'autres jeux de données d'exemple
+
+
     
     
     

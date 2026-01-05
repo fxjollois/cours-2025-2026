@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
 
 
@@ -17,11 +17,12 @@ knitr::opts_chunk$set(echo = TRUE)
 Nous allons utiliser le jeu de données [`adult.csv`](https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv), issu d'une enquête aux USA pour analyser le salaire (variable binaire : plus ou moins de 50k$) en fonction de certains critères (âge, sexe, éducation, nombre d'heures de travail par semaine...).
 
 ```{r adult}
-library(readr)
+library(tidyverse)
 library(DT)
-adult = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv")
+adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-3a-add-tests/adult.csv")
 datatable(adult, options = list(scrollX = TRUE))
 ```
+
 ### Détail sur ces données
 
 La variable *cible* dans ce jeu de données est la colonne **`class`**, qui permet de savoir si une personne gagne plus (`>50K`) ou moins (`<=50K`) de 50000$ par an. Le but de l'enquête est de connaître les différentes variables permettant de déterminer le positionnement d'un adulte par rapport à ce seuil.
@@ -44,22 +45,10 @@ Les autres variables sont les suivantes (celles avec un nom explicite ne sont pa
 - `hours_per_week`
 - `native_country`
 
-## Conseil de rédaction
-
-Rédiger le compte-rendu dans un fichier **Rmarkdown**. Quelques liens pour vous aider, si besoin :
-
-- La référence (en anglais bien évidemment) : <https://rmarkdown.rstudio.com/docs/>
-- Un document en français bien fait : <https://lms.fun-mooc.fr/asset-v1:ParisSaclay+71007+session16+type@asset+block/RMarkdown.pdf>
-- Autres liens :
-  - <https://book.utilitr.org/03_Fiches_thematiques/Fiche_rmarkdown.html>
-  - <https://sites.google.com/site/rgraphiques/home/rmarkdown-notebook-jupyter>
-  - <https://larmarange.github.io/analyse-R/rmarkdown-les-rapports-automatises.html>
-  - <https://egallic.fr/Enseignement/AMSE/Comment_utiliser_RMarkdown.html>
-
 
 ## Demandes
 
-Pour chaque demande, produire les résultats numériques et le graphique utile (voire plusieurs si nécessaire) pour étayer votre analyse.
+Rédiger le compte-rendu dans un fichier **Rmarkdown**. Pour chaque demande, produire les résultats numériques et le graphique utile (voire plusieurs si nécessaire) pour étayer votre analyse.
 
 ### Analyses univariées
 
@@ -82,4 +71,10 @@ Identifier si les liens suivants sont réels :
 1. Sexe et salaire
 1. Catégorie ethnique (variable `race`) et salaire
 1. Âge et nombre d'heures de travail par semaine
+
+### Analyses multivariées
+
+1. A l'aide d'une ACP et d'une classification sur les variables quantitatives, indiquer s'il y a une répartition en classes intéressantes
+1. A l'aide d'une AFC, déterminer s'il y a un lien entre la catégorie ethnique et le statut marital
+
 
