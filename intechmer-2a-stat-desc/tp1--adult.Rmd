@@ -1,0 +1,62 @@
+---
+title: "Applications sur données réelles - TP 1 - Adult"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Données `ADULT`
+
+### Importation
+
+Nous allons utiliser le jeu de données [`adult.csv`](adult.csv), issu d'une enquête aux USA pour analyser le salaire (variable binaire : plus ou moins de 50k$) en fonction de certains critères (âge, sexe, éducation, nombre d'heures de travail par semaine...).
+
+```{r adult}
+library(tidyverse)
+library(DT)
+adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/adult.csv")
+knitr::kable(head(adult, 10))
+```
+
+### Détail sur ces données
+
+La variable *cible* dans ce jeu de données est la colonne **`class`**, qui permet de savoir si une personne gagne plus (`>50K`) ou moins (`<=50K`) de 50000$ par an. Le but de l'enquête est de connaître les différentes variables permettant de déterminer le positionnement d'un adulte par rapport à ce seuil.
+
+Les autres variables sont les suivantes (celles avec un nom explicite ne sont pas détaillées) :
+
+- `age`
+- `workclass` : statut
+- `fnlwgt` : poids de chaque individu permettant de redresser l'échantillon
+  - On ne va pas prendre en coompte cette variable pour le moment
+- `education` : niveau d'éducation de la personne
+  - `education_num` contient la même information, mais codée
+- `marital_status`
+- `occupation` : équivalent de nos CSP
+- `relationship`
+- `race` : groupe ethnique d'appartenance
+  - aux USA, il est courant d'utiliser ce terme et cette répartition
+- `sex`
+- `capital_gain` et `capital_loss` : résultat positif et/ou négatif des placements
+- `hours_per_week`
+- `native_country`
+
+
+## Demandes
+
+Rédiger le compte-rendu dans un fichier **Rmarkdown**. A l'aide de calculs numériques et de graphiques judicieusement choisis, répondez aux demandes suivantes
+
+- Décrire les variables âge, nombre d'heures de travail, gain et perte sur les investissement (`capital_gain` et `capital_loss`) ;
+- Décrire les variables salaire, sexe, catégorie éthnique (`race`), statut marital et education ;
+- Décrire les liens entre chaque variable et le salaire ;
+- Décrire aussi les liens entre :
+  - Âge et nombre d'heures de travail ;
+  - Âge et investissement (les deux variables `capital_xxx`).
