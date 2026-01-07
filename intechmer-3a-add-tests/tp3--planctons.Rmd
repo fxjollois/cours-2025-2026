@@ -6,7 +6,9 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
 ```
 
 ## Données Planctons
@@ -49,11 +51,14 @@ ggplot() +
 Nous souhaitons donc étudier les concentrations de planctons pour avoir des profils type. Pour cela, nous allons procéder aux étapes suivantes en suivant le plan de l'article initial, pour chaque couche (cf variable `layer`) :
 
 1. Décrire les données, en particulier de concentrations
+
+### En considérant les données brutes
+
 2. Effectuer une transformation de Hellinger sur les données de concentrations (cf fonction `decostand()` du package `vegan` par exemple)
-3. Faire quelques traitements sur les variables explicatives
+3. Faire quelques traitements sur les autres variables explicatives
     - Remplacer les données manquantes par la valeur moyenne de la variable
     - Transformer les variables `bulk_conc` et `snow_conc` en calculant $\log(1+x)$ (car valeurs parfois égales à 0)
-    - Normaliser toutes les variables
+    - Normaliser toutes ces variables
 4. Réaliser une ACP sur les concentrations, en ajoutant les variables explicatives en variables supplémentaires (cf paramètre `quanti.sup` dans la fonction `PCA()`)
 5. Rechercher un nombre de classes avec une CAH (en utilisant la distance euclidienne et la méthode de *Ward*) 
 6. Rechercher la partition optimale à l'aide de $k$-means
@@ -63,6 +68,14 @@ Nous souhaitons donc étudier les concentrations de planctons pour avoir des pro
 8. Représenter la partition sur une carte
 
 Dans l'article initial [1], la partition est recherchée sur les cinq premiers facteurs de l'ACP. L'idée n'est pas nouvelle et elle est couramment mise en oeuvre. L'idée derrière est de supprimer le *bruit* éventuel présent dans les données. Essayez de comparer vos résultats avec leurs résultats.
+
+
+### En binarisant les variables
+
+1. Effectuer une transformation binaire sur les données de concentrations (présence = 1, absence = 0)
+2. Rechercher une partition à l'aide de la CAH, en utilisant la distance de Manhattan (cf paramètre `method` dans la fonction `dist()`) et le lien simple (cf paramètre `method` dans la fonction `hclust()`)
+3. Décrire les classes ainsi obtenues, en utilisant les variables d'origine
+
 
 ## Bibliographie
 

@@ -5,14 +5,21 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.align = "center")
 ```
 
 ```{r import, include=FALSE}
 library(tidyverse)
+library(scales)
 library(knitr)
+library(FactoMineR)
+library(DT)
+library(gridExtra)
 
-adult = read_csv("https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv")
+adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-3a-add-tests/adult.csv")
 ```
 
 ## Analyses univariées
@@ -228,15 +235,80 @@ ggplot(adult, aes(capital_loss)) +
 
 #### Tranformation en variable binaire
 
-```{r capital-transform}
-adult = adult %>%
-  mutate(capital = (capital_loss + capital_gain) > 0)
-ggplot(adult, aes(capital, fill = capital)) +
-  geom_bar(show.legend = FALSE) +
-  scale_fill_discrete(type = c("lightgray", "orange")) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "", y = "")
+On vérifie déjà qu'il n'y a bien aucun individu avec des valeurs supérieurs à 0 dans les deux variables.
+
+```{r}
+adult %>%
+  filter(capital_gain > 0 & capital_loss > 0) %>%
+  nrow()
+```
+
+
+Dans ce cas, il est possible de penser à trois transformations possibles :
+
+- *Binariser* ces deux variables, en mettant la valeur 1 si c'est supérieur à 0 et 0 sinon
+- Créer une seule nouvelle variable à trois valeurs possible : *Perte*, *Rien*, *Gain*
+- Créer deux variables *imbriquées* :
+  - On peut considérer que s'il y a perte ou gain de capital, c'est qu'il y a investissement. Au contraire, s'il n'y a rien, c'est que très sûrement, il n'y a pas d'investissement
+  - La première variable indiquera s'il y a investissement
+  - La deuxième variable, qui n'aura de valeur que pour les individus ayant un investissement, sera égale à *Perte* ou *Gain*.
+  
+Voici les codes pour chaque possibilité, ainsi qu'un graphique descriptif des nouvelles variables
+
+##### Binarisation des variables
+
+Assez peu de valeurs à `TRUE`
+
+```{r capital-transform1, fig.height = 4, echo = TRUE}
+adult_transform1 = adult %>%
+  mutate(capital_loss_bin = capital_loss > 0,
+         capital_gain_bin = capital_gain > 0)
+
+g1 = ggplot(adult_transform1, aes(capital_loss_bin)) +
+  geom_bar()
+g2 = ggplot(adult_transform1, aes(capital_gain_bin)) +
+  geom_bar()
+grid.arrange(g1, g2, ncol = 2)
+```
+
+##### Création d'une seule variable à trois modalités
+
+Beaucoup de *Rien* et peu de *Perte* ou de *Gain*
+
+```{r capital-transform2, fig.height = 4, echo = TRUE}
+adult_transform2 = adult %>%
+  mutate(capital = capital_gain - capital_loss) %>%
+  mutate(capital = ifelse(capital < 0, 
+                          "Perte",
+                          ifelse(capital > 0, 
+                                 "Gain", 
+                                 "Rien")))
+
+ggplot(adult_transform2, aes(capital)) +
+  geom_bar() +
+  scale_x_discrete(limits = c("Perte", "Rien", "Gain"))
+```
+
+##### Création de deux variables imbriquées
+
+Peu d'investissement donc, mais plus de gain que de perte.
+
+```{r capital-transform3, fig.height = 4, echo = TRUE}
+adult_transform3 = adult %>%
+  mutate(capital = capital_gain + capital_loss == 0) %>%
+  mutate(capital_res = ifelse(capital_gain > 0, 
+                              "Gain",
+                              ifelse(capital_loss > 0,
+                                     "Perte",
+                                     NA)))
+
+g1 = ggplot(adult_transform3, aes(capital)) +
+  geom_bar()
+# drop_na() permet de supprimer les lignes avec données manquantes
+g2 = ggplot(adult_transform3 %>% drop_na(),
+            aes(capital_res)) +
+  geom_bar()
+grid.arrange(g1, g2, ncol = 2)
 ```
 
 
@@ -399,7 +471,7 @@ ggplot(adult, aes(hours_per_week, class, fill = class)) +
 
 Les deux variables étant qualitatives (binaires), nous allons chercher le lien avec le test du $\chi^2$.
 
-```{r}
+```{r sex-class}
 t7 = table(adult$sex, adult$class)
 r7 = chisq.test(t7)
 ```
@@ -432,7 +504,7 @@ ggplot(adult, aes(class, fill = sex)) +
 
 Même cas que précédemment.
 
-```{r}
+```{r race-class}
 t8 = table(adult$race, adult$class)
 r8 = chisq.test(t8)
 ```
@@ -492,5 +564,169 @@ kable(df9)
 ggplot(adult, aes(age, hours_per_week)) +
   geom_bin_2d() +
   theme_minimal()
+```
+
+:::
+:::
+
+## Analyses multivariées
+
+### Existe-t'il une partition ?
+
+A l'aide d'une ACP et d'une classification sur les variables quantitatives, indiquer s'il y a une répartition en classes intéressantes
+
+Ici, le nombre d'individus est trop important pour pouvoir réaliser une CAH directement. Nous allons donc déjà résumer les données en 100 classes via $k$-means.
+
+```{r km100}
+adult_quanti = adult %>%
+  select(age, hours_per_week, capital_gain, capital_loss)
+km100 = kmeans(scale(adult_quanti), 100)
+```
+
+Pour information, la partition en 100 classes explique tout de même `r round(km100$betweenss / km100$totss * 100)`% de l'information totale. 
+
+Sur la base du dendrogramme obtenu, on peut considérer que le choix de 4 classes est intéressant.
+
+```{r cah}
+cah = km100$centers %>%
+  dist() %>%
+  hclust(method = "ward.D2")
+
+par(mar = c(0, 2, 2, 0) + .1)
+plot(cah, hang = -1, labels = FALSE, ylab = "", 
+     main = "CAH - Ward")
+abline(h = 24, lty = 2, col = "gray")
+abline(h = 12, lty = 2, col = "gray")
+```
+
+Avec une recherche du nombre de classes directement par $k$-means, en utilisant les critères $r^2$ et $PseudoF$, on a du mal à définir un nombre de classes de façon nette. Le premier critère semble ne pas proposé de choix (légère inflexion à 4 et 5 classes), et le deuxième propose lui 8 classes (il y a aussi une très légère inflexion à 4 classes).
+
+```{r km-choix}
+res = data.frame(nbclust = NA, I = NA, W = NA, B = NA)
+for (k in 1:10) {
+  km = kmeans(scale(adult_quanti), centers = k, nstart = 30)
+  res[k,] = c(k, km$totss, km$tot.withinss, km$betweenss)
+}
+res = res %>% 
+  mutate(r2 = B / I) %>%
+  mutate(psf = (r2 / (nbclust - 1)) / ((1 - r2) / (nrow(adult_quanti) - nbclust))) %>%
+  mutate_all(~ ifelse(is.infinite(.x), NA, .x))
+
+g_r2 = ggplot(res, aes(nbclust, r2)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "R^2") +
+  theme_minimal()
+g_psf = ggplot(res, aes(nbclust, psf)) +
+  geom_line() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(x = "Nombre de classes", y = "Pseudo-F") +
+  theme_minimal()
+grid.arrange(g_r2, g_psf, ncol = 2)
+```
+
+La représentation sur le premier plan factoriel est assez particulière, avec des classes très allongées. En regardant en plus le cercle de corrélations, les boîtes à moustaches de chaque variable par classe et les centres des classes, on remarque qu'on a une classe d'individus avec de forts gains sur leurs placements, âgées et travaillant beaucoup.
+
+::: {}
+::: {.column width="48%"}
+
+```{r km4}
+km4 = kmeans(adult_quanti, 4, nstart = 30)
+
+acp = PCA(scale(adult_quanti), graph = FALSE)
+
+acp$ind$coord %>%
+  data.frame() %>%
+  mutate(classe = as.character(km4$cluster)) %>%
+  ggplot(aes(Dim.1, Dim.2, color = classe)) +
+  geom_point() +
+  theme_minimal()
+```
+
+A noter que le premier plan factoriel représente `r round(acp$eig[2,3])`% de l'information.
+
+:::
+::: {.column width="48%"}
+
+```{r acp}
+plot(acp, choix = "var")
+```
+
+:::
+:::
+
+```{r }
+centres = adult_quanti %>%
+  mutate(classe = km4$cluster) %>%
+  group_by(classe) %>%
+  summarise_all(mean)
+
+datatable(centres, rownames = FALSE, 
+          options = list(paging = F, searching = FALSE)) %>%
+  formatRound(columns = 2:5, digits = 2)
+```
+
+
+```{r km4-graph-box, fig.width = 10}
+adult_quanti %>%
+  mutate(classe = as.character(km4$cluster)) %>%
+  pivot_longer(-classe) %>%
+  ggplot(aes(x = value, y = classe, fill = classe)) +
+  geom_boxplot(show.legend = FALSE) +
+  facet_wrap(~ name, scale = "free_x", ncol = 4) +
+  #theme_minimal() +
+  theme(strip.text = element_text(face = "bold", size = rel(1.5))) +
+  labs(x = "", y = "")
+```
+
+
+### Lien entre catégorie ethnique et statut marital
+
+On calcule la table de contingence entre ces deux variables. On remarque que les statuts *Married-spouse-absent* et surtout *Married-AF-spouse* sont peu présents. 
+
+```{r race-marital-tab1}
+tab = adult %>%
+  group_by(race, marital_status) %>%
+  summarise(nb = n()) %>%
+  pivot_wider(names_from = race, values_from = nb) %>%
+  mutate_all(~ ifelse(is.na(.x), 0, .x)) %>%
+  column_to_rownames("marital_status")
+datatable(tab)
+```
+
+On décide donc de les réunir avec l'autre statut *Married-civ-spouse* dans la suite de cette partie.
+
+```{r race-marital-tab2}
+tab = adult %>%
+  mutate(marital_status = ifelse(str_detect(marital_status, "Married"), "Married", marital_status)) %>%
+  group_by(race, marital_status) %>%
+  summarise(nb = n()) %>%
+  pivot_wider(names_from = race, values_from = nb) %>%
+  mutate_all(~ ifelse(is.na(.x), 0, .x)) %>%
+  column_to_rownames("marital_status")
+datatable(tab)
+```
+
+Grâce à l'AFC, on fait les remarques suivantes :
+
+- La modalité *Black* est très proche de la modalité *Separated* ;
+- La modalité *White* est placé au centre du nuage, proche de la modalité *Married* ;
+- Les modalités *Asian-Pac-Islander* et *Other* sont opposées à la modalité *Amer-Indian-Eskimo*, celle-ci étant proche des modalités *Divorced* et *Widowed* dans une moindre mesure.
+
+```{r race-marital-ca}
+afc = CA(tab)
+```
+
+Le graphique ci-dessous confirme nos analyses précédentes.
+
+```{r race-marital-graph}
+adult %>%
+  mutate(marital_status = ifelse(str_detect(marital_status, "Married"), "Married", marital_status)) %>%
+  ggplot(aes(y = race, fill = marital_status)) +
+  geom_bar(position = "fill") +
+  theme_minimal() +
+  scale_x_continuous(labels = percent) +
+  labs(x = "", y = "Catégorie ethnique",
+       fill = "Statut\nmarital")
 ```
 

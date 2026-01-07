@@ -24,10 +24,10 @@ library(gridExtra)
 
 ```{r import}
 wine = read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", col_names = FALSE)
-names(wine) = c("class", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
+names(wine) = c("type", "Alcohol", "Malic acid", "Ash", "Alcalinity of ash", "Magnesium", 
                 "Total phenols", "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
                 "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline")
-datatable(wine, options = list(scrollX = TRUE))
+datatable(wine, rownames = FALSE, options = list(scrollX = TRUE))
 ```
 
 
@@ -62,7 +62,7 @@ cah_centre3 = wine[,-1] %>%
   pivot_longer(-classe) %>%
   pivot_wider(names_from = classe, values_from = value)
   
-datatable(cah_centre3, 
+datatable(cah_centre3, rownames = FALSE, 
           options = list(paging = F, searching = FALSE)) %>%
   formatRound(2:4, digits = 2)
 ```
@@ -70,7 +70,7 @@ datatable(cah_centre3,
 La partition obtenue par la CAH est très proche de la répartition des types de vin, à part pour 13 (5 + 8) vins mal classés (CAH en ligne et type de départ en colonne)
 
 ```{r cah3-tab}
-table(cah_z3, wine$class)
+table(cah_z3, wine$type)
 ```
 
 
@@ -88,7 +88,7 @@ cah_centre9 = wine[,-1] %>%
   pivot_longer(-classe) %>%
   pivot_wider(names_from = classe, values_from = value)
   
-datatable(cah_centre9, 
+datatable(cah_centre9, rownames = FALSE, 
           options = list(paging = F, searching = FALSE)) %>%
   formatRound(2:10, digits = 2)
 ```
@@ -96,7 +96,7 @@ datatable(cah_centre9,
 Les classes obtenues sont parfois très petites (3 vins au minimum), et il y a tout de même quelques classes sur 2 types de vin.
 
 ```{r cah9-tab}
-table(cah_z9, wine$class)
+table(cah_z9, wine$type)
 ```
 
 
@@ -147,7 +147,7 @@ datatable(km3_centres, rownames = FALSE,
 On retrouve très bien la répartition en 3 types de vin, avec toutefois 6 (3 + 3) vins *mal classés*.
 
 ```{r kmeans3-tab}
-table(km3$cluster, wine$class)
+table(km3$cluster, wine$type)
 ```
 
 ## Comparaison des deux partitions

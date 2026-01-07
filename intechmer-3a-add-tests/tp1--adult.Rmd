@@ -6,7 +6,9 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
 ```
 
 
@@ -14,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 
 ### Importation
 
-Nous allons utiliser le jeu de données [`adult.csv`](https://fxjollois.github.io/cours-2024-2025/intechmer-3a-add-tests/adult.csv), issu d'une enquête aux USA pour analyser le salaire (variable binaire : plus ou moins de 50k$) en fonction de certains critères (âge, sexe, éducation, nombre d'heures de travail par semaine...).
+Nous allons utiliser le jeu de données [`adult.csv`](adult.csv), issu d'une enquête aux USA pour analyser le salaire (variable binaire : plus ou moins de 50k$) en fonction de certains critères (âge, sexe, éducation, nombre d'heures de travail par semaine...).
 
 ```{r adult}
 library(tidyverse)
@@ -37,7 +39,7 @@ Les autres variables sont les suivantes (celles avec un nom explicite ne sont pa
   - `education_num` contient la même information, mais codée
 - `marital_status`
 - `occupation` : équivalent de nos CSP
-- `relationship` : 
+- `relationship`
 - `race` : groupe ethnique d'appartenance
   - aux USA, il est courant d'utiliser ce terme et cette répartition
 - `sex`
