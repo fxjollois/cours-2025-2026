@@ -1,0 +1,559 @@
+---
+title: "TP 1 - Correction"
+author: "Traitement des données"
+date: "INTECHMER - CT2 GEM/PVRM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+
+## Importation
+
+```{r adult}
+library(tidyverse)
+library(knitr)      # pour la fonction kable() surtout
+library(kableExtra) # pour le style de 
+
+adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/adult.csv")
+```
+
+## Description de la population
+
+### Âge
+
+Les individus ont en moyenne **38,6 ans**, et se situent tous entre 17 et 90 ans.
+
+
+```{r age-num}
+x = adult$age
+tab = data.frame(
+  Information = c("Moyenne", "Ecart-type", "Minimum", "Maximum"),
+  Valeur = c(mean(x), sd(x), min(x), max(x))
+)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+On remarque qu'un majorité des individus ont entre 25 et 50 ans.
+
+```{r age-hist}
+ggplot(adult, aes(age)) +
+  geom_histogram(bins = 20)
+```
+
+```{r age-box}
+ggplot(adult, aes(age)) +
+  geom_boxplot()
+```
+
+
+### Nombre d'heures de travail
+
+Les individus travaillent très majoritairement 40 heures par semaine, avec une étendue très large - de 1 heure par semaine à 99 heures par semaine.
+
+```{r hours-num}
+x = adult$hours_per_week
+tab = data.frame(
+  Information = c("Moyenne", "Ecart-type", "Minimum", "Maximum"),
+  Valeur = c(mean(x), sd(x), min(x), max(x))
+)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r hours-hist}
+ggplot(adult, aes(hours_per_week)) +
+  geom_histogram()
+```
+
+
+```{r hours-box}
+ggplot(adult, aes(hours_per_week)) +
+  geom_boxplot()
+```
+
+### Investissements
+
+#### Gain
+
+```{r gain-num}
+x = adult$capital_gain
+tab = data.frame(
+  Information = c("Moyenne", "Ecart-type", "Minimum", "Maximum"),
+  Valeur = c(mean(x), sd(x), min(x), max(x))
+)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r gain-hist}
+ggplot(adult, aes(capital_gain)) +
+  geom_histogram()
+```
+
+
+```{r gain-box}
+ggplot(adult, aes(capital_gain)) +
+  geom_boxplot()
+```
+
+#### PErte
+
+
+```{r loss-num}
+x = adult$capital_loss
+tab = data.frame(
+  Information = c("Moyenne", "Ecart-type", "Minimum", "Maximum"),
+  Valeur = c(mean(x), sd(x), min(x), max(x))
+)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r loss-hist}
+ggplot(adult, aes(capital_loss)) +
+  geom_histogram()
+```
+
+
+```{r loss-box}
+ggplot(adult, aes(capital_loss)) +
+  geom_boxplot()
+```
+
+### Les 4 variables quantitatives en une fois
+
+On peut produire un seul tableau avec les informations des 4 variables quantitatives, comme ci-dessous.
+
+```{r all-num}
+x1 = adult$age
+x2 = adult$hours_per_week
+x3 = adult$capital_gain
+x4 = adult$capital_loss
+tab = data.frame(
+  Information = c("Moyenne", "Ecart-type", "Minimum", "Maximum"),
+  Age = c(mean(x1), sd(x1), min(x1), max(x1)),
+  Travail = c(mean(x2), sd(x2), min(x2), max(x2)),
+  Gain = c(mean(x3), sd(x3), min(x3), max(x3)),
+  Perte = c(mean(x4), sd(x4), min(x4), max(x4))
+)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+En version un peu compliquée tout de même
+
+```{r all-box}
+adult %>%
+  select(age, hours_per_week, capital_gain, capital_loss) %>%
+  rownames_to_column("id") %>%
+  pivot_longer(-id) %>%
+  ggplot(aes(y = value)) +
+  geom_boxplot() +
+  facet_wrap(~ name, ncol = 4, scale = "free_y")
+```
+
+En version plus simple à comprendre, en utilisant le package [`gridExtra`](https://cran.r-project.org/web/packages/gridExtra/index.html).
+
+```{r all-box-bis}
+library(gridExtra)
+
+g1 = ggplot(adult, aes(y = age)) +
+  geom_boxplot() + ggtitle("Age") + labs(y = "")
+g2 = ggplot(adult, aes(y = hours_per_week)) +
+  geom_boxplot() + ggtitle("Travail") + labs(y = "")
+g3 = ggplot(adult, aes(y = capital_gain)) +
+  geom_boxplot() + ggtitle("Gain") + labs(y = "")
+g4 = ggplot(adult, aes(y = capital_loss)) +
+  geom_boxplot() + ggtitle("Perte") + labs(y = "")
+grid.arrange(g1, g2, g3, g4, ncol = 4)
+```
+
+
+### Salaire
+
+Un quart des gens environ gagnent plus de 50 k\$.
+
+```{r class-num}
+adult %>% 
+  group_by(class) %>%
+  summarise(Nombre = n()) %>%
+  mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2))
+```
+
+```{r class-bar}
+ggplot(adult, aes(class)) +
+  geom_bar()
+```
+
+
+### Sexe
+
+On a une répartition inégale des sexes, avec un tiers de femmes seulement.
+
+
+```{r sex-num}
+adult %>% 
+  group_by(sex) %>%
+  summarise(Nombre = n()) %>%
+  mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2))
+```
+
+```{r sex-bar}
+ggplot(adult, aes(sex)) +
+  geom_bar()
+```
+
+### Catégorie éthnique 
+
+Il y a bien évidemment une grande majorité de personnes dites *White* (85%), suivi par environ 10% de personnes dites *Black*. Les autres catégories sont très peu présentes (moins de 5% donc).
+
+```{r race-num}
+adult %>% 
+  group_by(race) %>%
+  summarise(Nombre = n()) %>%
+  mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
+  arrange(desc(Nombre))
+```
+
+```{r race-bar}
+ggplot(adult, aes(race)) +
+  geom_bar()
+```
+
+### Statut marital
+
+Presque la moitié de personnes sont mariées (environ 47% en prenant en considération les trois modalités concernées). Il y a par contre un tiers environ de personnes jamais mariés, et environ 20% de personnes divorcés (14%), séparés ou veuves (3% chaque modalité).
+
+```{r marital-num}
+adult %>% 
+  group_by(marital_status) %>%
+  summarise(Nombre = n()) %>%
+  mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
+  arrange(desc(Nombre))
+```
+
+```{r marital-bar}
+ggplot(adult, aes(marital_status)) +
+  geom_bar()
+```
+
+### Niveau d'éducation
+
+Un peu plus de la moitié des personnes interrogées ont un niveau supérieur au Baccalauréat. Un tiers ont un niveau Baccalauréat (*HS-grad*), et donc environ 1 personne sur 6 a un niveau inférieur au Bac. 
+
+```{r educ-num}
+adult %>% 
+  group_by(education, education_num) %>%
+  summarise(Nombre = n()) %>%
+  ungroup() %>% # nécessaire car group_by() avec 2 variables
+  mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
+  arrange(desc(education_num))
+```
+
+```{r educ-bar}
+ggplot(adult, aes(y = fct_reorder(education, education_num))) +
+  geom_bar()
+```
+
+## Quels critères sont liés au salaire ?
+
+- Décrire les liens entre chaque variable et le salaire ;
+
+### Age, Travail, Gain et Perte
+
+Les personnes gagnant plus de 50 k\$ ont les caractéristiques suivantes :
+
+- Elles sont plus âgées (44 ans vs 37 ans) ;
+- Elles travaillent plus longtemps (45 heures vs 39 heures) ;
+- Elles ont aussi des gains et des pertes plus élevés.
+
+```{r all-class-num}
+tab = adult %>%
+  select(class, age, hours_per_week, capital_gain, capital_loss) %>% 
+  group_by(class) %>%
+  summarise_all(mean)
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r all-class-box}
+adult %>%
+  select(class, age, hours_per_week, capital_gain, capital_loss) %>%
+  pivot_longer(-class) %>%
+  ggplot(aes(x = class, y = value)) +
+  geom_boxplot() +
+  facet_wrap(~ name, ncol = 4, scale = "free_y") +
+  labs(x = "", y = "")
+```
+
+### Sexe
+
+Les femmes sont moins nombreuses à gagner plus de 50 k\$.
+
+```{r sex-class}
+tab = adult %>%
+  group_by(class, sex) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = sex, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r sex-class-marge}
+tab = prop.table(table(adult$class, adult$sex), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r sex-class-bar}
+ggplot(adult, aes(y = sex, fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+
+### Type de travail
+
+Plus d'une personne sur deux étant *Self-emp-inc* gagnent plus de 50 k\$. Sans surprise, les personnes *Without-pay* ou *Never-worked* ne gagnent jamais plus de 50 k\$.
+
+```{r workclass-class}
+tab = adult %>%
+  group_by(class, workclass) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = workclass, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r workclass-class-marge}
+tab = prop.table(table(adult$class, adult$workclass), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+```{r workclass-class-bar}
+ggplot(adult, aes(y = workclass, fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+### Education
+
+On voit très clairement que plus les études sont longues, plus la part de personnes gagnant plus de 50 k\$ est importante.
+
+```{r educ-class}
+tab = adult %>%
+  group_by(class, education_num, education) %>%
+  summarise(nb = n()) %>% 
+  arrange(desc(education_num)) %>%
+  ungroup() %>%
+  select(-education_num) %>%
+  pivot_wider(names_from = education, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r educ-class-bar}
+ggplot(adult, aes(y = fct_reorder(education, education_num), 
+                  fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+### Statut marital
+
+Les personnes mariées gagnent plus souvent plus de 50 k\$ que les autres.
+
+```{r marital-class}
+tab = adult %>%
+  group_by(class, marital_status) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = marital_status, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r marital-class-marge}
+tab = prop.table(table(adult$class, adult$marital_status), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+```{r marital-class-bar}
+ggplot(adult, aes(y = marital_status, fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+### Occupation
+
+On remarque que certaines catégories sociales permettent plus facilement l'accès à un salaire élevé.
+
+```{r occupation-class}
+tab = adult %>%
+  group_by(class, occupation) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = occupation, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r occupation-class-marge}
+tab = prop.table(table(adult$class, adult$occupation), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+```{r occupation-class-bar}
+ggplot(adult, aes(y = occupation, fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+### Race
+
+Ici aussi, on remarque une différence entre les différentes catégories ethniques pour l'accès à des salaires supérieurs à 50 k\$.
+
+```{r race-class}
+tab = adult %>%
+  group_by(class, race) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = race, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r race-class-marge}
+tab = prop.table(table(adult$class, adult$race), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+```{r race-class-bar}
+ggplot(adult, aes(y = race, fill = class)) +
+  geom_bar(position = "fill")
+```
+
+
+### Pays de naissance
+
+La part de personnes gagnant plus de 50 k\$ changent parfois énormément selon le pays d'origine. Près de 40% des personnes venant de France, par exemple, ont un salaire élevé.
+
+```{r native-class}
+tab = adult %>%
+  group_by(class, native_country) %>%
+  summarise(nb = n()) %>% 
+  pivot_wider(names_from = native_country, values_from = nb)
+kable(tab) %>%
+  kable_styling(full_width = F)
+```
+
+
+```{r native-class-marge}
+tab = prop.table(table(adult$class, adult$native_country), margin = 2) * 100
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+```{r native-class-bar}
+tab2 = t(tab) %>% 
+  data.frame() %>%
+  filter(Var2 == ">50K")
+ggplot(tab2, 
+       aes(y = fct_reorder(Var1, Freq), x = Freq)) +
+  geom_bar(stat = "identity") +
+  xlim(0, 100)
+```
+
+## Quelques liens entre variables
+
+### Âge et nombre d'heures de travail
+
+Pas de tendance visible directement (certainement dû au caractère particulier de la variable nombre d'heures de travail -- beaucoup de personnes à 40h exactement)
+
+```{r}
+ggplot(adult, aes(age, hours_per_week)) +
+  geom_point(alpha = .01) +
+  theme_minimal()
+```
+
+En modifiant la variable nombre d'heures par semaine, on remarque que les gens travaillant 40h ou plus sont plus agées que ceux travaillant moins.
+
+```{r}
+adult %>% 
+  mutate(hpw = ifelse(hours_per_week > 40, 
+                      "Plus", 
+                      ifelse(hours_per_week < 40,
+                             "Moins",
+                             "40h"))) %>%
+  ggplot(aes(age, hpw)) +
+  geom_boxplot() +
+  scale_y_discrete(limits = c("Moins", "40h", "Plus")) +
+  theme_minimal()
+```
+
+On peut aussi modifier la variable age. On remarque que les gens entre 25 et 55 travaillent plus que les autres.
+
+```{r}
+adult2 = adult %>%
+  mutate(age_new1 = cut(age, 4),
+         age_new2 = cut(age, c(0, 25, 40, 55, 100)))
+ggplot(adult2, aes(hours_per_week, age_new1)) +
+  geom_boxplot()
+```
+
+
+```{r}
+ggplot(adult2, aes(hours_per_week, age_new2)) +
+  geom_boxplot()
+```
+
+### Âge et investissement (les deux variables `capital_xxx`).
+
+Idem que précédemment, difficile de faire une conclusion sur la base de ce graphique, encore une fois à cause du caractère particulier des variables sur le capital.
+
+```{r}
+ggplot(adult, aes(age, capital_gain - capital_loss)) +
+  geom_point(alpha = .01) +
+  theme_minimal()
+```
+
+En combinant les deux variables en une seule qualitative, on remarque que les pertes ayant un investissement, quelque soit le résultat de celui-ci, sont plus âgées que les autres.
+
+```{r}
+adult %>%
+  mutate(invest = capital_gain - capital_loss) %>%
+  mutate(res = ifelse(invest > 0, 
+                      "Gain", 
+                      ifelse(invest < 0,
+                             "Perte",
+                             "Aucun"))) %>%
+  ggplot(aes(age, res, fill = res)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_y_discrete(limits = c("Perte", "Aucun", "Gain")) +
+  scale_fill_manual(
+    limits = c("Perte", "Aucun", "Gain"), 
+    values = c("firebrick3", "khaki1", "chartreuse3")
+    ) +
+  theme_minimal() +
+  labs(x = "", y = "") +
+  ggtitle("Résultat d'investissement et âge")
+```
+
