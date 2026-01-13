@@ -22,7 +22,6 @@ Nous allons utiliser le jeu de données [`adult.csv`](adult.csv), issu d'une enq
 
 ```{r adult}
 library(tidyverse)
-library(DT)
 adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/adult.csv")
 knitr::kable(head(adult, 10))
 ```
