@@ -31,6 +31,7 @@ JupyterHub de  l'UFR : <https://jupyter.ens.math-info.univ-paris5.fr/hub/login>
     
 8. [Application sur données réelles](seance8-donnees-reelles.html)
 
+9. TP noté 2 -  <a href = "#" id = "final">sujet en attente</a>
 
 <!-- - [correction](seance8-correction.html) -->
 
@@ -77,7 +78,8 @@ Lien vers les plateformes de l'UFR Math-Info :
 <script>
     // SCRIPT POUR TP NOTE 2 - EXAMEN FINAL
     const date = new Date();
-    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
-        document.getElementById("final").innerHTML = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
+    if (date.toJSON().slice(0, 10) == "2026-01-14" & date.toJSON().slice(11, 13) >= 13) { 
+        document.getElementById("final").hrf = "<a href='seance-finale--tpnote2.html'>TP noté 2</a>";
+        document.getElementById("intermediaire").innerHTML = "Cliquer ici pour voir le sujet";
     }
 </script>
