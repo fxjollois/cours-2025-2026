@@ -81,7 +81,7 @@ Lien vers les plateformes de l'UFR Math-Info :
 
 <script>
     // SCRIPT POUR TP NOTE 2 - EXAMEN FINAL
-    if (date.toJSON().slice(0, 10) == "2026-01-14" & date.toJSON().slice(11, 13) >= 13) { 
+    if (date.toJSON().slice(0, 10) == "2026-01-17" & date.toJSON().slice(11, 13) >= 13) { 
         document.getElementById("final").href = "seance-finale--tpnote2.html";
         document.getElementById("final").innerHTML = "Cliquer ici pour voir le sujet";
     }
