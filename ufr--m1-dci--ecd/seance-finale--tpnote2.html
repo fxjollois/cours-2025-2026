@@ -7312,6 +7312,7 @@ a.anchor-link {
                     processEnvironments: true
                 },
                 displayAlign: 'center',
+                messageStyle: 'none',
                 CommonHTML: {
                     linebreaks: {
                     automatic: true
@@ -7517,9 +7518,9 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="Extraction-de-connaissances-%C3%A0-partir-de-donn%C3%A9es-structur%C3%A9es-et-non-structur%C3%A9es">Extraction de connaissances à partir de données structurées et non structurées<a class="anchor-link" href="#Extraction-de-connaissances-%C3%A0-partir-de-donn%C3%A9es-structur%C3%A9es-et-non-structur%C3%A9es">¶</a></h1><h2 id="S%C3%A9ance-finale-:-TP-not%C3%A9-2">Séance finale : TP noté 2<a class="anchor-link" href="#S%C3%A9ance-finale-:-TP-not%C3%A9-2">¶</a></h2><p>Déposer le fichier <code>.ipynb</code> produit (attention à indiquer votre nom de famille dans le nom de fichier) dans ce dépôt :</p>
-<p><a href="https://cloud.parisdescartes.fr/index.php/s/cyjWG23M6DknM3r">https://cloud.parisdescartes.fr/index.php/s/cyjWG23M6DknM3r</a></p>
-<p>Délai : A rendre avant la fin de la séance le jour même</p>
-<h2 id="Donn%C3%A9es">Données<a class="anchor-link" href="#Donn%C3%A9es">¶</a></h2><p>Ce jeu de données contient des informations sur des menus McDonald. Vous trouverez le détail des variables sur <a href="https://www.kaggle.com/mcdonalds/nutrition-facts">cette page</a>. Vous devez l'importer comme ci-dessous.</p>
+<p><a href="https://cloud.parisdescartes.fr/index.php/s/6g9zyxZjkPwDB6z">https://cloud.parisdescartes.fr/index.php/s/6g9zyxZjkPwDB6z</a></p>
+<p>Délai : A rendre <strong>avant la fin de la séance</strong> le jour même</p>
+<h2 id="Donn%C3%A9es">Données<a class="anchor-link" href="#Donn%C3%A9es">¶</a></h2><p>Nous reprenons le jeu de données du premier TP noté, contenant des informations sur des menus McDonald. Vous trouverez le détail des variables sur <a href="https://www.kaggle.com/mcdonalds/nutrition-facts">cette page</a>. Vous devez l'importer comme ci-dessous.</p>
 </div>
 </div>
 </div>
@@ -7528,12 +7529,12 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 
-<span class="n">menus</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://fxjollois.github.io/cours-2024-2025/ufr--m1-dci--ecd/menus_mcdonald.csv"</span><span class="p">)</span>
+<span class="n">menus</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"https://fxjollois.github.io/cours-2025-2026/ufr--m1-dci--ecd/menus_mcdonald.csv"</span><span class="p">)</span>
 <span class="n">menus</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -7545,7 +7546,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">

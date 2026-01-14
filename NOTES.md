@@ -88,6 +88,11 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
         - sur les variables supplémentaires par exemple
         - sur ACP normée classique ou juste centrée
         - Choisir d'autres jeux de données d'exemple
+        - QUE SUR ACP ?
+    - TD 3 : plus complet aussi
+        - sur données binaires
+        - autres critères de choix du nombre de classes ?
+    
 
 
     
