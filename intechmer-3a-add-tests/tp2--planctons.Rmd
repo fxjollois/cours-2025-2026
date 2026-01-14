@@ -1,5 +1,5 @@
 ---
-title: "Applications sur données réelles - Planctons - TP 3"
+title: "Applications sur données réelles - Planctons - TP 2"
 author: "Outils de surveillance et analyses statistiques"
 date: "INTECHMER - CT3 GEM"
 output: html_document
@@ -17,11 +17,14 @@ Nous disposons de données de concentrations de planctons dans l'océan, provena
 
 Voici le jeu de données une fois importé :
 
-```{r immport, warning=FALSE}
-library(readr)
-library(DT)
+```{r import, warning=FALSE}
+library(tidyverse)
 
 data = read_csv("103673.csv", show_col_types = FALSE)
+```
+
+```{r affiche, echo=FALSE}
+library(DT)
 datatable(data, options = list(scrollX = TRUE, dom = 'tp')) %>%
   formatRound(c(8:58), digits = 3)  
 ```
@@ -32,9 +35,44 @@ Dans ces variables, nous avons différents types de variables :
 - Variables de concentrations de planctons : de `Acantharea` à `Trichodesmium` ;
 - Variables potentiellement explicatives des concentrations : de `temp` à `kd490`.
 
+### Quelques codes utiles pour le TP
+
+#### Sélection des variables de concentrations
+
+Il est possible de ne sélectionner que les variables de concentrations de la façon suivante :
+
+```{r concentrations}
+data_conc = data %>%
+  select(Acantharea:Trichodesmium)
+```
+
+```{r concentrations_affiche, echo=FALSE}
+datatable(data_conc, options = list(scrollX = TRUE, dom = 'tp')) %>%
+  formatRound(1:28, digits = 3)  
+```
+
+
+#### Transformation des concentrations via fonction `decostand()`
+
+Dans l'exemple ci-dessous, on divise chaque ligne par le total de la ligne.
+
+```{r total}
+library(vegan)
+
+data_total = decostand(data_conc, method = "total")
+```
+
+
+```{r total_affiche, echo=FALSE}
+datatable(data_total, options = list(scrollX = TRUE, dom = 'tp')) %>%
+  formatRound(1:28, digits = 3)  
+```
+
+#### Carte des points de collecte 
+
 On peut représenter les points de collecte de données sur une carte à l'aide du code suivant :
 
-```{r}
+```{r carte}
 library(maps)
 library(ggplot2)
 ggplot() +
@@ -50,11 +88,10 @@ ggplot() +
 
 Nous souhaitons donc étudier les concentrations de planctons pour avoir des profils type. Pour cela, nous allons procéder aux étapes suivantes en suivant le plan de l'article initial, pour chaque couche (cf variable `layer`) :
 
-1. Décrire les données, en particulier de concentrations
-
 ### En considérant les données brutes
 
-2. Effectuer une transformation de Hellinger sur les données de concentrations (cf fonction `decostand()` du package `vegan` par exemple)
+1. Décrire succinctement les données, en particulier de concentrations
+1. Effectuer une transformation de Hellinger sur les données de concentrations (cf fonction `decostand()` du package `vegan` par exemple - le paramètre `method` doit égal à `"hellinger"`)
 3. Faire quelques traitements sur les autres variables explicatives
     - Remplacer les données manquantes par la valeur moyenne de la variable
     - Transformer les variables `bulk_conc` et `snow_conc` en calculant $\log(1+x)$ (car valeurs parfois égales à 0)
@@ -72,10 +109,10 @@ Dans l'article initial [1], la partition est recherchée sur les cinq premiers f
 
 ### En binarisant les variables
 
-1. Effectuer une transformation binaire sur les données de concentrations (présence = 1, absence = 0)
+1. Effectuer une transformation binaire sur les données de concentrations (toujours avec la fonction `descostand()`, avec le paramètre `method` égal à `"pa"` - *presence/absence*)
 2. Rechercher une partition à l'aide de la CAH, en utilisant la distance de Manhattan (cf paramètre `method` dans la fonction `dist()`) et le lien simple (cf paramètre `method` dans la fonction `hclust()`)
 3. Décrire les classes ainsi obtenues, en utilisant les variables d'origine
-
+4. Comparer cette partition avec celle obtenue précédemment
 
 ## Bibliographie
 
