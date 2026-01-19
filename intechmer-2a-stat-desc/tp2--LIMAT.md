@@ -1,6 +1,6 @@
-# "Applications sur données réelles - TP 2 - Données LIMAT"
-### "Traitement des données"
-####  "INTECHMER - CT2 GEM/PVRM"
+# Applications sur données réelles - TP 2 - Données LIMAT
+### Traitement des données
+####  INTECHMER - CT2 GEM/PVRM
 
 Pour ce TP, vous devez rédiger un rapport en *Rmarkdown*, en commentant les résultats obtenus. 
 
