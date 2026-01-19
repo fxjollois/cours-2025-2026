@@ -6,7 +6,7 @@ Pour ce TP, vous devez rédiger un rapport en *Rmarkdown*, en commentant les ré
 
 ## Données de l'enquête LIMAT
 
-Les données utilisées sont issues de l'enquête LIMAT, sur les oiseaux d'eau, disponible ici [au format CSV](https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/DataLIMAT.txt) (à importer avec `read_delim()` sans aucun paramètre). Vous pourrez trouver des informations complémentaires sur [cette page](https://data.ofb.fr/catalogue/Donnees-geographiques-OFB/fre/catalog.search#/metadata/7c1c53b6-add0-4cb5-8b5c-c3a6b71c0b03).
+Les données utilisées sont issues de l'enquête LIMAT, sur les oiseaux d'eau, disponible ici [au format texte](https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/DataLIMAT.txt) (à importer avec `read_delim()` sans aucun paramètre). Vous pourrez trouver des informations complémentaires sur [cette page](https://data.ofb.fr/catalogue/Donnees-geographiques-OFB/fre/catalog.search#/metadata/7c1c53b6-add0-4cb5-8b5c-c3a6b71c0b03).
 
 ## Demandes
 
