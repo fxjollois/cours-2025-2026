@@ -1,0 +1,66 @@
+---
+title: "Rendu TP final"
+author: "JOLLOIS"
+date: "2026-01-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center")
+```
+
+
+## description des variables
+
+```{r}
+library(tidyverse)
+library(vegan)
+
+data = read_csv("103673.csv", show_col_types = FALSE)
+data_conc = data %>%
+  select(Acantharea:Trichodesmium) %>%
+  decostand(method = "total")
+```
+
+```{r}
+data_conc %>%
+  mutate(id = data$psampleid) %>%
+  pivot_longer(-id) %>%
+  ggplot(aes(value)) +
+  geom_boxplot() +
+  facet_wrap(~ name, scales = "free_x") +
+  scale_x_log10()
+```
+
+
+
+```{r}
+data_conc_bin = data %>%
+  select(Acantharea:Trichodesmium) %>%
+  decostand(method = "pa")
+data_conc_bin %>%
+  mutate(id = data$psampleid) %>%
+  pivot_longer(-id) %>%
+  ggplot(aes(as.character(value))) +
+  geom_bar() +
+  facet_wrap(~ name, scales = "free_x")
+```
+
+
+
+```{r}
+library(gridExtra)
+grid.arrange(
+  ggplot(data, aes(bulk_conc)) +
+    geom_boxplot(),
+  ggplot(data, aes(1 + bulk_conc)) +
+    geom_boxplot() +
+    scale_x_log10(),
+  ncol = 2
+)
+```
+

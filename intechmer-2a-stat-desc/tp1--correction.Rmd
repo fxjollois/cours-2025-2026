@@ -8,7 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, 
                       message = FALSE, 
-                      warning = FALSE)
+                      warning = FALSE,
+                      fig.align = "center",
+                      fig.height = 3)
 ```
 
 
@@ -17,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```{r adult}
 library(tidyverse)
 library(knitr)      # pour la fonction kable() surtout
-library(kableExtra) # pour le style de 
+library(kableExtra) # pour le style des tables affichées avec kable()
 
 adult = read_csv("https://fxjollois.github.io/cours-2025-2026/intechmer-2a-stat-desc/adult.csv")
 ```
@@ -104,7 +106,7 @@ ggplot(adult, aes(capital_gain)) +
   geom_boxplot()
 ```
 
-#### PErte
+#### Perte
 
 
 ```{r loss-num}
@@ -129,6 +131,91 @@ ggplot(adult, aes(capital_loss)) +
   geom_boxplot()
 ```
 
+#### Modification de ces deux variables
+
+On peut envisager plusieurs modifications de ces deux variables :
+
+- En créer une nouvelle égale aux gains moins les pertes
+  - Cette variable sera positive s'il y a eu gain, négative s'il y a eu perte et égale à 0 si aucun investissement
+- Les transformer en binaire (`TRUE`/`FALSE`) :
+  - `TRUE` si le montant est supérieur à 0
+- Ré-utiliser la première idée pour créer une variable ternaire à trois modalités : *Gain*, *Perte*, *Aucun*
+- Créer deux variables imbriquées :
+  - Une première égale à `TRUE` s'il y a investissement (*i.e.* il y a soit un gain, soit une perte) et `FALSE` sinon
+  - Une deuxième égale à `TRUE` s'il y a *Gain* et `FALSE` si *Perte*, uniquement pour les individus ayant `TRUE` à la variable précédente
+  
+Voici le code pour créer ces nouvelles variables
+
+```{r newvars_capital}
+adult_newvars_capital = adult %>%
+  
+  # Création de la variable capital_res = gain - perte
+  mutate(capital_res = capital_gain - capital_loss) %>%
+  
+  # Création des deux variables binaires
+  mutate(capital_gain_bin = capital_gain > 0,
+         capital_loss_bin = capital_loss > 0) %>%
+  
+  # Création de la variable ternaire
+  mutate(capital_res_cat = ifelse(capital_res > 0,
+                                  "Gain",
+                                  ifelse(capital_res < 0,
+                                         "Perte",
+                                         "Aucun"))) %>%
+
+  # Création des deux variables imbriquées
+  mutate(capital_invest = capital_res != 0) %>%
+  mutate(capital_invest_res = ifelse(capital_invest, capital_res > 0, NA))
+
+# Affichage de ces nouvelles 
+kable(head(adult_newvars_capital, 10) %>%
+        select(starts_with("capital")), digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+Voici quelques graphiques pour voir ce qu'on obtient
+
+::: {}
+::: {.column width="48%"}
+
+```{r newvars_capital1, echo=FALSE}
+ggplot(adult_newvars_capital, aes(capital_res)) +
+  geom_boxplot()
+```
+
+```{r newvars_capital2, echo=FALSE}
+adult_newvars_capital %>%
+  select(class, capital_gain_bin, capital_loss_bin) %>%
+  pivot_longer(-class) %>%
+  ggplot(aes(value)) +
+  geom_bar() +
+  labs(x = "") +
+  facet_wrap(~ name)
+```
+
+:::
+::: {.column width="48%"}
+
+```{r newvars_capital3, echo=FALSE}
+ggplot(adult_newvars_capital, aes(capital_res_cat)) +
+  geom_bar()
+```
+
+```{r newvars_capital4, echo=FALSE, fig.height=1.5}
+ggplot(adult_newvars_capital, aes(capital_invest)) +
+  geom_bar()
+```
+
+```{r newvars_capital4b, echo=FALSE, fig.height=1.5}
+ggplot(na.omit(adult_newvars_capital), 
+       aes(capital_invest_res)) +
+  geom_bar()
+```
+
+:::
+:::
+
+
 ### Les 4 variables quantitatives en une fois
 
 On peut produire un seul tableau avec les informations des 4 variables quantitatives, comme ci-dessous.
@@ -145,6 +232,24 @@ tab = data.frame(
   Gain = c(mean(x3), sd(x3), min(x3), max(x3)),
   Perte = c(mean(x4), sd(x4), min(x4), max(x4))
 )
+kable(tab, digits = 2) %>%
+  kable_styling(full_width = F)
+```
+
+Le même calcul de façon un peu plus automatique
+
+
+```{r all-num-bis}
+adult_quanti = adult %>%
+  select(age, hours_per_week, capital_gain, capital_loss)
+tab = data.frame(
+  Moyenne = apply(adult_quanti, 2, mean),
+  `Ecart-type` = apply(adult_quanti, 2, sd),
+  Minimum = apply(adult_quanti, 2, min),
+  Maximum = apply(adult_quanti, 2, max)) %>%
+  t() %>%
+  data.frame()
+names(tab) = c("Age", "Travail", "Gain", "Perte")
 kable(tab, digits = 2) %>%
   kable_styling(full_width = F)
 ```
@@ -183,10 +288,12 @@ grid.arrange(g1, g2, g3, g4, ncol = 4)
 Un quart des gens environ gagnent plus de 50 k\$.
 
 ```{r class-num}
-adult %>% 
+tab = adult %>% 
   group_by(class) %>%
   summarise(Nombre = n()) %>%
   mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2))
+kable(tab) %>%
+  kable_styling(full_width = F)
 ```
 
 ```{r class-bar}
@@ -201,10 +308,12 @@ On a une répartition inégale des sexes, avec un tiers de femmes seulement.
 
 
 ```{r sex-num}
-adult %>% 
+tab = adult %>% 
   group_by(sex) %>%
   summarise(Nombre = n()) %>%
   mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2))
+kable(tab) %>%
+  kable_styling(full_width = F)
 ```
 
 ```{r sex-bar}
@@ -217,11 +326,13 @@ ggplot(adult, aes(sex)) +
 Il y a bien évidemment une grande majorité de personnes dites *White* (85%), suivi par environ 10% de personnes dites *Black*. Les autres catégories sont très peu présentes (moins de 5% donc).
 
 ```{r race-num}
-adult %>% 
+tab = adult %>% 
   group_by(race) %>%
   summarise(Nombre = n()) %>%
   mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
   arrange(desc(Nombre))
+kable(tab) %>%
+  kable_styling(full_width = F)
 ```
 
 ```{r race-bar}
@@ -234,15 +345,17 @@ ggplot(adult, aes(race)) +
 Presque la moitié de personnes sont mariées (environ 47% en prenant en considération les trois modalités concernées). Il y a par contre un tiers environ de personnes jamais mariés, et environ 20% de personnes divorcés (14%), séparés ou veuves (3% chaque modalité).
 
 ```{r marital-num}
-adult %>% 
+tab = adult %>% 
   group_by(marital_status) %>%
   summarise(Nombre = n()) %>%
   mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
   arrange(desc(Nombre))
+kable(tab) %>%
+  kable_styling(full_width = F)
 ```
 
 ```{r marital-bar}
-ggplot(adult, aes(marital_status)) +
+ggplot(adult, aes(y = marital_status)) +
   geom_bar()
 ```
 
@@ -251,12 +364,14 @@ ggplot(adult, aes(marital_status)) +
 Un peu plus de la moitié des personnes interrogées ont un niveau supérieur au Baccalauréat. Un tiers ont un niveau Baccalauréat (*HS-grad*), et donc environ 1 personne sur 6 a un niveau inférieur au Bac. 
 
 ```{r educ-num}
-adult %>% 
+tab = adult %>% 
   group_by(education, education_num) %>%
   summarise(Nombre = n()) %>%
   ungroup() %>% # nécessaire car group_by() avec 2 variables
   mutate(Pourcent = round(Nombre / sum(Nombre) * 100, 2)) %>%
   arrange(desc(education_num))
+kable(tab) %>%
+  kable_styling(full_width = F)
 ```
 
 ```{r educ-bar}
@@ -488,7 +603,7 @@ ggplot(tab2,
 
 Pas de tendance visible directement (certainement dû au caractère particulier de la variable nombre d'heures de travail -- beaucoup de personnes à 40h exactement)
 
-```{r}
+```{r age-hpw-graph1}
 ggplot(adult, aes(age, hours_per_week)) +
   geom_point(alpha = .01) +
   theme_minimal()
@@ -496,7 +611,7 @@ ggplot(adult, aes(age, hours_per_week)) +
 
 En modifiant la variable nombre d'heures par semaine, on remarque que les gens travaillant 40h ou plus sont plus agées que ceux travaillant moins.
 
-```{r}
+```{r age-hpw-graph2}
 adult %>% 
   mutate(hpw = ifelse(hours_per_week > 40, 
                       "Plus", 
@@ -511,16 +626,16 @@ adult %>%
 
 On peut aussi modifier la variable age. On remarque que les gens entre 25 et 55 travaillent plus que les autres.
 
-```{r}
+```{r age-hpw-graph3}
 adult2 = adult %>%
   mutate(age_new1 = cut(age, 4),
-         age_new2 = cut(age, c(0, 25, 40, 55, 100)))
+         age_new2 = cut(age, c(0, 25, 40, 60, 100)))
 ggplot(adult2, aes(hours_per_week, age_new1)) +
   geom_boxplot()
 ```
 
 
-```{r}
+```{r age-hpw-graph4}
 ggplot(adult2, aes(hours_per_week, age_new2)) +
   geom_boxplot()
 ```
@@ -529,23 +644,16 @@ ggplot(adult2, aes(hours_per_week, age_new2)) +
 
 Idem que précédemment, difficile de faire une conclusion sur la base de ce graphique, encore une fois à cause du caractère particulier des variables sur le capital.
 
-```{r}
-ggplot(adult, aes(age, capital_gain - capital_loss)) +
+```{r age-invest1}
+ggplot(adult_newvars_capital, aes(age, capital_res)) +
   geom_point(alpha = .01) +
   theme_minimal()
 ```
 
 En combinant les deux variables en une seule qualitative, on remarque que les pertes ayant un investissement, quelque soit le résultat de celui-ci, sont plus âgées que les autres.
 
-```{r}
-adult %>%
-  mutate(invest = capital_gain - capital_loss) %>%
-  mutate(res = ifelse(invest > 0, 
-                      "Gain", 
-                      ifelse(invest < 0,
-                             "Perte",
-                             "Aucun"))) %>%
-  ggplot(aes(age, res, fill = res)) +
+```{r age-invest2}
+ggplot(adult_newvars_capital, aes(age, capital_res_cat, fill = capital_res_cat)) +
   geom_boxplot(show.legend = FALSE) +
   scale_y_discrete(limits = c("Perte", "Aucun", "Gain")) +
   scale_fill_manual(
