@@ -75,6 +75,9 @@ Réfléxion sur modif d'approche du cours (21h de cours donc 7 séances de 3h) :
     - CM : 
         - Faire plus "théorique" et aucun code dedans !
         - CM1 : Manip'
+            - Différence WIDE/LONG
+            - Importation de données
+            - Répertoire de travail
         - CM2 : Visu
             - Mettre le début du TD2 dans un CMs et les codes dans les TDs
         - CM3 : Rmarkdown et autres (TD3)

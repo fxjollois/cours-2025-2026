@@ -86,7 +86,7 @@ ggplot() +
 
 ## A faire
 
-Nous souhaitons donc étudier les concentrations de planctons pour avoir des profils type. Pour cela, nous allons procéder aux étapes suivantes en suivant le plan de l'article initial, pour chaque couche (cf variable `layer`) :
+Nous souhaitons donc étudier les concentrations de planctons pour avoir des profils type. Pour cela, nous allons procéder aux étapes suivantes en suivant le plan de l'article initial, **pour chaque couche** (cf variable `layer`) :
 
 ### En considérant les données brutes
 
